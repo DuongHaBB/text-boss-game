@@ -49,10 +49,9 @@ app.get('/', (req, res) => {
             localStorage.setItem('game_traveler_id', travelerId);
             localStorage.setItem('game_realm', realm);
             
-            // Khởi tạo cơ bản: Mặc định 10 điểm, khu vực nào ưu thế sẽ được +5 điểm sẵn
-            localStorage.setItem('game_the_luc', realm === 'xich_hoa' ? 15 : 10);
-            localStorage.setItem('game_linh_luc', realm === 'tam_sac' ? 15 : 10);
-            localStorage.setItem('game_tinh_luc', realm === 'bach_ngoc' ? 15 : 10);
+            localStorage.setItem('game_the_luc', 10);
+            localStorage.setItem('game_linh_luc', 10);
+            localStorage.setItem('game_tinh_luc', 10);
             
             window.location.href = '/profile';
         }
@@ -104,12 +103,14 @@ app.get('/profile', (req, res) => {
         <div class="stat-item"><span>Bối giáp:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
         <div class="stat-item"><span>Hộ thủ:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
         
-        <!-- Tab hiển thị chỉ số chi tiết đã tách nhánh Tinh Lực -->
+        <!-- Tab hiển thị chỉ số chiến đấu chi tiết -->
         <div id="detail-box" class="sub-panel">
             <div class="sub-title">⚡ CHỈ SỐ CHI TIẾT CHIẾN ĐẤU ⚡</div>
             <div class="stat-item"><span>Hệ số Cảnh Giới:</span> <span class="stat-value" id="d_he_so">1.0x</span></div>
-            <div class="stat-item"><span>Sinh Lực (HP / Phòng):</span> <span class="stat-value" id="d_hp">-</span></div>
-            <div class="stat-item"><span>Pháp Lực (MP giới hạn):</span> <span class="stat-value" id="d_mp">-</span></div>
+            <div class="stat-item"><span>Sinh Lực (HP / Thể chất):</span> <span class="stat-value" id="d_hp">-</span></div>
+            
+            <div class="stat-item" style="color: #00ffff; margin-top: 6px;"><span>Pháp Lực (MP giới hạn):</span> <span class="stat-value" id="d_mp" style="color: #00ffff;">-</span></div>
+            <div class="stat-item sub-stat"><span>└─ Kháng Pháp (Phòng thủ phép):</span> <span class="stat-value" id="d_khang_phap">-</span></div>
             
             <div class="stat-item" style="color: #d4af37; margin-top: 8px;"><span>Tinh Lực Quy Đổi:</span> <span class="stat-value" id="d_tinh_tong">-</span></div>
             <div class="stat-item sub-stat"><span>├─ Cước Lực (Tốc/Né):</span> <span class="stat-value" id="d_cuoc_luc">-</span></div>
@@ -166,12 +167,23 @@ app.get('/profile', (req, res) => {
             if (level === 10) heSo = 3.0;
 
             let sinhLucFinal = Math.floor(theLuc * heSo);
-            let phapLucFinal = Math.floor((linhLuc * heSo) / 10);
+            
+            // --- CÔNG THỨC MỚI CHO LINH LỰC (MP & Kháng Pháp) ---
+            // Tạm thời gán giá trị Item và Kỳ Ngộ = 0, sau này khi làm hệ thống trang bị/kỳ ngộ chỉ cần thay thế biến vào đây.
+            let itemMp = 0;
+            let kyNgoMp = 0;
+            let itemKhangPhap = 0;
+
+            let phapLucFinal = Math.floor(linhLuc * heSo * 2 + itemMp + kyNgoMp);
+            let khangPhapFinal = Math.floor(linhLuc * heSo + itemKhangPhap);
+            // ----------------------------------------------------
+
             let tinhLucFinal = Math.floor(tinhLuc * heSo);
 
             document.getElementById('d_he_so').innerText = heSo + "x";
             document.getElementById('d_hp').innerText = sinhLucFinal;
             document.getElementById('d_mp').innerText = phapLucFinal;
+            document.getElementById('d_khang_phap').innerText = khangPhapFinal;
             document.getElementById('d_tinh_tong').innerText = tinhLucFinal;
 
             document.getElementById('d_cuoc_luc').innerText = Math.floor(tinhLucFinal * 0.4);
@@ -189,7 +201,6 @@ app.get('/profile', (req, res) => {
             let gainLinhLuc = Math.max(1, Math.floor(3 * (1 - linhLuc / 120)));
             let gainTinhLuc = Math.max(1, Math.floor(3 * (1 - tinhLuc / 120)));
 
-            // Tốc độ tu luyện (thu thập) tăng x2 cho chỉ số ưu thế của khu vực
             if (realmKey === 'xich_hoa') gainTheLuc *= 2;
             if (realmKey === 'tam_sac') gainLinhLuc *= 2;
             if (realmKey === 'bach_ngoc') gainTinhLuc *= 2;
