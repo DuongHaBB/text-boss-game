@@ -81,15 +81,15 @@ app.get('/profile', (req, res) => {
         <div class="stat-item"><span id="d_label_traveler">Lữ khách -</span> <span class="stat-value" id="d_identity">-</span></div>
         <div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d_realm">-</span></div>
         <hr>
-        <div class="stat-item"><span>Sinh Lực (Hỏa):</span> <span class="stat-value" id="d_sinh_luc">-</span></div>
-        <div class="stat-item"><span>Linh Lực (Tam Sắc):</span> <span class="stat-value" id="d_linh_luc">-</span></div>
-        <div class="stat-item"><span>Tinh Lực (Bạch):</span> <span class="stat-value" id="d_tinh_luc">-</span></div>
+        <div class="stat-item"><span>Sinh Lực:</span> <span class="stat-value" id="d_sinh_luc">-</span></div>
+        <div class="stat-item"><span>Linh Lực:</span> <span class="stat-value" id="d_linh_luc">-</span></div>
+        <div class="stat-item"><span>Tinh Lực:</span> <span class="stat-value" id="d_tinh_luc">-</span></div>
         <hr>
         <h4 style="color: #888; margin: 10px 0 5px 0;">TRANG BỊ</h4>
         <div class="stat-item"><span>Vũ khí:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
-        <div class="stat-item"><span>Khôi giáp (Mũ):</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
-        <div class="stat-item"><span>Bối giáp (Thân):</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
-        <div class="stat-item"><span>Hộ thủ (Tay):</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
+        <div class="stat-item"><span>Khôi giáp:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
+        <div class="stat-item"><span>Bối giáp:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
+        <div class="stat-item"><span>Hộ thủ:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
         <button onclick="goBack()">🔄 Đầu thai (Chuyển sinh lại)</button>
     </div>
     <script>
