@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
         <input type="text" id="username" placeholder="Nhập tên của ngươi...">
         <div class="label-title">2. Khu vực sinh ra:</div>
         <select id="realm-select">
-            <option value="xich_hoa">Xích Hỏa Vực (+5 Sinh Lực)</option>
+            <option value="xich_hoa">Xích Hỏa Vực (+5 Thể Lực)</option>
             <option value="tam_sac">Tam Sắc Phủ (+5 Linh Lực)</option>
             <option value="bach_ngoc">Bạch Ngọc Đài (+5 Tinh Lực)</option>
         </select>
@@ -81,7 +81,8 @@ app.get('/profile', (req, res) => {
         <div class="stat-item"><span id="d_label_traveler">Lữ khách -</span> <span class="stat-value" id="d_identity">-</span></div>
         <div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d_realm">-</span></div>
         <hr>
-        <div class="stat-item"><span>Sinh Lực:</span> <span class="stat-value" id="d_sinh_luc">-</span></div>
+        <h4 style="color: #888; margin: 10px 0 5px 0;">TIỀM NĂNG</h4>
+        <div class="stat-item"><span>Thể Lực:</span> <span class="stat-value" id="d_the_luc">-</span></div>
         <div class="stat-item"><span>Linh Lực:</span> <span class="stat-value" id="d_linh_luc">-</span></div>
         <div class="stat-item"><span>Tinh Lực:</span> <span class="stat-value" id="d_tinh_luc">-</span></div>
         <hr>
@@ -94,9 +95,9 @@ app.get('/profile', (req, res) => {
     </div>
     <script>
         const REALMS_DATA = {
-            'xich_hoa': { name: 'Xích Hỏa Vực', sinh_luc: 15, linh_luc: 10, tinh_luc: 10 },
-            'tam_sac': { name: 'Tam Sắc Phủ', sinh_luc: 10, linh_luc: 15, tinh_luc: 10 },
-            'bach_ngoc': { name: 'Bạch Ngọc Đài', sinh_luc: 10, linh_luc: 10, tinh_luc: 15 }
+            'xich_hoa': { name: 'Xích Hỏa Vực', the_luc: 15, linh_luc: 10, tinh_luc: 10 },
+            'tam_sac': { name: 'Tam Sắc Phủ', the_luc: 10, linh_luc: 15, tinh_luc: 10 },
+            'bach_ngoc': { name: 'Bạch Ngọc Đài', the_luc: 10, linh_luc: 10, tinh_luc: 15 }
         };
 
         const charName = localStorage.getItem('game_character_name');
@@ -111,7 +112,7 @@ app.get('/profile', (req, res) => {
             document.getElementById('d_identity').innerText = charName;
             
             document.getElementById('d_realm').innerText = info.name;
-            document.getElementById('d_sinh_luc').innerText = info.sinh_luc;
+            document.getElementById('d_the_luc').innerText = info.the_luc;
             document.getElementById('d_linh_luc').innerText = info.linh_luc;
             document.getElementById('d_tinh_luc').innerText = info.tinh_luc;
         }
