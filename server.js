@@ -43,7 +43,6 @@ app.get('/', (req, res) => {
                 alert('Vui lòng nhập tên nhân vật!');
                 return;
             }
-            // Tạo mã số lữ khách ngẫu nhiên từ hệ thống (VD: #980)
             let travelerId = '#' + Math.floor(Math.random() * 900 + 100);
             
             localStorage.setItem('game_character_name', name);
@@ -88,9 +87,9 @@ app.get('/profile', (req, res) => {
         <hr>
         <h4 style="color: #888; margin: 10px 0 5px 0;">TRANG BỊ</h4>
         <div class="stat-item"><span>Vũ khí:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
-        <div class="stat-item"><span>Khôi giáp:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
-        <div class="stat-item"><span>Hộ giáp:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
-        <div class="stat-item"><span>Hộ thủ:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
+        <div class="stat-item"><span>Khôi giáp (Mũ):</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
+        <div class="stat-item"><span>Bối giáp (Thân):</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
+        <div class="stat-item"><span>Hộ thủ (Tay):</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
         <button onclick="goBack()">🔄 Đầu thai (Chuyển sinh lại)</button>
     </div>
     <script>
