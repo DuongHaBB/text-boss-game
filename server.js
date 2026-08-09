@@ -168,14 +168,13 @@ app.get('/profile', (req, res) => {
 
             let sinhLucFinal = Math.floor(theLuc * heSo);
             
-            // --- CÔNG THỨC MỚI CHO LINH LỰC (MP & Kháng Pháp) ---
-            // Tạm thời gán giá trị Item và Kỳ Ngộ = 0, sau này khi làm hệ thống trang bị/kỳ ngộ chỉ cần thay thế biến vào đây.
+            // --- CÔNG THỨC CHUẨN VỚI HỆ SỐ KHÁNG PHÁP = 0.5 ---
             let itemMp = 0;
             let kyNgoMp = 0;
             let itemKhangPhap = 0;
 
             let phapLucFinal = Math.floor(linhLuc * heSo * 2 + itemMp + kyNgoMp);
-            let khangPhapFinal = Math.floor(linhLuc * heSo + itemKhangPhap);
+            let khangPhapFinal = Math.floor(linhLuc * heSo * 0.5 + itemKhangPhap); 
             // ----------------------------------------------------
 
             let tinhLucFinal = Math.floor(tinhLuc * heSo);
