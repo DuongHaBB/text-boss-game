@@ -27,11 +27,11 @@ app.get('/', (req, res) => {
         <h2>🐾 CỬU MỆNH 🐾</h2>
         <div class="label-title">1. Nhập Tên Nhân Vật:</div>
         <input type="text" id="username" placeholder="Nhập tên của ngươi...">
-        <div class="label-title">2. Khu vực sinh ra (Ưu thế hệ x2):</div>
+        <div class="label-title">2. Khu vực sinh ra (Tốc độ tu luyện x2):</div>
         <select id="realm-select">
-            <option value="xich_hoa">Xích Hỏa Vực (Ưu thế Thể Lực x2)</option>
-            <option value="tam_sac">Tam Sắc Phủ (Ưu thế Linh Lực x2)</option>
-            <option value="bach_ngoc">Bạch Ngọc Đài (Ưu thế Tinh Lực x2)</option>
+            <option value="xich_hoa">Xích Hỏa Vực (Tốc độ Thể Lực x2)</option>
+            <option value="tam_sac">Tam Sắc Phủ (Tốc độ Linh Lực x2)</option>
+            <option value="bach_ngoc">Bạch Ngọc Đài (Tốc độ Tinh Lực x2)</option>
         </select>
         <button onclick="saveAndEnter()">NHẬP THẾ</button>
     </div>
@@ -49,10 +49,10 @@ app.get('/', (req, res) => {
             localStorage.setItem('game_traveler_id', travelerId);
             localStorage.setItem('game_realm', realm);
             
-            // Khởi tạo điểm số ở mức cơ bản để bắt đầu ở Cấp 1
-            localStorage.setItem('game_the_luc', realm === 'xich_hoa' ? 20 : 10);
-            localStorage.setItem('game_linh_luc', realm === 'tam_sac' ? 20 : 10);
-            localStorage.setItem('game_tinh_luc', realm === 'bach_ngoc' ? 20 : 10);
+            // Khởi tạo cơ bản: Mặc định 10 điểm, khu vực nào ưu thế sẽ được +5 điểm sẵn
+            localStorage.setItem('game_the_luc', realm === 'xich_hoa' ? 15 : 10);
+            localStorage.setItem('game_linh_luc', realm === 'tam_sac' ? 15 : 10);
+            localStorage.setItem('game_tinh_luc', realm === 'bach_ngoc' ? 15 : 10);
             
             window.location.href = '/profile';
         }
@@ -117,7 +117,7 @@ app.get('/profile', (req, res) => {
             <div class="stat-item sub-stat"><span>└─ Hoạt Lực (Chế đồ/Farm):</span> <span class="stat-value" id="d_hoat_luc">-</span></div>
         </div>
 
-        <button class="action-btn" onclick="simActivity()">⚡ Hoạt động tu luyện (Test tăng điểm)</button>
+        <button class="action-btn" onclick="simActivity()">⚡ Hoạt động tu luyện (Tăng tốc độ x2)</button>
         <button onclick="toggleDetails()">📊 Xem chỉ số chi tiết</button>
         <button onclick="goBack()" style="background: #2a1111; border-color: #773333; color: #ff9999;">🔄 Đầu thai (Chuyển sinh lại)</button>
     </div>
@@ -151,7 +151,6 @@ app.get('/profile', (req, res) => {
             document.getElementById('d_linh_luc').innerText = linhLuc;
             document.getElementById('d_tinh_luc').innerText = tinhLuc;
 
-            // Tính toán cấp độ chuẩn: Mốc 10 điểm đầu tiên nằm ở Cấp 1, mỗi 10 điểm tiếp theo tăng 1 cấp
             let maxStat = Math.max(theLuc, linhLuc, tinhLuc);
             let level = Math.min(10, Math.floor((maxStat - 10) / 10) + 1);
             if (level < 1) level = 1;
@@ -163,7 +162,6 @@ app.get('/profile', (req, res) => {
             ];
             document.getElementById('d_rank').innerText = rankNames[level - 1];
 
-            // Hệ số cảnh giới chuẩn từ 1.0 đến 3.0 (Cấp 1 bắt đầu chính xác là 1.0x)
             let heSo = parseFloat((1.0 + (level - 1) * 0.222).toFixed(2));
             if (level === 10) heSo = 3.0;
 
@@ -191,6 +189,7 @@ app.get('/profile', (req, res) => {
             let gainLinhLuc = Math.max(1, Math.floor(3 * (1 - linhLuc / 120)));
             let gainTinhLuc = Math.max(1, Math.floor(3 * (1 - tinhLuc / 120)));
 
+            // Tốc độ tu luyện (thu thập) tăng x2 cho chỉ số ưu thế của khu vực
             if (realmKey === 'xich_hoa') gainTheLuc *= 2;
             if (realmKey === 'tam_sac') gainLinhLuc *= 2;
             if (realmKey === 'bach_ngoc') gainTinhLuc *= 2;
