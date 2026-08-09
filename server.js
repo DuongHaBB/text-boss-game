@@ -5,14 +5,14 @@ const server = http.createServer(app);
 
 app.use(express.json());
 
-// 1. Màn hình Khởi Tạo: Tên (Đạo hiệu) lên trên, Khu vực sinh ra ở dưới
+// 1. Màn hình Khởi Tạo: Chỉ còn Tên và Khu vực xuất thân thuần túy
 app.get('/', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html lang="vi">
         <head>
             <meta charset="UTF-8">
-            <title>Cửu Mệnh - Khởi Tạo Tiên Miêu</title>
+            <title>Cửu Mệnh - Khởi Tông</title>
             <style>
                 body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
                 .auth-box { background: #1a1a1a; padding: 30px; border-radius: 8px; width: 420px; border: 1px solid #333; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.8); }
@@ -24,19 +24,19 @@ app.get('/', (req, res) => {
         </head>
         <body>
             <div class="auth-box">
-                <h2>🐾 CỬU MỆNH: KHỞI TÔNG 🐾</h2>
+                <h2>🐾 CỬU MỆNH 🐾</h2>
                 
-                <div class="label-title">1. Nhập Đạo Hiệu Tiên Miêu:</div>
-                <input type="text" id="username" placeholder="Ví dụ: Cuồng Phong Miêu...">
+                <div class="label-title">1. Nhập Đạo Hiệu:</div>
+                <input type="text" id="username" placeholder="Nhập tên của ngươi...">
 
                 <div class="label-title">2. Khu vực sinh ra:</div>
                 <select id="realm-select">
-                    <option value="bach_ngoc">🤍 Bạch Ngọc Đài (Mèo Trắng - Thân Pháp / Bạo Kích)</option>
-                    <option value="xich_hoa">🧡 Xích Hỏa Vực (Mèo Cam - Sức Mạnh Bộc Phát)</option>
-                    <option value="tam_sac">🤎 Tam Sắc Phủ (Tam Thể - Huyền Thuật Biến Hóa)</option>
+                    <option value="bach_ngoc">Bạch Ngọc Đài</option>
+                    <option value="xich_hoa">Xích Hỏa Vực</option>
+                    <option value="tam_sac">Tam Sắc Phủ</option>
                 </select>
 
-                <button onclick="saveAndEnter()">NHẬP THẾ TU TIÊN</button>
+                <button onclick="saveAndEnter()">NHẬP THẾ</button>
             </div>
 
             <script>
@@ -45,7 +45,7 @@ app.get('/', (req, res) => {
                     const realm = document.getElementById('realm-select').value;
                     
                     if (!name) {
-                        alert('Vui lòng nhập đạo hiệu cho chú mèo!');
+                        alert('Vui lòng nhập đạo hiệu!');
                         return;
                     }
                     
@@ -59,14 +59,14 @@ app.get('/', (req, res) => {
     `);
 });
 
-// 2. Màn hình Bảng Thông Số Nhân Vật & Khu Vực Sinh Ra
+// 2. Màn hình Bảng Thông Số Nhân Vật 
 app.get('/profile', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html lang="vi">
         <head>
             <meta charset="UTF-8">
-            <title>Hồ Sơ Đạo Hiệu</title>
+            <title>Đạo Tịch</title>
             <style>
                 body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
                 .panel { background: #1a1a1a; padding: 30px; border-radius: 8px; width: 420px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); }
@@ -79,7 +79,7 @@ app.get('/profile', (req, res) => {
         </head>
         <body>
             <div class="panel">
-                <h2 style="text-align: center; color: #d4af37; margin-top: 0;">ĐẠO TỊCH TIÊN MIÊU</h2>
+                <h2 style="text-align: center; color: #d4af37; margin-top: 0;">ĐẠO TỊCH</h2>
                 
                 <div class="stat-item"><span>Đạo hiệu:</span> <span class="stat-value" id="d-name">-</span></div>
                 <div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d-realm">-</span></div>
@@ -88,22 +88,22 @@ app.get('/profile', (req, res) => {
                 
                 <div class="stat-item"><span>Sinh lực (HP):</span> <span class="stat-value" id="d-hp">-</span></div>
                 <div class="stat-item"><span>Sức mạnh (ATK):</span> <span class="stat-value" id="d-atk">-</span></div>
-                <div class="stat-item"><span>Thiên phú đặc trưng:</span> <span class="stat-value" id="d-power">-</span></div>
                 
                 <hr>
                 
-                <h4 style="color: #888; margin: 10px 0 5px 0;">TRANG BỊ (HÀM LONG TRẤN)</h4>
-                <div class="stat-item"><span>Vũ khí:</span> <span class="stat-value" style="color: #666;">[Chưa trang bị]</span></div>
-                <div class="stat-item"><span>Y phục:</span> <span class="stat-value" style="color: #666;">[Chưa trang bị]</span></div>
+                <h4 style="color: #888; margin: 10px 0 5px 0;">TRANG BỊ</h4>
+                <div class="stat-item"><span>Vũ khí:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
+                <div class="stat-item"><span>Y phục:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
                 
-                <button onclick="goBack()">🔄 Chuyển sinh (Tạo lại từ đầu)</button>
+                <button onclick="goBack()">🔄 Đầu thai (Chuyển sinh lại)</button>
             </div>
 
             <script>
+                // Dữ liệu ngầm cho từng khu vực
                 const REALMS_DATA = {
-                    'bach_ngoc': { name: 'Bạch Ngọc Đài', hp: 190, atk: 35, power: 'Thân Pháp / Bạo Kích' },
-                    'xich_hoa': { name: 'Xích Hỏa Vực', hp: 260, atk: 48, power: 'Sức Mạnh Bộc Phát' },
-                    'tam_sac': { name: 'Tam Sắc Phủ', hp: 220, atk: 40, power: 'Huyền Thuật Biến Hóa' }
+                    'bach_ngoc': { name: 'Bạch Ngọc Đài', hp: 190, atk: 35 },
+                    'xich_hoa': { name: 'Xích Hỏa Vực', hp: 260, atk: 48 },
+                    'tam_sac': { name: 'Tam Sắc Phủ', hp: 220, atk: 40 }
                 };
 
                 const username = localStorage.getItem('game_username');
@@ -117,7 +117,6 @@ app.get('/profile', (req, res) => {
                     document.getElementById('d-realm').innerText = info.name;
                     document.getElementById('d-hp').innerText = info.hp;
                     document.getElementById('d-atk').innerText = info.atk;
-                    document.getElementById('d-power').innerText = info.power;
                 }
 
                 function goBack() {
