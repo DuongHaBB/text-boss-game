@@ -43,7 +43,7 @@ app.get('/', (req, res) => {
                 alert('Vui lòng nhập tên nhân vật!');
                 return;
             }
-            // Tạo mã số lữ khách ngẫu nhiên từ hệ thống (VD: #342)
+            // Tạo mã số lữ khách ngẫu nhiên từ hệ thống (VD: #337)
             let travelerId = '#' + Math.floor(Math.random() * 900 + 100);
             
             localStorage.setItem('game_character_name', name);
@@ -78,12 +78,12 @@ app.get('/profile', (req, res) => {
 <body>
     <div class="panel">
         <h2 style="text-align: center; color: #d4af37; margin-top: 0;">ĐẠO TỊCH</h2>
-        <div class="stat-item"><span>Danh xưng:</span> <span class="stat-value" id="d-identity">-</span></div>
-        <div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d-realm">-</span></div>
+        <div class="stat-item"><span>Danh xưng:</span> <span class="stat-value" id="d_identity">-</span></div>
+        <div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d_realm">-</span></div>
         <hr>
-        <div class="stat-item"><span>Sinh Lực (Hỏa):</span> <span class="stat-value" id="d-sinh-luc">-</span></div>
-        <div class="stat-item"><span>Linh Lực (Tam Sắc):</span> <span class="stat-value" id="d-linh-luc">-</span></div>
-        <div class="stat-item"><span>Tinh Lực (Bạch):</span> <span class="stat-value" id="d-tinh-luc">-</span></div>
+        <div class="stat-item"><span>Sinh Lực (Hỏa):</span> <span class="stat-value" id="d_sinh_luc">-</span></div>
+        <div class="stat-item"><span>Linh Lực (Tam Sắc):</span> <span class="stat-value" id="d_linh_luc">-</span></div>
+        <div class="stat-item"><span>Tinh Lực (Bạch):</span> <span class="stat-value" id="d_tinh_luc">-</span></div>
         <hr>
         <h4 style="color: #888; margin: 10px 0 5px 0;">TRANG BỊ</h4>
         <div class="stat-item"><span>Vũ khí:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
@@ -107,12 +107,12 @@ app.get('/profile', (req, res) => {
             window.location.href = '/';
         } else {
             const info = REALMS_DATA[realmKey];
-            // Gộp hiển thị: Lữ khách #xxx (Tên nhân vật)
-            document.getElementById('d-identity').innerText = travelerId + " (" + charName + ")";
-            document.getElementById('d-realm').innerText = info.name;
-            document.getElementById('d-sinh-luc').innerText = info.sinh_luc;
-            document.getElementById('d-linh-luc').innerText = info.linh_luc;
-            document.getElementById('d-tinh-luc').innerText = info.tinh_luc;
+            // Gộp gãy gọn trên 1 dòng duy nhất: Lữ khách #337 Vô Tà
+            document.getElementById('d_identity').innerText = "Lữ khách " + travelerId + " " + charName;
+            document.getElementById('d_realm').innerText = info.name;
+            document.getElementById('d_sinh_luc').innerText = info.sinh_luc;
+            document.getElementById('d_linh_luc').innerText = info.linh_luc;
+            document.getElementById('d_tinh_luc').innerText = info.tinh_luc;
         }
 
         function goBack() {
