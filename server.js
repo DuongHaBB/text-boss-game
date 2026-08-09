@@ -161,6 +161,7 @@ app.get('/profile', (req, res) => {
             ];
             document.getElementById('d_rank').innerText = rankNames[level - 1];
 
+            // Hệ số cảnh giới chuẩn từ 1.0 đến 3.0
             let heSo = parseFloat((1.0 + (level - 1) * 0.222).toFixed(2));
             if (level === 10) heSo = 3.0;
 
@@ -173,7 +174,6 @@ app.get('/profile', (req, res) => {
             document.getElementById('d_mp').innerText = phapLucFinal;
             document.getElementById('d_tinh_tong').innerText = tinhLucFinal;
 
-            // Phân nhánh Tinh lực (tạm chia tỷ lệ cân đối để bạn lên công thức sau)
             document.getElementById('d_cuoc_luc').innerText = Math.floor(tinhLucFinal * 0.4);
             document.getElementById('d_may_man').innerText = Math.floor(tinhLucFinal * 0.2) + " pts";
             document.getElementById('d_hoat_luc').innerText = Math.floor(tinhLucFinal * 0.4);
