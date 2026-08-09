@@ -5,9 +5,6 @@ const server = http.createServer(app);
 
 app.use(express.json());
 
-// Biến đếm giả lập số thứ tự lữ khách trên server
-let serverTravelerCounter = 1;
-
 // 1. Màn hình Khởi Tạo: Nhập Tên nhân vật & Chọn khu vực xuất thân
 app.get('/', (req, res) => {
     res.send(`
@@ -46,11 +43,11 @@ app.get('/', (req, res) => {
                 alert('Vui lòng nhập tên nhân vật!');
                 return;
             }
-            // Tạo mã lữ khách ngẫu nhiên/tăng dần dạng #001, #002... dựa trên thời gian thực hoặc random giả lập client
-            let travelerId = Math.floor(Math.random() * 900) + 100; // Hoặc lấy từ server
+            // Tạo mã số lữ khách ngẫu nhiên từ hệ thống (VD: #342)
+            let travelerId = '#' + Math.floor(Math.random() * 900 + 100);
             
             localStorage.setItem('game_character_name', name);
-            localStorage.setItem('game_traveler_id', '#' + travelerId);
+            localStorage.setItem('game_traveler_id', travelerId);
             localStorage.setItem('game_realm', realm);
             window.location.href = '/profile';
         }
@@ -81,8 +78,7 @@ app.get('/profile', (req, res) => {
 <body>
     <div class="panel">
         <h2 style="text-align: center; color: #d4af37; margin-top: 0;">ĐẠO TỊCH</h2>
-        <div class="stat-item"><span>Danh xưng:</span> <span class="stat-value" id="d-traveler-id">-</span></div>
-        <div class="stat-item"><span>Tên nhân vật:</span> <span class="stat-value" id="d-name">-</span></div>
+        <div class="stat-item"><span>Danh xưng:</span> <span class="stat-value" id="d-identity">-</span></div>
         <div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d-realm">-</span></div>
         <hr>
         <div class="stat-item"><span>Sinh Lực (Hỏa):</span> <span class="stat-value" id="d-sinh-luc">-</span></div>
@@ -111,8 +107,8 @@ app.get('/profile', (req, res) => {
             window.location.href = '/';
         } else {
             const info = REALMS_DATA[realmKey];
-            document.getElementById('d-traveler-id').innerText = "Lữ khách " + travelerId;
-            document.getElementById('d-name').innerText = charName;
+            // Gộp hiển thị: Lữ khách #xxx (Tên nhân vật)
+            document.getElementById('d-identity').innerText = travelerId + " (" + charName + ")";
             document.getElementById('d-realm').innerText = info.name;
             document.getElementById('d-sinh-luc').innerText = info.sinh_luc;
             document.getElementById('d-linh-luc').innerText = info.linh_luc;
