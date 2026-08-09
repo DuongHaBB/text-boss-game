@@ -1,62 +1,56 @@
 const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
 
 app.use(express.json());
 
-// Giao diện Đăng nhập và Tạo Nhân vật khởi đầu
+// 1. Màn hình Khởi Tạo Nhân Vật (Chọn Tông Môn & Đạo Hiệu)
 app.get('/', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html lang="vi">
         <head>
             <meta charset="UTF-8">
-            <title>Khởi Tạo Nhân Vật - Âm Dương Giới</title>
+            <title>Cửu Mệnh - Khởi Tạo Tiên Miêu</title>
             <style>
-                body { background: #121212; color: #fff; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-                .auth-box { background: #1e1e1e; padding: 30px; border-radius: 8px; width: 380px; border: 1px solid #444; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-                input, select { width: 90%; padding: 10px; margin: 10px 0; background: #2e2e2e; border: 1px solid #555; color: #fff; border-radius: 4px; font-family: inherit; }
-                button { width: 100%; padding: 12px; margin-top: 15px; background: #ff9800; color: #000; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; font-size: 15px; }
-                button:hover { background: #e68900; }
-                .desc { font-size: 12px; color: #aaa; margin-bottom: 15px; text-align: left; line-height: 1.4; }
+                body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+                .auth-box { background: #1a1a1a; padding: 30px; border-radius: 8px; width: 420px; border: 1px solid #333; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+                input, select { width: 90%; padding: 12px; margin: 12px 0; background: #262626; border: 1px solid #444; color: #fff; border-radius: 4px; font-family: inherit; font-size: 14px; }
+                button { width: 95%; padding: 12px; margin-top: 15px; background: #d4af37; color: #000; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; font-size: 15px; }
+                button:hover { background: #b89728; }
+                .desc { font-size: 12px; color: #888; margin-bottom: 15px; text-align: left; line-height: 1.5; }
             </style>
         </head>
         <body>
             <div class="auth-box">
-                <h2>KHỞI TẠO ANH HÙNG</h2>
+                <h2>🐾 CỬU MỆNH: TAM GIỚI 🐾</h2>
                 <div class="desc">
-                    - <b>Dương Lực:</b> Sức mạnh bộc phát, thiên hướng cận chiến.<br>
-                    - <b>Âm Linh:</b> Năng lượng huyền bí, thiên hướng ma pháp.
+                    Chọn tông môn bước chân vào con đường tu tiên của loài mèo:<br>
+                    - <b>Bạch Ngọc Đài (Mèo Trắng):</b> Kiêu sa, thuần khiết, Thân Pháp & Bạo Kích cao.<br>
+                    - <b>Xích Hỏa Vực (Mèo Cam):</b> Cuồng nộ, Sức mạnh thể chất bộc phát.<br>
+                    - <b>Tam Sắc Phủ (Tam Thể):</b> Biến hóa khôn lường, Huyền thuật thâm sâu.
                 </div>
-                <input type="text" id="username" placeholder="Nhập tên nhân vật của bạn...">
-                <select id="class-select">
-                    <option value="chien_binh">⚔️ Chiến Binh (Dương Lực +15 / Âm Linh +5)</option>
-                    <option value="phap_su">🔮 Pháp Sư (Dương Lực +5 / Âm Linh +18)</option>
-                    <option value="cung_thu">🏹 Cung Thủ (Dương Lực +10 / Âm Linh +10)</option>
+                <input type="text" id="username" placeholder="Nhập đạo hiệu của chú mèo...">
+                <select id="realm-select">
+                    <option value="bach_ngoc">🤍 Bạch Ngọc Đài (Mèo Trắng)</option>
+                    <option value="xich_hoa">🧡 Xích Hỏa Vực (Mèo Cam)</option>
+                    <option value="tam_sac">🤎 Tam Sắc Phủ (Tam Thể)</option>
                 </select>
-                <button onclick="saveAndEnter()">XÁC NHẬN TẠO NHÂN VẬT</button>
+                <button onclick="saveAndEnter()">XÁC NHẬN NHẬP MÔN</button>
             </div>
 
             <script>
                 function saveAndEnter() {
                     const name = document.getElementById('username').value.trim();
-                    const pClass = document.getElementById('class-select').value;
+                    const realm = document.getElementById('realm-select').value;
                     
                     if (!name) {
-                        alert('Vui lòng nhập tên nhân vật!');
+                        alert('Vui lòng nhập đạo hiệu cho mèo chiến!');
                         return;
                     }
                     
-                    // Lưu thông tin vào trình duyệt để test
                     localStorage.setItem('game_username', name);
-                    localStorage.setItem('game_class', pClass);
-                    
-                    // Chuyển sang màn hình xem thông tin nhân vật
-                    window.location.href = '/character';
+                    localStorage.setItem('game_realm', realm);
+                    window.location.href = '/profile';
                 }
             </script>
         </body>
@@ -64,56 +58,66 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Màn hình kiểm tra (Test) thông số nhân vật sau khi tạo
-app.get('/character', (req, res) => {
+// 2. Màn hình Bảng Thông Số Nhân Vật & Trang Bị
+app.get('/profile', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html lang="vi">
         <head>
             <meta charset="UTF-8">
-            <title>Bảng Thông Tin Nhân Vật</title>
+            <title>Đạo Tịch Tiên Miêu</title>
             <style>
-                body { background: #121212; color: #fff; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-                .panel { background: #1e1e1e; padding: 30px; border-radius: 8px; width: 400px; border: 1px solid #444; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-                .stat-item { margin: 12px 0; color: #aaa; font-size: 15px; }
-                .stat-value { color: #ff9800; font-weight: bold; }
-                button { width: 100%; padding: 10px; margin-top: 20px; background: #333; color: #fff; border: 1px solid #777; cursor: pointer; border-radius: 4px; font-size: 14px; }
-                button:hover { background: #555; }
+                body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+                .panel { background: #1a1a1a; padding: 30px; border-radius: 8px; width: 420px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+                .stat-item { margin: 12px 0; color: #aaa; font-size: 14px; display: flex; justify-content: space-between; }
+                .stat-value { color: #d4af37; font-weight: bold; }
+                hr { border: 0; border-top: 1px solid #333; margin: 15px 0; }
+                button { width: 100%; padding: 10px; margin-top: 20px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 4px; font-size: 14px; }
+                button:hover { background: #383838; }
             </style>
         </head>
         <body>
             <div class="panel">
-                <h2 style="text-align: center; color: #4CAF50;">HỒ SƠ ANH HÙNG</h2>
-                <div class="stat-item">Tên nhân vật: <span class="stat-value" id="display-name">-</span></div>
-                <div class="stat-item">Hệ phái: <span class="stat-value" id="display-class">-</span></div>
-                <div class="stat-item">Máu cơ bản (HP): <span class="stat-value" id="display-hp">-</span></div>
-                <hr style="border-color: #444; margin: 20px 0;">
-                <div class="stat-item" style="color: #ff5722;">☀️ Dương Lực khởi đầu: <span id="display-duong">-</span></div>
-                <div class="stat-item" style="color: #00bcd4;">🌙 Âm Linh khởi đầu: <span id="display-am">-</span></div>
+                <h2 style="text-align: center; color: #d4af37; margin-top: 0;">HỒ SƠ TIÊN MIÊU</h2>
                 
-                <button onclick="goBack()">🔄 Tạo lại nhân vật khác</button>
+                <div class="stat-item"><span>Đạo hiệu:</span> <span class="stat-value" id="d-name">-</span></div>
+                <div class="stat-item"><span>Tông môn:</span> <span class="stat-value" id="d-realm">-</span></div>
+                
+                <hr>
+                
+                <div class="stat-item"><span>Sinh lực (HP):</span> <span class="stat-value" id="d-hp">-</span></div>
+                <div class="stat-item"><span>Sức mạnh (ATK):</span> <span class="stat-value" id="d-atk">-</span></div>
+                <div class="stat-item"><span>Thiên phú đặc trưng:</span> <span class="stat-value" id="d-power">-</span></div>
+                
+                <hr>
+                
+                <h4 style="color: #888; margin: 10px 0 5px 0;">TRANG BỊ (HÀM LONG TRẤN)</h4>
+                <div class="stat-item"><span>Vũ khí:</span> <span class="stat-value" style="color: #666;">[Chưa trang bị - Khúc Mộc Kiếm]</span></div>
+                <div class="stat-item"><span>Y phục:</span> <span class="stat-value" style="color: #666;">[Chưa trang bị - Áo Vải Thô]</span></div>
+                
+                <button onclick="goBack()">🔄 Chuyển sinh (Tạo nhân vật mới)</button>
             </div>
 
             <script>
-                // Định nghĩa hệ phái tương ứng để hiển thị ở giao diện test
-                const CLASSES_INFO = {
-                    'chien_binh': { name: 'Chiến Binh', hp: 250, duongLuc: 15, amLinh: 5 },
-                    'phap_su': { name: 'Pháp Sư', hp: 150, duongLuc: 5, amLinh: 18 },
-                    'cung_thu': { name: 'Cung Thủ', hp: 180, duongLuc: 10, amLinh: 10 }
+                // Dữ liệu chỉ số tương ứng cho 3 phái
+                const REALMS_DATA = {
+                    'bach_ngoc': { name: 'Bạch Ngọc Đài (Mèo Trắng)', hp: 190, atk: 35, power: 'Thân Pháp / Bạo Kích' },
+                    'xich_hoa': { name: 'Xích Hỏa Vực (Mèo Cam)', hp: 260, atk: 48, power: 'Sức Mạnh Bộc Phát' },
+                    'tam_sac': { name: 'Tam Sắc Phủ (Tam Thể)', hp: 220, atk: 40, power: 'Huyền Thuật Biến Hóa' }
                 };
 
                 const username = localStorage.getItem('game_username');
-                const pClassKey = localStorage.getItem('game_class');
+                const realmKey = localStorage.getItem('game_realm');
 
-                if (!username || !CLASSES_INFO[pClassKey]) {
+                if (!username || !REALMS_DATA[realmKey]) {
                     window.location.href = '/';
                 } else {
-                    const info = CLASSES_INFO[pClassKey];
-                    document.getElementById('display-name').innerText = username;
-                    document.getElementById('display-class').innerText = info.name;
-                    document.getElementById('display-hp').innerText = info.hp;
-                    document.getElementById('display-duong').innerText = info.duongLuc;
-                    document.getElementById('display-am').innerText = info.amLinh;
+                    const info = REALMS_DATA[realmKey];
+                    document.getElementById('d-name').innerText = username;
+                    document.getElementById('d-realm').innerText = info.name;
+                    document.getElementById('d-hp').innerText = info.hp;
+                    document.getElementById('d-atk').innerText = info.atk;
+                    document.getElementById('d-power').innerText = info.power;
                 }
 
                 function goBack() {
