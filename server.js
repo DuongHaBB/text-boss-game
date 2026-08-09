@@ -5,7 +5,7 @@ const server = http.createServer(app);
 
 app.use(express.json());
 
-// 1. Màn hình Khởi Tạo: Nhập Đạo hiệu & Chọn khu vực xuất thân
+// 1. Màn hình Khởi Tạo: Nhập số định danh Lữ khách & Chọn khu vực xuất thân
 app.get('/', (req, res) => {
     res.send(`
 <!DOCTYPE html>
@@ -25,8 +25,8 @@ app.get('/', (req, res) => {
 <body>
     <div class="auth-box">
         <h2>🐾 CỬU MỆNH 🐾</h2>
-        <div class="label-title">1. Nhập Đạo Hiệu:</div>
-        <input type="text" id="username" placeholder="Nhập tên của ngươi...">
+        <div class="label-title">1. Nhập Mã Lữ Khách (Ví dụ: #08, #99...):</div>
+        <input type="text" id="username" placeholder="Nhập mã định danh của ngươi...">
         <div class="label-title">2. Khu vực sinh ra:</div>
         <select id="realm-select">
             <option value="xich_hoa">Xích Hỏa Vực (+5 Sinh Lực)</option>
@@ -37,13 +37,16 @@ app.get('/', (req, res) => {
     </div>
     <script>
         function saveAndEnter() {
-            const name = document.getElementById('username').value.trim();
+            let inputVal = document.getElementById('username').value.trim();
             const realm = document.getElementById('realm-select').value;
-            if (!name) {
-                alert('Vui lòng nhập đạo hiệu!');
+            if (!inputVal) {
+                alert('Vui lòng nhập mã lữ khách!');
                 return;
             }
-            localStorage.setItem('game_username', name);
+            // Tự động thêm dấu # nếu người chơi quên nhập
+            const travelerName = inputVal.startsWith('#') ? inputVal : '#' + inputVal;
+            
+            localStorage.setItem('game_username', travelerName);
             localStorage.setItem('game_realm', realm);
             window.location.href = '/profile';
         }
@@ -53,14 +56,14 @@ app.get('/', (req, res) => {
     `);
 });
 
-// 2. Màn hình Bảng Thông Số Nhân Vật (Đạo Tịch)
+// 2. Màn hình Bảng Thông Số Nhân Vật (Thông Tịch)
 app.get('/profile', (req, res) => {
     res.send(`
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Đạo Tịch</title>
+    <title>Thông Tịch</title>
     <style>
         body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .panel { background: #1a1a1a; padding: 30px; border-radius: 8px; width: 420px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); }
@@ -73,8 +76,8 @@ app.get('/profile', (req, res) => {
 </head>
 <body>
     <div class="panel">
-        <h2 style="text-align: center; color: #d4af37; margin-top: 0;">ĐẠO TỊCH</h2>
-        <div class="stat-item"><span>Đạo hiệu:</span> <span class="stat-value" id="d-name">-</span></div>
+        <h2 style="text-align: center; color: #d4af37; margin-top: 0;">THÔNG TỊCH</h2>
+        <div class="stat-item"><span>Danh xưng:</span> <span class="stat-value" id="d-name">-</span></div>
         <div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d-realm">-</span></div>
         <hr>
         <div class="stat-item"><span>Sinh Lực (Hỏa):</span> <span class="stat-value" id="d-sinh-luc">-</span></div>
@@ -87,7 +90,6 @@ app.get('/profile', (req, res) => {
         <button onclick="goBack()">🔄 Đầu thai (Chuyển sinh lại)</button>
     </div>
     <script>
-        // Cấu hình chỉ số gốc mặc định là 10 và cộng +5 điểm theo khu vực tương ứng
         const REALMS_DATA = {
             'xich_hoa': { name: 'Xích Hỏa Vực', sinh_luc: 15, linh_luc: 10, tinh_luc: 10 },
             'tam_sac': { name: 'Tam Sắc Phủ', sinh_luc: 10, linh_luc: 15, tinh_luc: 10 },
@@ -101,7 +103,8 @@ app.get('/profile', (req, res) => {
             window.location.href = '/';
         } else {
             const info = REALMS_DATA[realmKey];
-            document.getElementById('d-name').innerText = username;
+            // Hiển thị dạng "Lữ khách #xxx"
+            document.getElementById('d-name').innerText = "Lữ khách " + username;
             document.getElementById('d-realm').innerText = info.name;
             document.getElementById('d-sinh-luc').innerText = info.sinh_luc;
             document.getElementById('d-linh-luc').innerText = info.linh_luc;
