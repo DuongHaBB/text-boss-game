@@ -43,7 +43,7 @@ app.get('/', (req, res) => {
                 alert('Vui lòng nhập tên nhân vật!');
                 return;
             }
-            // Tạo mã số lữ khách ngẫu nhiên từ hệ thống (VD: #337)
+            // Tạo mã số lữ khách ngẫu nhiên từ hệ thống (VD: #486)
             let travelerId = '#' + Math.floor(Math.random() * 900 + 100);
             
             localStorage.setItem('game_character_name', name);
@@ -70,6 +70,7 @@ app.get('/profile', (req, res) => {
         .panel { background: #1a1a1a; padding: 30px; border-radius: 8px; width: 420px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); }
         .stat-item { margin: 12px 0; color: #aaa; font-size: 14px; display: flex; justify-content: space-between; }
         .stat-value { color: #d4af37; font-weight: bold; }
+        .center-identity { text-align: center; font-size: 16px; margin: 15px 0; }
         hr { border: 0; border-top: 1px solid #333; margin: 15px 0; }
         button { width: 100%; padding: 10px; margin-top: 20px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 4px; font-size: 14px; }
         button:hover { background: #383838; }
@@ -78,7 +79,8 @@ app.get('/profile', (req, res) => {
 <body>
     <div class="panel">
         <h2 style="text-align: center; color: #d4af37; margin-top: 0;">ĐẠO TỊCH</h2>
-        <div class="stat-item"><span>Danh xưng:</span> <span class="stat-value" id="d_identity">-</span></div>
+        <!-- Gộp trọn vẹn ở chính giữa, bỏ hẳn nhãn bên trái -->
+        <div class="center-identity"><span class="stat-value" id="d_identity">-</span></div>
         <div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d_realm">-</span></div>
         <hr>
         <div class="stat-item"><span>Sinh Lực (Hỏa):</span> <span class="stat-value" id="d_sinh_luc">-</span></div>
@@ -107,8 +109,8 @@ app.get('/profile', (req, res) => {
             window.location.href = '/';
         } else {
             const info = REALMS_DATA[realmKey];
-            // Gộp gãy gọn trên 1 dòng duy nhất: Lữ khách #337 Vô Tà
-            document.getElementById('d_identity').innerText = "Lữ khách " + travelerId + " " + charName;
+            // Hiển thị trực tiếp dạng: Lữ khách #xxx (Tên nhân vật)
+            document.getElementById('d_identity').innerText = "Lữ khách " + travelerId + " (" + charName + ")";
             document.getElementById('d_realm').innerText = info.name;
             document.getElementById('d_sinh_luc').innerText = info.sinh_luc;
             document.getElementById('d_linh_luc').innerText = info.linh_luc;
