@@ -29,9 +29,9 @@ app.get('/', (req, res) => {
         <input type="text" id="username" placeholder="Nhập tên của ngươi...">
         <div class="label-title">2. Khu vực sinh ra:</div>
         <select id="realm-select">
-            <option value="bach_ngoc">Bạch Ngọc Đài (+5 Tinh Lực)</option>
-            <option value="xich_hoa">Xích Hỏa Vực (+5 Thể Lực)</option>
+            <option value="xich_hoa">Xích Hỏa Vực (+5 Sinh Lực)</option>
             <option value="tam_sac">Tam Sắc Phủ (+5 Linh Lực)</option>
+            <option value="bach_ngoc">Bạch Ngọc Đài (+5 Tinh Lực)</option>
         </select>
         <button onclick="saveAndEnter()">NHẬP THẾ</button>
     </div>
@@ -77,7 +77,7 @@ app.get('/profile', (req, res) => {
         <div class="stat-item"><span>Đạo hiệu:</span> <span class="stat-value" id="d-name">-</span></div>
         <div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d-realm">-</span></div>
         <hr>
-        <div class="stat-item"><span>Thể Lực (Hỏa):</span> <span class="stat-value" id="d-the-luc">-</span></div>
+        <div class="stat-item"><span>Sinh Lực (Hỏa):</span> <span class="stat-value" id="d-sinh-luc">-</span></div>
         <div class="stat-item"><span>Linh Lực (Tam Sắc):</span> <span class="stat-value" id="d-linh-luc">-</span></div>
         <div class="stat-item"><span>Tinh Lực (Bạch):</span> <span class="stat-value" id="d-tinh-luc">-</span></div>
         <hr>
@@ -87,11 +87,11 @@ app.get('/profile', (req, res) => {
         <button onclick="goBack()">🔄 Đầu thai (Chuyển sinh lại)</button>
     </div>
     <script>
-        // Thiết lập chỉ số gốc mặc định là 10 cho mỗi loại
+        // Cấu hình chỉ số gốc mặc định là 10 và cộng +5 điểm theo khu vực tương ứng
         const REALMS_DATA = {
-            'bach_ngoc': { name: 'Bạch Ngọc Đài', the_luc: 10, linh_luc: 10, tinh_luc: 10 + 5 },
-            'xich_hoa': { name: 'Xích Hỏa Vực', the_luc: 10 + 5, linh_luc: 10, tinh_luc: 10 },
-            'tam_sac': { name: 'Tam Sắc Phủ', the_luc: 10, linh_luc: 10 + 5, tinh_luc: 10 }
+            'xich_hoa': { name: 'Xích Hỏa Vực', sinh_luc: 15, linh_luc: 10, tinh_luc: 10 },
+            'tam_sac': { name: 'Tam Sắc Phủ', sinh_luc: 10, linh_luc: 15, tinh_luc: 10 },
+            'bach_ngoc': { name: 'Bạch Ngọc Đài', sinh_luc: 10, linh_luc: 10, tinh_luc: 15 }
         };
 
         const username = localStorage.getItem('game_username');
@@ -103,7 +103,7 @@ app.get('/profile', (req, res) => {
             const info = REALMS_DATA[realmKey];
             document.getElementById('d-name').innerText = username;
             document.getElementById('d-realm').innerText = info.name;
-            document.getElementById('d-the-luc').innerText = info.the_luc;
+            document.getElementById('d-sinh-luc').innerText = info.sinh_luc;
             document.getElementById('d-linh-luc').innerText = info.linh_luc;
             document.getElementById('d-tinh-luc').innerText = info.tinh_luc;
         }
