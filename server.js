@@ -49,6 +49,7 @@ app.get('/', (req, res) => {
             localStorage.setItem('game_traveler_id', travelerId);
             localStorage.setItem('game_realm', realm);
             
+            // Khởi tạo điểm số ở mức cơ bản để bắt đầu ở Cấp 1
             localStorage.setItem('game_the_luc', realm === 'xich_hoa' ? 20 : 10);
             localStorage.setItem('game_linh_luc', realm === 'tam_sac' ? 20 : 10);
             localStorage.setItem('game_tinh_luc', realm === 'bach_ngoc' ? 20 : 10);
@@ -150,6 +151,7 @@ app.get('/profile', (req, res) => {
             document.getElementById('d_linh_luc').innerText = linhLuc;
             document.getElementById('d_tinh_luc').innerText = tinhLuc;
 
+            // Tính toán cấp độ chuẩn: Mốc 10 điểm đầu tiên nằm ở Cấp 1, mỗi 10 điểm tiếp theo tăng 1 cấp
             let maxStat = Math.max(theLuc, linhLuc, tinhLuc);
             let level = Math.min(10, Math.floor((maxStat - 10) / 10) + 1);
             if (level < 1) level = 1;
@@ -161,7 +163,7 @@ app.get('/profile', (req, res) => {
             ];
             document.getElementById('d_rank').innerText = rankNames[level - 1];
 
-            // Hệ số cảnh giới chuẩn từ 1.0 đến 3.0
+            // Hệ số cảnh giới chuẩn từ 1.0 đến 3.0 (Cấp 1 bắt đầu chính xác là 1.0x)
             let heSo = parseFloat((1.0 + (level - 1) * 0.222).toFixed(2));
             if (level === 10) heSo = 3.0;
 
