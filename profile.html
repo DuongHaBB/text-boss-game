@@ -138,7 +138,10 @@ let isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
 
 let maxHoatLuc = 10 + currentPeriod * 10;
 let hoatLuc = Number(localStorage.getItem('game_hoat_luc'));
-if (isNaN(hoatLuc)) hoatLuc = maxHoatLuc;
+if (isNaN(hoatLuc)) {
+  hoatLuc = maxHoatLuc;
+  localStorage.setItem('game_hoat_luc', hoatLuc);
+}
 
 let itemStvl = Number(localStorage.getItem('item_stvl')) || 0;
 let itemStp = Number(localStorage.getItem('item_stp')) || 0;
