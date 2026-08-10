@@ -116,7 +116,7 @@ let theLuc = Number(localStorage.getItem('game_the_luc')) || 0;
 let linhLuc = Number(localStorage.getItem('game_linh_luc')) || 0;
 let tinhLuc = Number(localStorage.getItem('game_tinh_luc')) || 0;
 let progTheLuc = Number(localStorage.getItem('game_prog_the_luc')) || 0;
-let progLinhLuc = Number(localStorage.getItem('game_prog_prog_linh_luc')) || 0;
+let progLinhLuc = Number(localStorage.getItem('game_prog_linh_luc')) || 0;
 let progTinhLuc = Number(localStorage.getItem('game_prog_tinh_luc')) || 0;
 let currentPeriod = Number(localStorage.getItem('game_period')) || 1;
 let isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
@@ -203,13 +203,7 @@ function updateUI() {
       }
     }
 
-    let sampleBossDef = 10;
-    let netCombat = atkVal - sampleBossDef;
     let displayAtk = isNaN(atkVal) ? "0.0" : Number(atkVal).toFixed(1);
-
-    if (netCombat < 0) {
-      displayAtk += ` (Phản chấn: ${Math.abs(netCombat).toFixed(1)})`;
-    }
 
     document.getElementById('d_dmg_type').innerText = dmgTypeStr;
     document.getElementById('d_atk_val').innerText = displayAtk;
