@@ -28,7 +28,7 @@ button:hover { background: #383838; }
 </style>
 </head>
 <body>
-<div class="panel">
+<div class="panel" id="main-panel">
 <h2 style="text-align: center; color: #d4af37; margin-top: 0; margin-bottom: 12px;">CỬU MỆNH</h2>
 <div class="stat-item"><span id="d_label_traveler">Lữ khách -</span> <span class="stat-value" id="d_identity">-</span></div>
 <div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d_realm">-</span></div>
@@ -40,6 +40,7 @@ button:hover { background: #383838; }
 <div class="stat-item"><span>Thể Lực:</span> <div><span class="stat-value" id="d_the_luc">0</span> <span class="prog-text" id="p_the_luc">(0%)</span></div></div>
 <div class="stat-item"><span>Linh Lực:</span> <div><span class="stat-value" id="d_linh_luc">0</span> <span class="prog-text" id="p_linh_luc">(0%)</span></div></div>
 <div class="stat-item"><span>Tinh Lực:</span> <div><span class="stat-value" id="d_tinh_luc">0</span> <span class="prog-text" id="p_tinh_luc">(0%)</span></div></div>
+<div class="stat-item"><span>Hoạt Lực (HP Hành Động):</span> <span class="stat-value" id="d_hoat_luc" style="color: #2ecc71;">20 / 20</span></div>
 
 <hr>
 <h4 style="color: #888; margin: 6px 0 4px 0;">CHỈ SỐ CHIẾN ĐẤU (ATK & DEF)</h4>
@@ -52,8 +53,20 @@ button:hover { background: #383838; }
 <button class="combat-btn" onclick="openCombatModal()">⚔️ Săn Quái & Hấp Thu Nguyên Khí</button>
 <button onclick="openEffectModal()" style="background: #251d08; border-color: #d4af37; color: #d4af37;">📜 Xem Bảng Hiệu Ứng & Trang Bị</button>
 <button onclick="openDetailsModal()" style="background: #1f1f1f; border-color: #444;">📊 Xem Chi Tiết Giới Hạn Kỳ</button>
-<button id="btn-break" class="break-btn" onclick="breakBottleneck()" style="display: none;">⚡ PHÁ VỠ BÌNH CẢNH</button>
-<button onclick="goBack()" style="background: #2a1111; border-color: #773333; color: #ff9999;">🔄 Đầu thai (Chuyển sinh lại)</button>
+<button onclick="openTestGameplay()" style="background: #11252a; border-color: #3498db; color: #3498db; font-weight: bold;">🧪 Test Gameplay (Sự Kiện)</button>
+</div>
+
+<!-- Giao diện Test Gameplay -->
+<div class="panel" id="test-gameplay-panel" style="display: none;">
+<h3 style="text-align: center; color: #3498db; margin-top: 0;">🧪 SỰ KIỆN KHÁM PHÁ</h3>
+<div id="story-box" style="background: #141414; padding: 15px; border-radius: 6px; border: 1px solid #333; font-size: 13px; line-height: 1.5; margin-bottom: 15px; color: #ddd;">
+  Bạn chợt thấy 1 con heo rừng chạy băng qua. Bạn quyết định...
+</div>
+<div id="story-actions">
+  <button onclick="actionChaseBoar()" style="background: #0f2a1a; border-color: #2ecc71; color: #2ecc71; font-weight: bold;">🏃 Đuổi theo (Tốn 2 Hoạt Lực nếu hụt)</button>
+  <button onclick="actionWalkAway()" style="background: #262626; border-color: #555; color: #aaa;">🚶 Đi tiếp (Bỏ qua)</button>
+</div>
+<button onclick="closeTestGameplay()" style="background: #333; margin-top: 15px; border: 1px solid #555; color: #ccc;">⬅ Quay lại Bảng Chính</button>
 </div>
 
 <div id="combat-modal" class="modal-overlay">
@@ -124,6 +137,10 @@ let progTinhLuc = Number(localStorage.getItem('game_prog_prog_tinh_luc')) || 0;
 let currentPeriod = Number(localStorage.getItem('game_period')) || 1;
 let isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
 
+let maxHoatLuc = 10 + currentPeriod * 10;
+let hoatLuc = Number(localStorage.getItem('game_hoat_luc'));
+if (isNaN(hoatLuc)) hoatLuc = maxHoatLuc;
+
 let itemStvl = Number(localStorage.getItem('item_stvl')) || 0;
 let itemStp = Number(localStorage.getItem('item_stp')) || 0;
 let itemDefVl = Number(localStorage.getItem('item_def_vl')) || 0;
@@ -159,6 +176,10 @@ function updateUI() {
     document.getElementById('d_linh_luc').innerText = linhLuc;
     document.getElementById('d_tinh_luc').innerText = tinhLuc;
 
+    maxHoatLuc = 10 + currentPeriod * 10;
+    if (hoatLuc > maxHoatLuc) hoatLuc = maxHoatLuc;
+    document.getElementById('d_hoat_luc').innerText = hoatLuc + " / " + maxHoatLuc;
+
     document.getElementById('p_the_luc').innerText = "(" + Math.round(progTheLuc * 100) + "%)";
     document.getElementById('p_linh_luc').innerText = "(" + Math.round(progLinhLuc * 100) + "%)";
     document.getElementById('p_tinh_luc').innerText = "(" + Math.round(progTinhLuc * 100) + "%)";
@@ -169,13 +190,10 @@ function updateUI() {
     document.getElementById('d_max_stat').innerText = maxStat;
 
     let statusBox = document.getElementById('bottleneck-status-box');
-    let breakBtn = document.getElementById('btn-break');
     if (isBottleneck) {
       statusBox.style.display = 'flex';
-      breakBtn.style.display = 'block';
     } else {
       statusBox.style.display = 'none';
-      breakBtn.style.display = 'none';
     }
 
     let dmgTypeStr = "Vật Lý";
@@ -234,7 +252,87 @@ function openDetailsModal() { document.getElementById('details-modal').style.dis
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
 // ----------------------------------------------------
-// HỆ THỐNG COMBAT: TỈ LỆ PHẨM CHẤT NGUYÊN LIỆU MỚI (TẬP TRUNG TỐC ĐỘ CÀY CUỐC)
+// TEST GAMEPLAY & SỰ KIỆN LỢN RỪNG
+// ----------------------------------------------------
+function openTestGameplay() {
+  document.getElementById('main-panel').style.display = 'none';
+  document.getElementById('test-gameplay-panel').style.display = 'block';
+  document.getElementById('story-box').innerHTML = "Bạn chợt thấy 1 con heo rừng chạy băng qua. Bạn quyết định...";
+  document.getElementById('story-actions').style.display = 'block';
+}
+
+function closeTestGameplay() {
+  document.getElementById('test-gameplay-panel').style.display = 'none';
+  document.getElementById('main-panel').style.display = 'block';
+}
+
+function actionWalkAway() {
+  document.getElementById('story-box').innerHTML = "Bạn quyết định bỏ qua và tiếp tục bước đi trên con đường của mình...";
+  document.getElementById('story-actions').style.display = 'none';
+}
+
+function actionChaseBoar() {
+  let playerSpeed = Number(((tinhLuc / 10) + currentPeriod).toFixed(1));
+  
+  // Tạo lợn rừng tổng điểm 20
+  let r1 = Math.random();
+  let r2 = Math.random();
+  let low = Math.min(r1, r2);
+  let high = Math.max(r1, r2);
+  let boarThe = Math.floor(low * 20);
+  let boarLinh = Math.floor((high - low) * 20);
+  let boarTinh = 20 - boarThe - boarLinh;
+
+  // Tốc lực lợn rừng tính theo Tinh lực lợn / 10 + 1 (hoặc tương đương hệ thống)
+  let boarSpeed = Number(((boarTinh / 10) + 1).toFixed(1));
+
+  if (boarSpeed <= playerSpeed) {
+    // Đuổi kịp và combat thắng luôn
+    hoatLuc = Math.max(0, hoatLuc - 1); // Trừ 1 hoạt lực combat
+    localStorage.setItem('game_hoat_luc', hoatLuc);
+    updateUI();
+
+    // Xử lý rơi đồ chuẩn tinh anh/thường (tạm dùng tỷ lệ cấp 2 Tinh anh)
+    let matList = [{ name: 'Nguyên liệu A' }, { name: 'Nguyên liệu B' }, { name: 'Nguyên liệu C' }, { name: 'Nguyên liệu D' }];
+    let totalDropCount = Math.floor(Math.random() * 5);
+    let droppedItemsMap = {};
+    let shuffledMats = [...matList].sort(() => 0.5 - Math.random());
+    let actualDropCount = Math.min(totalDropCount, shuffledMats.length);
+
+    for (let i = 0; i < actualDropCount; i++) {
+      let randQuality = Math.random() * 100;
+      let qualityTier = "Phàm Phẩm";
+      if (randQuality < 2.0) qualityTier = "Thượng Phẩm";
+      else if (randQuality < 35.0) qualityTier = "Trung Phẩm";
+      droppedItemsMap[shuffledMats[i].name + " [" + qualityTier + "]"] = 1;
+    }
+
+    let itemsListText = [];
+    for (let key in droppedItemsMap) itemsListText.push(`- ${key} (x1)`);
+
+    document.getElementById('story-box').innerHTML = 
+      `🏃 Bạn tăng tốc đuổi theo và tóm gọn được con Lợn Rừng!<br>` +
+      `⚡ Tốc lực bạn: ${playerSpeed} | Tốc lực Lợn: ${boarSpeed}<br>` +
+      `⚔️ Đã tiêu diệt lợn rừng (Tốn 1 Hoạt Lực).<br><br>` +
+      `🎁 <b>Chiến lợi phẩm thu được:</b><br>` + (itemsListText.length > 0 ? itemsListText.join('<br>') : "Không rơi nguyên liệu nào.");
+    document.getElementById('story-actions').style.display = 'none';
+
+  } else {
+    // Không đuổi kịp, trừ 2 hoạt lực
+    hoatLuc = Math.max(0, hoatLuc - 2);
+    localStorage.setItem('game_hoat_luc', hoatLuc);
+    updateUI();
+
+    document.getElementById('story-box').innerHTML = 
+      `💨 Bạn chạy hết hơi cũng không đuổi theo kịp con lợn rừng!<br>` +
+      `⚡ Tốc lực bạn: ${playerSpeed} | Tốc lực Lợn: ${boarSpeed}<br>` +
+      `❌ Thể lực hao hụt, bạn bị trừ <b>2 Hoạt Lực</b>.`;
+    document.getElementById('story-actions').style.display = 'none';
+  }
+}
+
+// ----------------------------------------------------
+// HỆ THỐNG COMBAT CHÍNH (GIỮ NGUYÊN TỶ LỆ)
 // ----------------------------------------------------
 function startCombat(tier, rewardType) {
   if (isBottleneck) return;
@@ -272,20 +370,16 @@ function startCombat(tier, rewardType) {
 
   for (let i = 0; i < actualDropCount; i++) {
     let chosenMat = shuffledMats[i];
-    
     let randQuality = Math.random() * 100;
     let qualityTier = "Phàm Phẩm";
 
     if (tier === 1) {
-      // Quái Thường: Thượng 0.2%, Trung 5.0%, Phàm 94.8%
       if (randQuality < 0.2) qualityTier = "Thượng Phẩm";
       else if (randQuality < 5.2) qualityTier = "Trung Phẩm";
     } else if (tier === 2) {
-      // Quái Tinh Anh: Thượng 2.0%, Trung 33.0% (tăng nhẹ), Phàm 65.0%
       if (randQuality < 2.0) qualityTier = "Thượng Phẩm";
       else if (randQuality < 35.0) qualityTier = "Trung Phẩm";
     } else if (tier === 3) {
-      // Quái Thủ Lĩnh: Thượng 5.0%, Trung 70.0%, Phàm 25.0% (Chuẩn 25 - 70 - 5)
       if (randQuality < 5.0) qualityTier = "Thượng Phẩm";
       else if (randQuality < 75.0) qualityTier = "Trung Phẩm";
     }
@@ -294,7 +388,6 @@ function startCombat(tier, rewardType) {
     droppedItemsMap[keyStr] = 1; 
   }
 
-  // Xử lý Nội Đan: Cấp 1 không có. Cấp 2 tỷ lệ 50%. Cấp 3 tỷ lệ 75%.
   let innerCoreFound = null;
   let coreDropChance = 0;
   if (tier === 2) coreDropChance = 0.5;
@@ -309,7 +402,9 @@ function startCombat(tier, rewardType) {
     innerCoreFound = coreName + " (x1)";
   }
 
-  // Cập nhật tiến độ tu vi
+  hoatLuc = Math.max(0, hoatLuc - 1); // Trừ 1 hoạt lực combat
+  localStorage.setItem('game_hoat_luc', hoatLuc);
+
   let baseGain = (tier === 1) ? 0.05 : (tier === 2 ? 0.2 : 0.4);
   let targetProgType = rewardType;
   if (rewardType === 'random') {
@@ -338,27 +433,14 @@ function startCombat(tier, rewardType) {
     itemsListText.push(`- ${key} (x1)`);
   }
 
-  let report = `⚔️ KẾT QUẢ CHIẾN THẮNG QUÁI CẤP ${tier}!\n\n` +
+  let report = `⚔️ KẾT QUẢ CHIẾN THẮNG QUÁI CẤP ${tier} (Tiêu hao 1 Hoạt Lực)!\n\n` +
                `📊 Chỉ số quái (Random):\n` +
                `- Thể: ${monsterThe} | Linh: ${monsterLinh} | Tinh: ${monsterTinh} (Tổng: ${totalPoints})\n\n` +
                `🎁 Chiến lợi phẩm nhận được (${itemsListText.length} món):\n` +
                (itemsListText.length > 0 ? itemsListText.join('\n') : `- Không rơi vật phẩm nguyên liệu nào`) + '\n\n' +
-               (innerCoreFound ? `🌟 BÁU VẬT THU ĐƯỢC:\n- Tìm thấy ${innerCoreFound}` : `🌟 BÁU VẬT THU ĐƯỢC:\n- Không rơi nội đan (Rớt tỷ lệ xịt!)`);
+               (innerCoreFound ? `🌟 BÁU VẬT THU ĐƯỢC:\n- Tìm thấy ${innerCoreFound}` : `🌟 BÁU VẬT THU ĐƯỢC:\n- Không rơi nội đan`);
 
   alert(report);
-}
-
-function breakBottleneck() {
-  let bonus = currentPeriod;
-  theLuc += bonus; linhLuc += bonus; tinhLuc += bonus;
-  currentPeriod += 1; isBottleneck = false;
-  localStorage.setItem('game_the_luc', theLuc);
-  localStorage.setItem('game_linh_luc', linhLuc);
-  localStorage.setItem('game_tinh_luc', tinhLuc);
-  localStorage.setItem('game_period', currentPeriod);
-  localStorage.setItem('game_is_bottleneck', 'false');
-  alert('Phá vỡ bình cảnh thành công lên Kỳ ' + currentPeriod + '!');
-  updateUI();
 }
 
 function goBack() { localStorage.clear(); window.location.href = '/'; }
