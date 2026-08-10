@@ -69,7 +69,7 @@ button:hover { background: #383838; }
   </div>
 </div>
 <div class="monster-group">
-  <div class="monster-title">2. Quái Tinh Anh (Test Combat - Có cơ hội rơi nguyên liệu A, B, C, D)</div>
+  <div class="monster-title">2. Quái Tinh Anh (Test Combat - Rơi nguyên liệu A, B, C, D)</div>
   <div class="monster-row">
     <button class="reward-btn" onclick="startCombat(2, 'the_luc')">⚡ Thể</button>
     <button class="reward-btn" onclick="startCombat(2, 'linh_luc')">💧 Linh</button>
@@ -225,7 +225,7 @@ function openDetailsModal() { document.getElementById('details-modal').style.dis
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
 // ----------------------------------------------------
-// HỆ THỐNG COMBAT & RƠI ĐỒ MỚI (QUÁI CẤP 1 & CẤP 2)
+// HỆ THỐNG COMBAT & RƠI ĐỒ MỚI (CẬP NHẬT ĐỊNH DẠNG xN)
 // ----------------------------------------------------
 function startCombat(tier, rewardType) {
   if (isBottleneck) return;
@@ -245,58 +245,52 @@ function startCombat(tier, rewardType) {
   let monsterLinh = Math.floor((high - low) * totalPoints);
   let monsterTinh = totalPoints - monsterThe - monsterLinh;
 
-  // Tìm chỉ số cao nhất và xác định hệ trội
   let maxVal = Math.max(monsterThe, monsterLinh, monsterTinh);
   let dominantAttr = 'THE';
   if (maxVal === monsterLinh) dominantAttr = 'LINH';
   if (maxVal === monsterTinh) dominantAttr = 'TINH';
 
-  // Kiểm tra chỉ số vượt trội (> 50% tổng điểm phân phối)
   let isMutation = (maxVal > (totalPoints * 0.5));
 
-  // 2. Xử lý nguyên liệu rơi ra (4 loại A, B, C, D) tương ứng 4 loại giáp
-  // Tạm gọi tên nguyên liệu thô A, B, C, D ngẫu nhiên theo hệ trội
   let matNames = {
-    'THE': { name: 'Nguyên liệu A (Hệ Thể - Sắc Đỏ/Hồng)', color: '#ff4d4d' },
-    'LINH': { name: 'Nguyên liệu B (Hệ Linh - Sắc Lam)', color: '#3498db' },
-    'TINH': { name: 'Nguyên liệu C (Hệ Tinh - Sắc Lục)', color: '#2ecc71' },
-    'HON_HOP': { name: 'Nguyên liệu D (Hỗn Nguyên Vạn Năng)', color: '#d4af37' }
+    'THE': 'Nguyên liệu A',
+    'LINH': 'Nguyên liệu B',
+    'TINH': 'Nguyên liệu C',
+    'HON_HOP': 'Nguyên liệu D'
   };
 
   let chosenMatKey = dominantAttr;
-  // Nếu cấp 2 mà điểm rải đều (không vượt trội), có thể rơi nguyên liệu D (Hỗn hợp)
   if (tier >= 2 && !isMutation) {
     let spread = maxVal - Math.min(monsterThe, monsterLinh, monsterTinh);
     if (spread < (totalPoints * 0.2)) chosenMatKey = 'HON_HOP';
   }
 
-  // Số lượng rơi ngẫu nhiên từ 0 đến 4 món
-  let dropCount = Math.floor(Math.random() * 5); 
-  let droppedItemsList = [];
+  // Số lượng rơi ngẫu nhiên tổng cộng từ 0 đến 4 món
+  let totalDropCount = Math.floor(Math.random() * 5); 
+  let droppedItemsMap = {};
+  
+  if (totalDropCount > 0) {
+    let matName = matNames[chosenMatKey];
+    let qualityTier = (tier === 2 && isMutation) ? "Thượng Phẩm" : "Phàm Phẩm";
+    let keyStr = matName + " [" + qualityTier + "]";
+    droppedItemsMap[keyStr] = totalDropCount;
+  }
 
-  // Xác định phẩm chất nguyên liệu & Nội đan (chỉ từ cấp 2 trở lên mới có tỷ lệ đặc biệt)
-  let qualityTier = "Phàm Phẩm";
+  // Xử lý nội đan
   let innerCoreFound = null;
-
-  if (tier === 2) {
-    if (isMutation) {
-      qualityTier = "Thượng Phẩm (Cực kỳ hiếm do đột biến chỉ số)";
-      // Tỷ lệ rơi nội đan khi có đột biến
-      if (Math.random() < 0.3) {
-        if (dominantAttr === 'THE') innerCoreFound = "🔴 Cốt Tủy Yêu Đan (Sắc Hồng)";
-        else if (dominantAttr === 'LINH') innerCoreFound = "🔵 Nguyên Khí Yêu Đan (Sắc Lam)";
-        else innerCoreFound = "🟢 Thần Phách Yêu Đan (Sắc Lục)";
-      }
-    } else {
-      qualityTier = "Trung Phẩm / Phàm Phẩm";
+  if (tier === 2 && isMutation) {
+    if (Math.random() < 0.3) {
+      let coreName = "";
+      if (dominantAttr === 'THE') coreName = "Cốt Tủy Yêu Đan";
+      else if (dominantAttr === 'LINH') coreName = "Nguyên Khí Yêu Đan";
+      else coreName = "Thần Phách Yêu Đan";
+      
+      let coreCount = 1; // Thường rơi 1 viên, có thể mở rộng sau nếu có quái 2 đan
+      innerCoreFound = coreName + " (x" + coreCount + ") [Thượng Phẩm]";
     }
   }
 
-  for (let i = 0; i < dropCount; i++) {
-    droppedItemsList.push(matNames[chosenMatKey].name + " [" + qualityTier + "]");
-  }
-
-  // 3. Cập nhật tiến độ tu vi cho người chơi
+  // 2. Cập nhật tiến độ tu vi cho người chơi
   let baseGain = (tier === 1) ? 0.05 : 0.2;
   let targetProgType = rewardType;
   if (rewardType === 'random') {
@@ -320,14 +314,19 @@ function startCombat(tier, rewardType) {
   closeModal('combat-modal');
   updateUI();
 
-  // 4. Báo cáo kết quả trận đấu test
+  // 3. Chuẩn bị text báo cáo kết quả
+  let itemsListText = [];
+  for (let key in droppedItemsMap) {
+    itemsListText.push(`- ${key} (x${droppedItemsMap[key]})`);
+  }
+
   let report = `⚔️ KẾT QUẢ CHIẾN THẮNG QUÁI CẤP ${tier}!\n\n` +
                `📊 Chỉ số quái (Random):\n` +
                `- Thể: ${monsterThe} | Linh: ${monsterLinh} | Tinh: ${monsterTinh} (Tổng: ${totalPoints})\n` +
                `- Trạng thái đột biến (>50%): ${isMutation ? 'CÓ (Chỉ số áp đảo)' : 'KHÔNG (Rải đều bình thường)'}\n\n` +
-               `🎁 Chiến lợi phẩm nhận được (${dropCount} món):\n` +
-               (droppedItemsList.length > 0 ? droppedItemsList.map(item => `- ${item}`).join('\n') : `- Không rơi vật phẩm nào (Rơi 0 món)`) + '\n\n' +
-               (innerCoreFound ? `🌟 SĂN ĐƯỢC BÁU VẬT:\n- ${innerCoreFound}` : `(Không rớt nội đan lần này)`);
+               `🎁 Chiến lợi phẩm nhận được (${totalDropCount} món):\n` +
+               (itemsListText.length > 0 ? itemsListText.join('\n') : `- Không rơi vật phẩm nguyên liệu nào`) + '\n\n' +
+               (innerCoreFound ? `🌟 BÁU VẬT THU ĐƯỢC:\n- Tìm thấy ${innerCoreFound}` : `🌟 BÁU VẬT THU ĐƯỢC:\n- Không tìm thấy nội đan`);
 
   alert(report);
 }
