@@ -189,7 +189,6 @@ function updateUI() {
   let dmgTypeStr = "Vật Lý";
   let atkVal = itemStvl + (theLuc / 10);
 
-  // Kiểm tra hiệu ứng danh hiệu và hệ sát thương an toàn
   if (theLuc === linhLuc && linhLuc === tinhLuc && maxStat > 0) {
     currentTitleEffect = { name: "👑 Tam Thanh Nhất Khí", desc: "Giảm 50% chỉ số địch, Sát thương x2." };
     dmgTypeStr = "Hỗn Hợp Tuyệt Đối";
@@ -212,8 +211,17 @@ function updateUI() {
     }
   }
 
+  // --- MÔ PHỎNG PHẢN CHẤN (Khi ATK thấp hơn DEF của mục tiêu mẫu = 10) ---
+  let sampleBossDef = 10;
+  let netCombat = atkVal - sampleBossDef;
+  let displayAtk = atkVal.toFixed(1);
+
+  if (netCombat < 0) {
+    displayAtk = atkVal.toFixed(1) + ` (Phản chấn: ${Math.abs(netCombat).toFixed(1)})`;
+  }
+
   document.getElementById('d_dmg_type').innerText = dmgTypeStr;
-  document.getElementById('d_atk_val').innerText = atkVal.toFixed(1);
+  document.getElementById('d_atk_val').innerText = displayAtk;
   document.getElementById('d_def_vl').innerText = itemDefVl + Math.round(theLuc / 20);
   document.getElementById('d_def_p').innerText = itemDefP + Math.round(linhLuc / 20);
   document.getElementById('d_speed').innerText = ((tinhLuc / 10) + currentPeriod).toFixed(1);
