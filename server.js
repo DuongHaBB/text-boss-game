@@ -19,7 +19,7 @@ const BOTTLENECK_LIMITS = {
   10: 12800
 };
 
-// 1. Màn hình Khởi Tạo: Nhập Tên, Phân bổ 10 điểm tiềm năng & Chọn khu vực
+// 1. Màn hình Khởi Tạo: Nhập Tên, Phân bổ 10 điểm tự do (Khởi đầu gốc = 0) & Chọn khu vực (+5 điểm)
 app.get('/', (req, res) => {
   res.send(`
 <!DOCTYPE html>
@@ -57,12 +57,12 @@ hr { border: 0; border-top: 1px solid #333; margin: 12px 0; }
 
 <hr>
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-  <span style="font-size: 13px; color: #aaa;">3. Phân bổ điểm tiềm năng:</span>
+  <span style="font-size: 13px; color: #aaa;">3. Phân bổ 10 điểm tiềm năng tự do:</span>
   <span style="font-size: 12px;">Còn lại: <span id="points-left" class="points-left">10</span> điểm</span>
 </div>
 
 <div class="stat-alloc-row">
-  <span>Thể Lực (Cơ bản: 10 + Khu vực: <span id="bonus-the">5</span> + Tự do: <span id="alloc-the" style="color:#d4af37">0</span>)</span>
+  <span>Thể Lực (Gốc: 0 + Khu vực: <span id="bonus-the">5</span> + Tự do: <span id="alloc-the" style="color:#d4af37">0</span>)</span>
   <div>
     <button class="alloc-btn" onclick="adjustStat('the', -1)">-</button>
     <button class="alloc-btn" onclick="adjustStat('the', 1)">+</button>
@@ -70,7 +70,7 @@ hr { border: 0; border-top: 1px solid #333; margin: 12px 0; }
 </div>
 
 <div class="stat-alloc-row">
-  <span>Linh Lực (Cơ bản: 10 + Khu vực: <span id="bonus-linh">0</span> + Tự do: <span id="alloc-linh" style="color:#d4af37">0</span>)</span>
+  <span>Linh Lực (Gốc: 0 + Khu vực: <span id="bonus-linh">0</span> + Tự do: <span id="alloc-linh" style="color:#d4af37">0</span>)</span>
   <div>
     <button class="alloc-btn" onclick="adjustStat('linh', -1)">-</button>
     <button class="alloc-btn" onclick="adjustStat('linh', 1)">+</button>
@@ -78,7 +78,7 @@ hr { border: 0; border-top: 1px solid #333; margin: 12px 0; }
 </div>
 
 <div class="stat-alloc-row">
-  <span>Tinh Lực (Cơ bản: 10 + Khu vực: <span id="bonus-tinh">0</span> + Tự do: <span id="alloc-tinh" style="color:#d4af37">0</span>)</span>
+  <span>Tinh Lực (Gốc: 0 + Khu vực: <span id="bonus-tinh">0</span> + Tự do: <span id="alloc-tinh" style="color:#d4af37">0</span>)</span>
   <div>
     <button class="alloc-btn" onclick="adjustStat('tinh', -1)">-</button>
     <button class="alloc-btn" onclick="adjustStat('tinh', 1)">+</button>
@@ -127,9 +127,9 @@ function saveAndEnter() {
 
   let travelerId = '#' + Math.floor(Math.random() * 900 + 100);
 
-  let theLuc = 10 + allocThe;
-  let linhLuc = 10 + allocLinh;
-  let tinhLuc = 10 + allocTinh;
+  let theLuc = 0 + allocThe;
+  let linhLuc = 0 + allocLinh;
+  let tinhLuc = 0 + allocTinh;
 
   if (realm === 'xich_hoa') { theLuc += 5; }
   else if (realm === 'tam_sac') { linhLuc += 5; }
@@ -293,9 +293,9 @@ const charName = localStorage.getItem('game_character_name');
 const travelerId = localStorage.getItem('game_traveler_id');
 const realmKey = localStorage.getItem('game_realm');
 
-let theLuc = parseInt(localStorage.getItem('game_the_luc')) || 10;
-let linhLuc = parseInt(localStorage.getItem('game_linh_luc')) || 10;
-let tinhLuc = parseInt(localStorage.getItem('game_tinh_luc')) || 10;
+let theLuc = parseInt(localStorage.getItem('game_the_luc')) || 0;
+let linhLuc = parseInt(localStorage.getItem('game_linh_luc')) || 0;
+let tinhLuc = parseInt(localStorage.getItem('game_tinh_luc')) || 0;
 
 let progTheLuc = parseFloat(localStorage.getItem('game_prog_the_luc')) || 0.0;
 let progLinhLuc = parseFloat(localStorage.getItem('game_prog_linh_luc')) || 0.0;
@@ -358,28 +358,44 @@ function updateUI() {
   let atkVal = 0;
   let titleStr = "[Bình Thường]";
 
-  if (theLuc === linhLuc && linhLuc === tinhLuc) {
-    titleStr = "👑 [Tam Thanh Nhất Khí - Giảm 50% chỉ số địch, x2 Dmg]";
-    dmgTypeStr = "Hỗn Hợp Tuyệt Đối (Tam Thanh)";
-    atkVal = (itemStvl + (theLuc / 10)) * 2;
-  } else if (theLuc === linhLuc) {
-    titleStr = "⚡ [Lưỡng Nghi Đồng Nguyên - Dmg x2 trừ kháng]";
-    dmgTypeStr = "Hỗn Hợp (Thể = Linh)";
-    atkVal = (itemStvl + (theLuc / 10)) * 2;
-  } else if (theLuc === tinhLuc) {
-    titleStr = "🗡️ [Thân Tinh Hợp Nhất - Xuyên 50% PTVL]";
-    dmgTypeStr = "Vật Lý (Thể = Tinh)";
-    atkVal = itemStvl + (theLuc / 10);
-  } else if (linhLuc === tinhLuc) {
-    titleStr = "🔮 [Linh Tinh Giao Hòa - Xuyên 50% Kháng Pháp]";
-    dmgTypeStr = "Pháp Thuật (Linh = Tinh)";
-    atkVal = itemStp + (linhLuc / 10);
-  } else if (theLuc > linhLuc) {
-    dmgTypeStr = "Vật Lý (STVL)";
-    atkVal = itemStvl + (theLuc / 10);
+  // --- LOGIC XÁC ĐỊNH DANH HIỆU CHUẨN XÁC ---
+  let statsObj = { 'Thể': theLuc, 'Linh': linhLuc, 'Tinh': tinhLuc };
+  let maxVal = Math.max(theLuc, linhLuc, tinhLuc);
+  let highestKeys = Object.keys(statsObj).filter(k => statsObj[k] === maxVal);
+
+  if (highestKeys.length >= 2 && maxVal > 0) {
+    if (highestKeys.length === 3) {
+      titleStr = "👑 [Tam Thanh Nhất Khí - Giảm 50% chỉ số địch, x2 Dmg]";
+      dmgTypeStr = "Hỗn Hợp Tuyệt Đối (Tam Thanh)";
+      atkVal = (itemStvl + (theLuc / 10)) * 2;
+    } else if (highestKeys.includes('Thể') && highestKeys.includes('Linh')) {
+      titleStr = "⚡ [Lưỡng Nghi Đồng Nguyên - Dmg x2 trừ kháng]";
+      dmgTypeStr = "Hỗn Hợp (Thể = Linh)";
+      atkVal = (itemStvl + (theLuc / 10)) * 2;
+    } else if (highestKeys.includes('Thể') && highestKeys.includes('Tinh')) {
+      titleStr = "🗡️ [Thân Tinh Hợp Nhất - Xuyên 50% PTVL]";
+      dmgTypeStr = "Vật Lý (Thể = Tinh)";
+      atkVal = itemStvl + (theLuc / 10);
+    } else if (highestKeys.includes('Linh') && highestKeys.includes('Tinh')) {
+      titleStr = "🔮 [Linh Tinh Giao Hòa - Xuyên 50% Kháng Pháp]";
+      dmgTypeStr = "Pháp Thuật (Linh = Tinh)";
+      atkVal = itemStp + (linhLuc / 10);
+    }
   } else {
-    dmgTypeStr = "Pháp Thuật (STP)";
-    atkVal = itemStp + (linhLuc / 10);
+    // Trường hợp chỉ có 1 chỉ số lớn nhất hoặc toàn 0
+    if (theLuc > linhLuc && theLuc >= tinhLuc) {
+      dmgTypeStr = "Vật Lý (STVL)";
+      atkVal = itemStvl + (theLuc / 10);
+    } else if (linhLuc > theLuc && linhLuc >= tinhLuc) {
+      dmgTypeStr = "Pháp Thuật (STP)";
+      atkVal = itemStp + (linhLuc / 10);
+    } else if (tinhLuc > theLuc && tinhLuc > linhLuc) {
+      dmgTypeStr = "Tinh Thần";
+      atkVal = itemStvl + (tinhLuc / 10);
+    } else {
+      dmgTypeStr = "Cơ Bản";
+      atkVal = itemStvl;
+    }
   }
 
   document.getElementById('d_dmg_type').innerText = dmgTypeStr;
