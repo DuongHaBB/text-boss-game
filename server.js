@@ -29,7 +29,8 @@ hr { border: 0; border-top: 1px solid #333; margin: 12px 0; }
 </head>
 <body>
 <div class="auth-box">
-<h2 style="text-align: center; color: #d4af37; margin-top: 0; margin-bottom: 12px;">🐾 CỬU MỆNH 🐾</h2>
+<h2 style="text-align: center; color: #d4af37; margin-top: 0; margin-bottom: 2px;">🐾 CỬU MỆNH 🐾</h2>
+<div style="text-align: center; font-size: 12px; color: #888; font-style: italic; margin-bottom: 15px;">Quyển 1: Xuân Thu như mộng</div>
 
 <div class="label-title">1. Nhập Tên Main:</div>
 <input type="text" id="username" placeholder="Nhập tên của main...">
