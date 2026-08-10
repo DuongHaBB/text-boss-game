@@ -1,25 +1,17 @@
 const express = require('express');
-const http = http = require('http');
+const http = require('http');
 const app = express();
 const server = http.createServer(app);
 
 app.use(express.json());
 
-// Bảng tra cứu mốc trần Bình Cảnh (Kỳ 1 là 20 điểm)
+// Bảng tra cứu mốc trần Bình Cảnh
 const BOTTLENECK_LIMITS = {
-  1: 20,
-  2: 50,
-  3: 100,
-  4: 200,
-  5: 400,
-  6: 800,
-  7: 1600,
-  8: 3200,
-  9: 6400,
-  10: 12800
+  1: 20, 2: 50, 3: 100, 4: 200, 5: 400,
+  6: 800, 7: 1600, 8: 3200, 9: 6400, 10: 12800
 };
 
-// 1. Màn hình Khởi Tạo: Nhập Tên, Phân bổ 10 điểm tự do (Khởi đầu gốc = 0) & Chọn khu vực (+5 điểm)
+// 1. Màn hình Khởi Tạo
 app.get('/', (req, res) => {
   res.send(`
 <!DOCTYPE html>
@@ -153,6 +145,7 @@ function saveAndEnter() {
   localStorage.setItem('item_stp', 5);
   localStorage.setItem('item_def_vl', 3);
   localStorage.setItem('item_def_p', 3);
+  localStorage.setItem('item_desc_name', 'Mộc Đao Cũ Kỹ (Mặc định)');
 
   window.location.href = '/profile';
 }
@@ -185,10 +178,10 @@ button { width: 100%; padding: 10px; margin-top: 6px; background: #262626; color
 button:hover { background: #383838; }
 .combat-btn { background: #0f2a1a; border-color: #2ecc71; color: #2ecc71; font-weight: bold; }
 .break-btn { background: #3c2a0f; border-color: #d4af37; color: #d4af37; font-weight: bold; }
-.sub-panel { background: #141414; border: 1px dashed #444; padding: 10px; margin-top: 12px; border-radius: 6px; display: none; }
+.sub-panel { background: #141414; border: 1px dashed #444; padding: 10px; margin-top: 8px; border-radius: 6px; display: none; }
 .sub-title { color: #d4af37; font-size: 12px; margin-bottom: 6px; text-align: center; font-weight: bold; }
 
-/* Modal chung */
+/* Modal Combat */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
 .modal-content { background: #1a1a1a; padding: 25px; border-radius: 8px; width: 420px; border: 1px solid #2ecc71; text-align: center; }
 .monster-group { margin: 10px 0; border: 1px solid #333; padding: 8px; border-radius: 6px; background: #141414; text-align: left; }
@@ -197,9 +190,9 @@ button:hover { background: #383838; }
 .reward-btn:hover { background: #383838; border-color: #d4af37; }
 .monster-row { display: flex; justify-content: space-between; }
 
-/* Tab Hiệu Ứng */
-.effect-box { background: #141414; border: 1px solid #444; padding: 10px; border-radius: 6px; margin: 6px 0; text-align: left; max-height: 180px; overflow-y: auto; }
-.effect-row { font-size: 12px; padding: 4px 0; border-bottom: 1px dashed #262626; display: flex; justify-content: space-between; }
+/* Trình bày Tab Hiệu Ứng / Danh Hiệu Nhỏ */
+.effect-section-title { font-size: 11px; color: #2ecc71; margin-top: 6px; margin-bottom: 2px; font-weight: bold; }
+.effect-row-item { font-size: 11px; color: #ccc; padding: 2px 0; border-bottom: 1px dashed #222; display: flex; justify-content: space-between; }
 </style>
 </head>
 <body>
@@ -223,22 +216,32 @@ button:hover { background: #383838; }
 <div class="stat-item"><span>Kháng Vật Lý:</span> <span class="stat-value" id="d_def_vl">-</span></div>
 <div class="stat-item"><span>Kháng Pháp Lực:</span> <span class="stat-value" id="d_def_p">-</span></div>
 <div class="stat-item"><span>Tốc Lực (Tinh Lực / 10 + Kỳ):</span> <span class="stat-value" id="d_speed">-</span></div>
-<div class="stat-item"><span>Trạng Thái Hiệu Ứng:</span> <button onclick="openEffectModal()" style="width: auto; padding: 2px 8px; margin:0; font-size: 11px; background: #332200; color: #d4af37; border-color: #d4af37;">📜 Xem Tab Hiệu Ứng</button></div>
+<div class="stat-item"><span>Danh Hiệu / Hiệu Ứng:</span> <span class="stat-value" id="d_title_tag" style="color: #e67e22;">[Bình Thường]</span></div>
 
+<!-- Tab Chi Tiết Giới Hạn -->
+<button onclick="toggleDetails()" style="background: #1f1f1f; border-color: #444; font-size: 12px;">📊 Xem chi tiết giới hạn kỳ</button>
 <div id="detail-box" class="sub-panel">
-<div class="sub-title">⚡ CHI TIẾT TÍNH TOÁN ⚡</div>
+<div class="sub-title">⚡ CHI TIẾT GIỚI HẠN KỲ ⚡</div>
 <div class="stat-item"><span>Trần điểm hiện tại:</span> <span class="stat-value" id="d_limit_val">20</span></div>
 <div class="stat-item"><span>Chỉ số cao nhất:</span> <span class="stat-value" id="d_max_stat">10</span></div>
 </div>
 
+<!-- Tab Danh Hiệu & Hiệu Ứng Trực Tiếp -->
+<button onclick="toggleEffectTab()" style="background: #251d08; border-color: #d4af37; color: #d4af37; font-size: 12px;">📜 Hệ Thống Danh Hiệu & Hiệu Ứng (Tab)</button>
+<div id="effect-tab-box" class="sub-panel" style="border-color: #d4af37;">
+<div class="sub-title" style="color: #d4af37;">📜 TỔNG HỢP HIỆU ỨNG & TRANG BỊ 📜</div>
+<div id="effect-content-container">
+  <!-- Nội dung load qua JS -->
+</div>
+</div>
+
 <button id="btn-break" class="break-btn" onclick="breakBottleneck()" style="display: none;">⚡ PHÁ VỠ BÌNH CẢNH</button>
 <button class="combat-btn" onclick="openCombatModal()">⚔️ Test Combat (Hấp Thu Nguyên Khí)</button>
-<button onclick="toggleDetails()">📊 Xem chi tiết giới hạn</button>
 <button onclick="goBack()" style="background: #2a1111; border-color: #773333; color: #ff9999;">🔄 Đầu thai (Chuyển sinh lại)</button>
 </div>
 
 <!-- Modal Combat -->
-<div id="combat-modal" class="modal-overlay" style="display: none;">
+<div id="combat-modal" class="modal-overlay">
 <div class="modal-content">
 <h3 style="color: #2ecc71; margin-top: 0;">🎉 CHIẾN THẮNG COMBAT!</h3>
 <p style="color: #aaa; font-size: 11px; margin-bottom: 6px;">Chọn loại quái để nhận tiến độ:</p>
@@ -283,20 +286,6 @@ button:hover { background: #383838; }
 </div>
 </div>
 
-<!-- Modal Tab Hiệu Ứng -->
-<div id="effect-modal" class="modal-overlay">
-<div class="modal-content" style="border-color: #d4af37; width: 440px;">
-<h3 style="color: #d4af37; margin-top: 0;">📜 TAB HIỆU ỨNG & DANH HIỆU</h3>
-<p style="color: #888; font-size: 11px; margin-bottom: 8px;">Danh sách các hiệu ứng bị động, danh hiệu và item đang tác động:</p>
-
-<div class="effect-box" id="effect-list-container">
-  <!-- Nội dung hiệu ứng render tự động qua JS -->
-</div>
-
-<button onclick="closeEffectModal()" style="background: #333; margin-top: 10px; border: 1px solid #555; color: #ccc; padding: 8px;">Đóng Tab</button>
-</div>
-</div>
-
 <script>
 const REALMS_DATA = {
   'xich_hoa': { name: 'Xích Hỏa Vực' },
@@ -328,6 +317,7 @@ let itemStvl = parseInt(localStorage.getItem('item_stvl')) || 5;
 let itemStp = parseInt(localStorage.getItem('item_stp')) || 5;
 let itemDefVl = parseInt(localStorage.getItem('item_def_vl')) || 3;
 let itemDefP = parseInt(localStorage.getItem('item_def_p')) || 3;
+let itemDescName = localStorage.getItem('item_desc_name') || 'Mộc Đao Cũ Kỹ';
 
 if (!charName || !travelerId || !realmKey || !REALMS_DATA[realmKey]) {
   window.location.href = '/';
@@ -345,7 +335,11 @@ function checkAndTriggerBottleneck() {
   }
 }
 
-let activeEffects = [];
+// Biến chứa thông tin chi tiết hiển thị trong Tab Hiệu Ứng
+let currentTitleEffect = { name: "Bình Thường", desc: "Chưa kích hoạt danh hiệu song/tam tu đặc biệt." };
+let currentItemEffects = [
+  { name: itemDescName, desc: `STVL: +${itemStvl} | STP: +${itemStp} | Kháng: +${itemDefVl}` }
+];
 
 function updateUI() {
   document.getElementById('d_label_traveler').innerText = "Lữ khách " + travelerId;
@@ -378,35 +372,37 @@ function updateUI() {
 
   let dmgTypeStr = "";
   let atkVal = 0;
-  
-  // Làm sạch danh sách hiệu ứng để tính lại từ đầu
-  activeEffects = [];
 
-  // Logic xác định danh hiệu & hiệu ứng
+  // Xác định danh hiệu & hiệu ứng động
   let statsObj = { 'Thể': theLuc, 'Linh': linhLuc, 'Tinh': tinhLuc };
   let maxVal = Math.max(theLuc, linhLuc, tinhLuc);
   let highestKeys = Object.keys(statsObj).filter(k => statsObj[k] === maxVal);
 
   if (highestKeys.length >= 2 && maxVal > 0) {
     if (highestKeys.length === 3) {
-      activeEffects.push({ name: "👑 Tam Thanh Nhất Khí", desc: "Giảm 50% chỉ số địch, Sát thương x2 (Tam Thanh)", type: "buff" });
+      currentTitleEffect = { name: "👑 Tam Thanh Nhất Khí", desc: "Giảm 50% chỉ số địch, Sát thương x2 toàn diện." };
+      document.getElementById('d_title_tag').innerText = "[Tam Thanh Nhất Khí]";
       dmgTypeStr = "Hỗn Hợp Tuyệt Đối (Tam Thanh)";
       atkVal = (itemStvl + (theLuc / 10)) * 2;
     } else if (highestKeys.includes('Thể') && highestKeys.includes('Linh')) {
-      activeEffects.push({ name: "⚡ Lưỡng Nghi Đồng Nguyên", desc: "Sát thương x2 trừ kháng (Thể = Linh)", type: "buff" });
+      currentTitleEffect = { name: "⚡ Lưỡng Nghi Đồng Nguyên", desc: "Sát thương x2 trừ kháng (Thể = Linh)." };
+      document.getElementById('d_title_tag').innerText = "[Lưỡng Nghi Đồng Nguyên]";
       dmgTypeStr = "Hỗn Hợp (Thể = Linh)";
       atkVal = (itemStvl + (theLuc / 10)) * 2;
     } else if (highestKeys.includes('Thể') && highestKeys.includes('Tinh')) {
-      activeEffects.push({ name: "🗡️ Thân Tinh Hợp Nhất", desc: "Xuyên 50% Kháng Vật Lý (Thể = Tinh)", type: "buff" });
+      currentTitleEffect = { name: "🗡️ Thân Tinh Hợp Nhất", desc: "Xuyên 50% Kháng Vật Lý (Thể = Tinh)." };
+      document.getElementById('d_title_tag').innerText = "[Thân Tinh Hợp Nhất]";
       dmgTypeStr = "Vật Lý (Thể = Tinh)";
       atkVal = itemStvl + (theLuc / 10);
     } else if (highestKeys.includes('Linh') && highestKeys.includes('Tinh')) {
-      activeEffects.push({ name: "🔮 Linh Tinh Giao Hòa", desc: "Xuyên 50% Kháng Pháp (Linh = Tinh)", type: "buff" });
+      currentTitleEffect = { name: "🔮 Linh Tinh Giao Hòa", desc: "Xuyên 50% Kháng Pháp (Linh = Tinh)." };
+      document.getElementById('d_title_tag').innerText = "[Linh Tinh Giao Hòa]";
       dmgTypeStr = "Pháp Thuật (Linh = Tinh)";
       atkVal = itemStp + (linhLuc / 10);
     }
   } else {
-    activeEffects.push({ name: "🛡️ Trạng Thái Bình Thường", desc: "Chưa kích hoạt danh hiệu song/tam tu đặc biệt.", type: "neutral" });
+    currentTitleEffect = { name: "🛡️ Bình Thường", desc: "Chưa kích hoạt danh hiệu song/tam tu đặc biệt." };
+    document.getElementById('d_title_tag').innerText = "[Bình Thường]";
     if (theLuc > linhLuc && theLuc >= tinhLuc) {
       dmgTypeStr = "Vật Lý (STVL)";
       atkVal = itemStvl + (theLuc / 10);
@@ -422,9 +418,6 @@ function updateUI() {
     }
   }
 
-  // Ví dụ minh họa sau này nhét item giảm 10% dmg hoặc hiệu ứng phụ vào đây:
-  // activeEffects.push({ name: "💍 Nhẫn Trừ Tà (Item)", desc: "Giảm 10% sát thương phải chịu từ yêu thú.", type: "item" });
-
   document.getElementById('d_dmg_type').innerText = dmgTypeStr;
   document.getElementById('d_atk_val').innerText = atkVal.toFixed(1);
 
@@ -436,25 +429,38 @@ function updateUI() {
   document.getElementById('d_def_p').innerText = defP;
   document.getElementById('d_speed').innerText = speed.toFixed(1);
 
-  renderEffectList();
+  renderEffectTabContent();
 }
 
-function renderEffectList() {
-  let container = document.getElementById('effect-list-container');
-  container.innerHTML = "";
-  activeEffects.forEach(eff => {
-    let color = (eff.type === 'buff') ? '#2ecc71' : (eff.type === 'debuff') ? '#e74c3c' : '#d4af37';
-    container.innerHTML += \`
-      <div class="effect-row">
-        <span style="color: \${color}; font-weight: bold;">\${eff.name}</span>
-        <span style="color: #aaa; font-size: 11px; text-align: right; max-width: 220px;">\${eff.desc}</span>
+function renderEffectTabContent() {
+  let container = document.getElementById('effect-content-container');
+  container.innerHTML = `
+    <div class="effect-section-title">🏆 Danh Hiệu & Hiệu Ứng Đang Nhận:</div>
+    <div class="effect-row-item">
+      <span style="color: #d4af37; font-weight: bold;">${currentTitleEffect.name}</span>
+      <span style="color: #aaa; text-align: right;">${currentTitleEffect.desc}</span>
+    </div>
+
+    <div class="effect-section-title" style="margin-top: 8px;">🎒 Chỉ Số Cộng Từ Trang Bị (Item):</div>
+  `;
+
+  currentItemEffects.forEach(item => {
+    container.innerHTML += `
+      <div class="effect-row-item">
+        <span style="color: #3498db; font-weight: bold;">${item.name}</span>
+        <span style="color: #888; text-align: right;">${item.desc}</span>
       </div>
-    \`;
+    `;
   });
 }
 
 function toggleDetails() {
   let box = document.getElementById('detail-box');
+  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
+
+function toggleEffectTab() {
+  let box = document.getElementById('effect-tab-box');
   box.style.display = box.style.display === 'block' ? 'none' : 'block';
 }
 
@@ -468,14 +474,6 @@ function openCombatModal() {
 
 function closeCombatModal() {
   document.getElementById('combat-modal').style.display = 'none';
-}
-
-function openEffectModal() {
-  document.getElementById('effect-modal').style.display = 'flex';
-}
-
-function closeEffectModal() {
-  document.getElementById('effect-modal').style.display = 'none';
 }
 
 function absorbCombat(baseAmount, type) {
@@ -500,7 +498,7 @@ function absorbCombat(baseAmount, type) {
   } else if (type === 'linh_luc') {
     progLinhLuc += gained;
     while (progLinhLuc >= 1.0) { linhLuc += 1; progLinhLuc -= 1.0; }
-    localStorage.setItem('game_linh_luc', linhLuc);
+    localStorage.setItem('game_linh_luc', linhLin);
     localStorage.setItem('game_prog_linh_luc', progLinhLuc.toFixed(2));
   } else if (type === 'tinh_luc') {
     progTinhLuc += gained;
