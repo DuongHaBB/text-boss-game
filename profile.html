@@ -47,7 +47,7 @@ button:hover { background: #383838; }
 <div class="stat-item"><span>Kháng Vật Lý:</span> <span class="stat-value" id="d_def_vl">0</span></div>
 <div class="stat-item"><span>Kháng Pháp Lực:</span> <span class="stat-value" id="d_def_p">0</span></div>
 <div class="stat-item"><span>Tốc Lực:</span> <span class="stat-value" id="d_speed">0</span></div>
-<div class="stat-item"><span>Hoạt Lực:</span> <span class="stat-value" id="d_hoat_luc" style="color: #2ecc71;">20 / 20</span></div>
+<div class="stat-item"><span>Hoạt Lực:</span> <span class="stat-value" id="d_hoat_luc" style="color: #2ecc71;">21 / 21</span></div>
 
 <button class="combat-btn" onclick="openCombatModal()">⚔️ Săn Quái & Hấp Thu Nguyên Khí</button>
 <button onclick="openEffectModal()" style="background: #251d08; border-color: #d4af37; color: #d4af37;">📜 Xem Bảng Hiệu Ứng & Trang Bị</button>
@@ -138,7 +138,9 @@ let isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
 
 let maxHoatLuc = Math.floor(10 + (tinhLuc / 10) + (currentPeriod * 10));
 let hoatLuc = Number(localStorage.getItem('game_hoat_luc'));
-if (isNaN(hoatLuc)) {
+
+// Nếu chưa có hoặc lưu giá trị 0/âm hoặc lớn hơn max mới thì khởi tạo bằng mức tối đa
+if (isNaN(hoatLuc) || hoatLuc <= 0 || hoatLuc > maxHoatLuc) {
   hoatLuc = maxHoatLuc;
   localStorage.setItem('game_hoat_luc', hoatLuc);
 }
@@ -178,8 +180,16 @@ function updateUI() {
     document.getElementById('d_linh_luc').innerText = linhLuc;
     document.getElementById('d_tinh_luc').innerText = tinhLuc;
 
+    let oldMaxHoatLuc = maxHoatLuc;
     maxHoatLuc = Math.floor(10 + (tinhLuc / 10) + (currentPeriod * 10));
+    
+    // Nếu trần hoạt lực tăng lên (do tăng Tinh Lực), tự động cộng thêm phần chênh lệch cho điểm hiện tại
+    if (maxHoatLuc > oldMaxHoatLuc) {
+      hoatLuc += (maxHoatLuc - oldMaxHoatLuc);
+    }
     if (hoatLuc > maxHoatLuc) hoatLuc = maxHoatLuc;
+    localStorage.setItem('game_hoat_luc', hoatLuc);
+
     document.getElementById('d_hoat_luc').innerText = hoatLuc + " / " + maxHoatLuc;
 
     document.getElementById('p_the_luc').innerText = "(" + Math.round(progTheLuc * 100) + "%)";
