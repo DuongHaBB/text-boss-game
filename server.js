@@ -1,5 +1,5 @@
 const express = require('express');
-const http = require('http');
+const http = http = require('http');
 const app = express();
 const server = http.createServer(app);
 
@@ -188,13 +188,18 @@ button:hover { background: #383838; }
 .sub-panel { background: #141414; border: 1px dashed #444; padding: 10px; margin-top: 12px; border-radius: 6px; display: none; }
 .sub-title { color: #d4af37; font-size: 12px; margin-bottom: 6px; text-align: center; font-weight: bold; }
 
-#combat-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
+/* Modal chung */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
 .modal-content { background: #1a1a1a; padding: 25px; border-radius: 8px; width: 420px; border: 1px solid #2ecc71; text-align: center; }
 .monster-group { margin: 10px 0; border: 1px solid #333; padding: 8px; border-radius: 6px; background: #141414; text-align: left; }
 .monster-title { font-size: 11px; color: #2ecc71; font-weight: bold; margin-bottom: 4px; }
 .reward-btn { width: 32%; padding: 6px 2px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 3px; font-size: 10px; text-align: center; font-family: inherit; }
 .reward-btn:hover { background: #383838; border-color: #d4af37; }
 .monster-row { display: flex; justify-content: space-between; }
+
+/* Tab Hiệu Ứng */
+.effect-box { background: #141414; border: 1px solid #444; padding: 10px; border-radius: 6px; margin: 6px 0; text-align: left; max-height: 180px; overflow-y: auto; }
+.effect-row { font-size: 12px; padding: 4px 0; border-bottom: 1px dashed #262626; display: flex; justify-content: space-between; }
 </style>
 </head>
 <body>
@@ -218,7 +223,7 @@ button:hover { background: #383838; }
 <div class="stat-item"><span>Kháng Vật Lý:</span> <span class="stat-value" id="d_def_vl">-</span></div>
 <div class="stat-item"><span>Kháng Pháp Lực:</span> <span class="stat-value" id="d_def_p">-</span></div>
 <div class="stat-item"><span>Tốc Lực (Tinh Lực / 10 + Kỳ):</span> <span class="stat-value" id="d_speed">-</span></div>
-<div class="stat-item"><span>Danh Hiệu / Hiệu Ứng:</span> <span class="stat-value" id="d_title" style="color: #e67e22;">[Bình Thường]</span></div>
+<div class="stat-item"><span>Trạng Thái Hiệu Ứng:</span> <button onclick="openEffectModal()" style="width: auto; padding: 2px 8px; margin:0; font-size: 11px; background: #332200; color: #d4af37; border-color: #d4af37;">📜 Xem Tab Hiệu Ứng</button></div>
 
 <div id="detail-box" class="sub-panel">
 <div class="sub-title">⚡ CHI TIẾT TÍNH TOÁN ⚡</div>
@@ -232,7 +237,8 @@ button:hover { background: #383838; }
 <button onclick="goBack()" style="background: #2a1111; border-color: #773333; color: #ff9999;">🔄 Đầu thai (Chuyển sinh lại)</button>
 </div>
 
-<div id="combat-modal">
+<!-- Modal Combat -->
+<div id="combat-modal" class="modal-overlay" style="display: none;">
 <div class="modal-content">
 <h3 style="color: #2ecc71; margin-top: 0;">🎉 CHIẾN THẮNG COMBAT!</h3>
 <p style="color: #aaa; font-size: 11px; margin-bottom: 6px;">Chọn loại quái để nhận tiến độ:</p>
@@ -274,6 +280,20 @@ button:hover { background: #383838; }
 </div>
 
 <button onclick="closeCombatModal()" style="background: #333; margin-top: 6px; border: 1px solid #555; color: #ccc; padding: 6px;">Đóng</button>
+</div>
+</div>
+
+<!-- Modal Tab Hiệu Ứng -->
+<div id="effect-modal" class="modal-overlay">
+<div class="modal-content" style="border-color: #d4af37; width: 440px;">
+<h3 style="color: #d4af37; margin-top: 0;">📜 TAB HIỆU ỨNG & DANH HIỆU</h3>
+<p style="color: #888; font-size: 11px; margin-bottom: 8px;">Danh sách các hiệu ứng bị động, danh hiệu và item đang tác động:</p>
+
+<div class="effect-box" id="effect-list-container">
+  <!-- Nội dung hiệu ứng render tự động qua JS -->
+</div>
+
+<button onclick="closeEffectModal()" style="background: #333; margin-top: 10px; border: 1px solid #555; color: #ccc; padding: 8px;">Đóng Tab</button>
 </div>
 </div>
 
@@ -325,6 +345,8 @@ function checkAndTriggerBottleneck() {
   }
 }
 
+let activeEffects = [];
+
 function updateUI() {
   document.getElementById('d_label_traveler').innerText = "Lữ khách " + travelerId;
   document.getElementById('d_identity').innerText = charName;
@@ -356,33 +378,35 @@ function updateUI() {
 
   let dmgTypeStr = "";
   let atkVal = 0;
-  let titleStr = "[Bình Thường]";
+  
+  // Làm sạch danh sách hiệu ứng để tính lại từ đầu
+  activeEffects = [];
 
-  // --- LOGIC XÁC ĐỊNH DANH HIỆU CHUẨN XÁC ---
+  // Logic xác định danh hiệu & hiệu ứng
   let statsObj = { 'Thể': theLuc, 'Linh': linhLuc, 'Tinh': tinhLuc };
   let maxVal = Math.max(theLuc, linhLuc, tinhLuc);
   let highestKeys = Object.keys(statsObj).filter(k => statsObj[k] === maxVal);
 
   if (highestKeys.length >= 2 && maxVal > 0) {
     if (highestKeys.length === 3) {
-      titleStr = "👑 [Tam Thanh Nhất Khí - Giảm 50% chỉ số địch, x2 Dmg]";
+      activeEffects.push({ name: "👑 Tam Thanh Nhất Khí", desc: "Giảm 50% chỉ số địch, Sát thương x2 (Tam Thanh)", type: "buff" });
       dmgTypeStr = "Hỗn Hợp Tuyệt Đối (Tam Thanh)";
       atkVal = (itemStvl + (theLuc / 10)) * 2;
     } else if (highestKeys.includes('Thể') && highestKeys.includes('Linh')) {
-      titleStr = "⚡ [Lưỡng Nghi Đồng Nguyên - Dmg x2 trừ kháng]";
+      activeEffects.push({ name: "⚡ Lưỡng Nghi Đồng Nguyên", desc: "Sát thương x2 trừ kháng (Thể = Linh)", type: "buff" });
       dmgTypeStr = "Hỗn Hợp (Thể = Linh)";
       atkVal = (itemStvl + (theLuc / 10)) * 2;
     } else if (highestKeys.includes('Thể') && highestKeys.includes('Tinh')) {
-      titleStr = "🗡️ [Thân Tinh Hợp Nhất - Xuyên 50% PTVL]";
+      activeEffects.push({ name: "🗡️ Thân Tinh Hợp Nhất", desc: "Xuyên 50% Kháng Vật Lý (Thể = Tinh)", type: "buff" });
       dmgTypeStr = "Vật Lý (Thể = Tinh)";
       atkVal = itemStvl + (theLuc / 10);
     } else if (highestKeys.includes('Linh') && highestKeys.includes('Tinh')) {
-      titleStr = "🔮 [Linh Tinh Giao Hòa - Xuyên 50% Kháng Pháp]";
+      activeEffects.push({ name: "🔮 Linh Tinh Giao Hòa", desc: "Xuyên 50% Kháng Pháp (Linh = Tinh)", type: "buff" });
       dmgTypeStr = "Pháp Thuật (Linh = Tinh)";
       atkVal = itemStp + (linhLuc / 10);
     }
   } else {
-    // Trường hợp chỉ có 1 chỉ số lớn nhất hoặc toàn 0
+    activeEffects.push({ name: "🛡️ Trạng Thái Bình Thường", desc: "Chưa kích hoạt danh hiệu song/tam tu đặc biệt.", type: "neutral" });
     if (theLuc > linhLuc && theLuc >= tinhLuc) {
       dmgTypeStr = "Vật Lý (STVL)";
       atkVal = itemStvl + (theLuc / 10);
@@ -398,9 +422,11 @@ function updateUI() {
     }
   }
 
+  // Ví dụ minh họa sau này nhét item giảm 10% dmg hoặc hiệu ứng phụ vào đây:
+  // activeEffects.push({ name: "💍 Nhẫn Trừ Tà (Item)", desc: "Giảm 10% sát thương phải chịu từ yêu thú.", type: "item" });
+
   document.getElementById('d_dmg_type').innerText = dmgTypeStr;
   document.getElementById('d_atk_val').innerText = atkVal.toFixed(1);
-  document.getElementById('d_title').innerText = titleStr;
 
   let defVl = itemDefVl + Math.round(theLuc / 20);
   let defP = itemDefP + Math.round(linhLuc / 20);
@@ -409,6 +435,22 @@ function updateUI() {
   document.getElementById('d_def_vl').innerText = defVl;
   document.getElementById('d_def_p').innerText = defP;
   document.getElementById('d_speed').innerText = speed.toFixed(1);
+
+  renderEffectList();
+}
+
+function renderEffectList() {
+  let container = document.getElementById('effect-list-container');
+  container.innerHTML = "";
+  activeEffects.forEach(eff => {
+    let color = (eff.type === 'buff') ? '#2ecc71' : (eff.type === 'debuff') ? '#e74c3c' : '#d4af37';
+    container.innerHTML += \`
+      <div class="effect-row">
+        <span style="color: \${color}; font-weight: bold;">\${eff.name}</span>
+        <span style="color: #aaa; font-size: 11px; text-align: right; max-width: 220px;">\${eff.desc}</span>
+      </div>
+    \`;
+  });
 }
 
 function toggleDetails() {
@@ -426,6 +468,14 @@ function openCombatModal() {
 
 function closeCombatModal() {
   document.getElementById('combat-modal').style.display = 'none';
+}
+
+function openEffectModal() {
+  document.getElementById('effect-modal').style.display = 'flex';
+}
+
+function closeEffectModal() {
+  document.getElementById('effect-modal').style.display = 'none';
 }
 
 function absorbCombat(baseAmount, type) {
