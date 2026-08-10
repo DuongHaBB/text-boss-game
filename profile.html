@@ -39,7 +39,6 @@ button:hover { background: #383838; }
 <div class="stat-item"><span>Thể Lực:</span> <div><span class="stat-value" id="d_the_luc">0</span> <span class="prog-text" id="p_the_luc">(0%)</span></div></div>
 <div class="stat-item"><span>Linh Lực:</span> <div><span class="stat-value" id="d_linh_luc">0</span> <span class="prog-text" id="p_linh_luc">(0%)</span></div></div>
 <div class="stat-item"><span>Tinh Lực:</span> <div><span class="stat-value" id="d_tinh_luc">0</span> <span class="prog-text" id="p_tinh_luc">(0%)</span></div></div>
-<div class="stat-item"><span>Hoạt Lực (HP Hành Động):</span> <span class="stat-value" id="d_hoat_luc" style="color: #2ecc71;">20 / 20</span></div>
 
 <hr>
 <h4 style="color: #888; margin: 6px 0 4px 0;">CHỈ SỐ CHIẾN ĐẤU (ATK & DEF)</h4>
@@ -47,7 +46,8 @@ button:hover { background: #383838; }
 <div class="stat-item"><span>Chỉ Số Tấn Công (ATK):</span> <span class="stat-value" id="d_atk_val">0</span></div>
 <div class="stat-item"><span>Kháng Vật Lý:</span> <span class="stat-value" id="d_def_vl">0</span></div>
 <div class="stat-item"><span>Kháng Pháp Lực:</span> <span class="stat-value" id="d_def_p">0</span></div>
-<div class="stat-item"><span>Tốc Lực (Tinh Lực / 10 + Kỳ):</span> <span class="stat-value" id="d_speed">0</span></div>
+<div class="stat-item"><span>Tốc Lực:</span> <span class="stat-value" id="d_speed">0</span></div>
+<div class="stat-item"><span>Hoạt Lực:</span> <span class="stat-value" id="d_hoat_luc" style="color: #2ecc71;">20 / 20</span></div>
 
 <button class="combat-btn" onclick="openCombatModal()">⚔️ Săn Quái & Hấp Thu Nguyên Khí</button>
 <button onclick="openEffectModal()" style="background: #251d08; border-color: #d4af37; color: #d4af37;">📜 Xem Bảng Hiệu Ứng & Trang Bị</button>
@@ -273,7 +273,6 @@ function actionWalkAway() {
 function actionChaseBoar() {
   let playerSpeed = Number(((tinhLuc / 10) + currentPeriod).toFixed(1));
   
-  // Tạo lợn rừng tổng điểm 20
   let r1 = Math.random();
   let r2 = Math.random();
   let low = Math.min(r1, r2);
