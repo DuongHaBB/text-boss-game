@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Cửu Mệnh - Khởi Tông</title>
+<style>
+body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+.auth-box { background: #1a1a1a; padding: 25px 30px; border-radius: 8px; width: 440px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+input, select { width: 100%; padding: 10px; margin: 6px 0 12px 0; background: #262626; border: 1px solid #444; color: #fff; border-radius: 4px; font-family: inherit; font-size: 13px; box-sizing: border-box; }
+button { width: 100%; padding: 12px; margin-top: 15px; background: #d4af37; color: #000; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; font-size: 15px; }
+button:hover { background: #b89728; }
+.label-title { font-size: 13px; color: #aaa; text-align: left; margin-top: 6px; }
+.stat-alloc-row { display: flex; justify-content: space-between; align-items: center; background: #141414; border: 1px solid #333; padding: 8px 12px; margin: 6px 0; border-radius: 4px; font-size: 13px; }
+.alloc-btn { background: #262626; border: 1px solid #555; color: #fff; width: 30px; height: 30px; font-weight: bold; cursor: pointer; border-radius: 3px; font-size: 14px; margin: 0; }
+.alloc-btn:hover { background: #383838; border-color: #d4af37; }
+.points-left { color: #2ecc71; font-weight: bold; }
+hr { border: 0; border-top: 1px solid #333; margin: 12px 0; }
+</style>
+</head>
+<body>
+<div class="auth-box">
+<h2 style="text-align: center; color: #d4af37; margin-top: 0; margin-bottom: 2px;">🐾 CỬU MỆNH 🐾</h2>
+<div style="text-align: center; font-size: 12px; color: #888; font-style: italic; margin-bottom: 15px;">Quyển 1: Xuân Thu như mộng</div>
+
+<div class="label-title">1. Nhập Tên Main:</div>
+<input type="text" id="username" placeholder="Nhập tên của main...">
+
+<div class="label-title">2. Khu vực sinh ra (+5 điểm ưu thế theo khu vực):</div>
+<select id="realm-select" onchange="updateRealmBonus()">
+<option value="xich_hoa">Xích Hỏa Vực (+5 Thể Lực & Hấp thu Thể Lực x2)</option>
+<option value="tam_sac">Tam Sắc Phủ (+5 Linh Lực & Hấp thu Linh Lực x2)</option>
+<option value="bach_ngoc">Bạch Ngọc Đài (+5 Tinh Lực & Hấp thu Tinh Lực x2)</option>
+</select>
+
+<hr>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+  <span style="font-size: 13px; color: #aaa;">3. Phân bổ 10 điểm tiềm năng tự do:</span>
+  <span style="font-size: 12px;">Còn lại: <span id="points-left" class="points-left">10</span> điểm</span>
+</div>
+
+<div class="stat-alloc-row">
+  <span>Thể Lực (Gốc: 0 + Khu vực: <span id="bonus-the">5</span> + Tự do: <span id="alloc-the" style="color:#d4af37">0</span>)</span>
+  <div>
+    <button class="alloc-btn" onclick="adjustStat('the', -1)">-</button>
+    <button class="alloc-btn" onclick="adjustStat('the', 1)">+</button>
+  </div>
+</div>
+
+<div class="stat-alloc-row">
+  <span>Linh Lực (Gốc: 0 + Khu vực: <span id="bonus-linh">0</span> + Tự do: <span id="alloc-linh" style="color:#d4af37">0</span>)</span>
+  <div>
+    <button class="alloc-btn" onclick="adjustStat('linh', -1)">-</button>
+    <button class="alloc-btn" onclick="adjustStat('linh', 1)">+</button>
+  </div>
+</div>
+
+<div class="stat-alloc-row">
+  <span>Tinh Lực (Gốc: 0 + Khu vực: <span id="bonus-tinh">0</span> + Tự do: <span id="alloc-tinh" style="color:#d4af37">0</span>)</span>
+  <div>
+    <button class="alloc-btn" onclick="adjustStat('tinh', -1)">-</button>
+    <button class="alloc-btn" onclick="adjustStat('tinh', 1)">+</button>
+  </div>
+</div>
+
+<button onclick="saveAndEnter()">NHẬP THẾ</button>
+</div>
+
+<script>
+let pointsLeft = 10;
+let allocThe = 0;
+let allocLinh = 0;
+let allocTinh = 0;
+
+function updateRealmBonus() {
+  let realm = document.getElementById('realm-select').value;
+  document.getElementById('bonus-the').innerText = (realm === 'xich_hoa') ? 5 : 0;
+  document.getElementById('bonus-linh').innerText = (realm === 'tam_sac') ? 5 : 0;
+  document.getElementById('bonus-tinh').innerText = (realm === 'bach_ngoc') ? 5 : 0;
+}
+
+function adjustStat(stat, amount) {
+  if (amount > 0 && pointsLeft > 0) {
+    if (stat === 'the') { allocThe++; }
+    if (stat === 'linh') { allocLinh++; }
+    if (stat === 'tinh') { allocTinh++; }
+    pointsLeft--;
+  } else if (amount < 0) {
+    if (stat === 'the' && allocThe > 0) { allocThe--; pointsLeft++; }
+    if (stat === 'linh' && allocLinh > 0) { allocLinh--; pointsLeft++; }
+    if (stat === 'tinh' && allocTinh > 0) { allocTinh--; pointsLeft++; }
+  }
+
+  document.getElementById('points-left').innerText = pointsLeft;
+  document.getElementById('alloc-the').innerText = allocThe;
+  document.getElementById('alloc-linh').innerText = allocLinh;
+  document.getElementById('alloc-tinh').innerText = allocTinh;
+}
+
+function saveAndEnter() {
+  const name = document.getElementById('username').value.trim();
+  const realm = document.getElementById('realm-select').value;
+  if (!name) { alert('Vui lòng nhập tên main!'); return; }
+  if (pointsLeft > 0) { alert('Bạn vẫn còn điểm tiềm năng chưa cộng hết!'); return; }
+
+  let travelerId = '#' + Math.floor(Math.random() * 900 + 100);
+
+  let theLuc = 0 + allocThe;
+  let linhLuc = 0 + allocLinh;
+  let tinhLuc = 0 + allocTinh;
+
+  if (realm === 'xich_hoa') { theLuc += 5; }
+  else if (realm === 'tam_sac') { linhLuc += 5; }
+  else if (realm === 'bach_ngoc') { tinhLuc += 5; }
+
+  localStorage.setItem('game_character_name', name);
+  localStorage.setItem('game_traveler_id', travelerId);
+  localStorage.setItem('game_realm', realm);
+  localStorage.setItem('game_the_luc', theLuc);
+  localStorage.setItem('game_linh_luc', linhLuc);
+  localStorage.setItem('game_tinh_luc', tinhLuc);
+
+  localStorage.setItem('game_prog_the_luc', 0.0);
+  localStorage.setItem('game_prog_linh_luc', 0.0);
+  localStorage.setItem('game_prog_tinh_luc', 0.0);
+
+  localStorage.setItem('game_period', 1);
+  localStorage.setItem('game_is_bottleneck', 'false');
+
+  localStorage.setItem('item_stvl', 5);
+  localStorage.setItem('item_stp', 5);
+  localStorage.setItem('item_def_vl', 3);
+  localStorage.setItem('item_def_p', 3);
+  localStorage.setItem('item_desc_name', 'Mộc Đao Cũ Kỹ (Mặc định)');
+
+  window.location.href = '/profile';
+}
+
+updateRealmBonus();
+</script>
+</body>
+</html>
