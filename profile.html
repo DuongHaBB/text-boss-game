@@ -48,7 +48,6 @@ button:hover { background: #383838; }
 <div class="stat-item"><span>Kháng Vật Lý:</span> <span class="stat-value" id="d_def_vl">-</span></div>
 <div class="stat-item"><span>Kháng Pháp Lực:</span> <span class="stat-value" id="d_def_p">-</span></div>
 <div class="stat-item"><span>Tốc Lực (Tinh Lực / 10 + Kỳ):</span> <span class="stat-value" id="d_speed">-</span></div>
-<!-- Đã cắt bỏ dòng hiển thị Hiệu Ứng rườm rà ở đây -->
 
 <button class="combat-btn" onclick="openCombatModal()">⚔️ Test Combat (Hấp Thu Nguyên Khí)</button>
 <button onclick="openEffectModal()" style="background: #251d08; border-color: #d4af37; color: #d4af37;">📜 Xem Bảng Hiệu Ứng & Trang Bị</button>
@@ -130,10 +129,15 @@ let progTinhLuc = parseFloat(localStorage.getItem('game_prog_tinh_luc')) || 0.0;
 let currentPeriod = parseInt(localStorage.getItem('game_period')) || 1;
 let isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
 
-let itemStvl = parseInt(localStorage.getItem('item_stvl')) || 5;
-let itemStp = parseInt(localStorage.getItem('item_stp')) || 5;
-let itemDefVl = parseInt(localStorage.getItem('item_def_vl')) || 3;
-let itemDefP = parseInt(localStorage.getItem('item_def_p')) || 3;
+// Khởi tạo các chỉ số trang bị mặc định để tránh lỗi NaN
+let itemStvl = parseInt(localStorage.getItem('item_stvl'));
+if (isNaN(itemStvl)) itemStvl = 5;
+let itemStp = parseInt(localStorage.getItem('item_stp'));
+if (isNaN(itemStp)) itemStp = 5;
+let itemDefVl = parseInt(localStorage.getItem('item_def_vl'));
+if (isNaN(itemDefVl)) itemDefVl = 3;
+let itemDefP = parseInt(localStorage.getItem('item_def_p'));
+if (isNaN(itemDefP)) itemDefP = 3;
 let itemDescName = localStorage.getItem('item_desc_name') || 'Mộc Đao Cũ Kỹ';
 
 if (!charName || !travelerId || !realmKey || !REALMS_DATA[realmKey]) {
@@ -153,7 +157,6 @@ function checkAndTriggerBottleneck() {
 }
 
 let currentTitleEffect = { name: "Bình Thường", desc: "Trạng thái ổn định." };
-let currentItemEffects = [{ name: itemDescName, desc: "STVL: +" + itemStvl + " | STP: +" + itemStp }];
 
 function updateUI() {
   document.getElementById('d_label_traveler').innerText = "Lữ khách " + travelerId;
@@ -225,8 +228,10 @@ function updateUI() {
 
 function renderEffectModalContent() {
   let container = document.getElementById('effect-content-container');
-  container.innerHTML = '<div style="font-size: 11px; color: #2ecc71; font-weight: bold;">✨ HIỆU ỨNG:</div>' +
-    '<div class="effect-row-item"><span style="color: #d4af37; font-weight: bold;">' + currentTitleEffect.name + '</span><span>' + currentTitleEffect.desc + '</span></div>';
+  container.innerHTML = '<div style="font-size: 11px; color: #2ecc71; font-weight: bold; margin-bottom:6px;">✨ HIỆU ỨNG:</div>' +
+    '<div class="effect-row-item"><span style="color: #d4af37; font-weight: bold;">' + currentTitleEffect.name + '</span><span>' + currentTitleEffect.desc + '</span></div>' +
+    '<div style="font-size: 11px; color: #2ecc71; font-weight: bold; margin: 10px 0 6px 0;">🛡️ TRANG BỊ ĐANG MẶC:</div>' +
+    '<div class="effect-row-item"><span style="color: #3498db; font-weight: bold;">' + itemDescName + '</span><span>STVL: +' + itemStvl + ' | STP: +' + itemStp + '<br>Kháng VL: +' + itemDefVl + ' | Kháng P: +' + itemDefP + '</span></div>';
 }
 
 function openCombatModal() {
