@@ -48,7 +48,7 @@ button:hover { background: #383838; }
 <div class="stat-item"><span>Kháng Vật Lý:</span> <span class="stat-value" id="d_def_vl">-</span></div>
 <div class="stat-item"><span>Kháng Pháp Lực:</span> <span class="stat-value" id="d_def_p">-</span></div>
 <div class="stat-item"><span>Tốc Lực (Tinh Lực / 10 + Kỳ):</span> <span class="stat-value" id="d_speed">-</span></div>
-<div class="stat-item"><span>Hiệu Ứng:</span> <span class="stat-value" id="d_title_tag" style="color: #e67e22;">[Bình Thường]</span></div>
+<!-- Đã cắt bỏ dòng hiển thị Hiệu Ứng rườm rà ở đây -->
 
 <button class="combat-btn" onclick="openCombatModal()">⚔️ Test Combat (Hấp Thu Nguyên Khí)</button>
 <button onclick="openEffectModal()" style="background: #251d08; border-color: #d4af37; color: #d4af37;">📜 Xem Bảng Hiệu Ứng & Trang Bị</button>
@@ -193,18 +193,15 @@ function updateUI() {
   if (highestKeys.length >= 2 && maxVal > 0) {
     if (highestKeys.length === 3) {
       currentTitleEffect = { name: "👑 Tam Thanh Nhất Khí", desc: "Giảm 50% chỉ số địch, Sát thương x2." };
-      document.getElementById('d_title_tag').innerText = "[Tam Thanh Nhất Khí]";
       dmgTypeStr = "Hỗn Hợp Tuyệt Đối";
       atkVal = (itemStvl + (theLuc / 10)) * 2;
     } else {
       currentTitleEffect = { name: "⚡ Lưỡng Nghi Đồng Nguyên", desc: "Cân bằng thuộc tính." };
-      document.getElementById('d_title_tag').innerText = "[Lưỡng Nghi Đồng Nguyên]";
       dmgTypeStr = "Hỗn Hợp";
       atkVal = (itemStvl + (theLuc / 10)) * 2;
     }
   } else {
     currentTitleEffect = { name: "🛡️ Bình Thường", desc: "Trạng thái ổn định." };
-    document.getElementById('d_title_tag').innerText = "[Bình Thường]";
     if (theLuc > linhLuc && theLuc >= tinhLuc) {
       dmgTypeStr = "Vật Lý";
       atkVal = itemStvl + (theLuc / 10);
