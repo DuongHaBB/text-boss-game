@@ -37,17 +37,17 @@ button:hover { background: #383838; }
 
 <hr>
 <h4 style="color: #888; margin: 6px 0 4px 0;">TIỀM NĂNG & TIẾN ĐỘ</h4>
-<div class="stat-item"><span>Thể Lực:</span> <div><span class="stat-value" id="d_the_luc">-</span> <span class="prog-text" id="p_the_luc">(0%)</span></div></div>
-<div class="stat-item"><span>Linh Lực:</span> <div><span class="stat-value" id="d_linh_luc">-</span> <span class="prog-text" id="p_linh_luc">(0%)</span></div></div>
-<div class="stat-item"><span>Tinh Lực:</span> <div><span class="stat-value" id="d_tinh_luc">-</span> <span class="prog-text" id="p_tinh_luc">(0%)</span></div></div>
+<div class="stat-item"><span>Thể Lực:</span> <div><span class="stat-value" id="d_the_luc">0</span> <span class="prog-text" id="p_the_luc">(0%)</span></div></div>
+<div class="stat-item"><span>Linh Lực:</span> <div><span class="stat-value" id="d_linh_luc">0</span> <span class="prog-text" id="p_linh_luc">(0%)</span></div></div>
+<div class="stat-item"><span>Tinh Lực:</span> <div><span class="stat-value" id="d_tinh_luc">0</span> <span class="prog-text" id="p_tinh_luc">(0%)</span></div></div>
 
 <hr>
 <h4 style="color: #888; margin: 6px 0 4px 0;">CHỈ SỐ CHIẾN ĐẤU (ATK & DEF)</h4>
-<div class="stat-item"><span>Hệ Sát Thương:</span> <span class="stat-value" id="d_dmg_type" style="color: #3498db;">-</span></div>
-<div class="stat-item"><span>Chỉ Số Tấn Công (ATK):</span> <span class="stat-value" id="d_atk_val">-</span></div>
-<div class="stat-item"><span>Kháng Vật Lý:</span> <span class="stat-value" id="d_def_vl">-</span></div>
-<div class="stat-item"><span>Kháng Pháp Lực:</span> <span class="stat-value" id="d_def_p">-</span></div>
-<div class="stat-item"><span>Tốc Lực (Tinh Lực / 10 + Kỳ):</span> <span class="stat-value" id="d_speed">-</span></div>
+<div class="stat-item"><span>Hệ Sát Thương:</span> <span class="stat-value" id="d_dmg_type" style="color: #3498db;">Vật Lý</span></div>
+<div class="stat-item"><span>Chỉ Số Tấn Công (ATK):</span> <span class="stat-value" id="d_atk_val">0</span></div>
+<div class="stat-item"><span>Kháng Vật Lý:</span> <span class="stat-value" id="d_def_vl">0</span></div>
+<div class="stat-item"><span>Kháng Pháp Lực:</span> <span class="stat-value" id="d_def_p">0</span></div>
+<div class="stat-item"><span>Tốc Lực (Tinh Lực / 10 + Kỳ):</span> <span class="stat-value" id="d_speed">0</span></div>
 
 <button class="combat-btn" onclick="openCombatModal()">⚔️ Test Combat (Hấp Thu Nguyên Khí)</button>
 <button onclick="openEffectModal()" style="background: #251d08; border-color: #d4af37; color: #d4af37;">📜 Xem Bảng Hiệu Ứng & Trang Bị</button>
@@ -59,14 +59,6 @@ button:hover { background: #383838; }
 <div id="combat-modal" class="modal-overlay">
 <div class="modal-content" style="border-color: #2ecc71;">
 <h3 style="color: #2ecc71; margin-top: 0;">⚔️ CHỌN KHU VỰC SĂN QUÁI</h3>
-<div style="margin-bottom: 10px; text-align: left;">
-  <label style="font-size: 12px; color: #d4af37; font-weight: bold;">Chọn Khu Vực Săn:</label>
-  <select id="combat-realm-select" style="margin-top: 4px;">
-    <option value="xich_hoa">🔥 Xích Hỏa Vực</option>
-    <option value="tam_sac">💧 Tam Sắc Phủ</option>
-    <option value="bach_ngoc">✨ Bạch Ngọc Đài</option>
-  </select>
-</div>
 <div class="monster-group">
   <div class="monster-title">1. Quái Thường [+0.05 pts]</div>
   <div class="monster-row">
@@ -107,7 +99,7 @@ button:hover { background: #383838; }
 <div class="modal-content" style="border-color: #3498db;">
 <h3 style="color: #3498db; margin-top: 0;">📊 CHI TIẾT GIỚI HẠN KỲ</h3>
 <div class="stat-item"><span>Trần điểm hiện tại:</span> <span class="stat-value" id="d_limit_val">20</span></div>
-<div class="stat-item"><span>Chỉ số cao nhất:</span> <span class="stat-value" id="d_max_stat">10</span></div>
+<div class="stat-item"><span>Chỉ số cao nhất:</span> <span class="stat-value" id="d_max_stat">0</span></div>
 <button onclick="closeModal('details-modal')" style="background: #333; margin-top: 15px; border: 1px solid #555; color: #ccc; padding: 8px;">Đóng</button>
 </div>
 </div>
@@ -120,24 +112,26 @@ const charName = localStorage.getItem('game_character_name');
 const travelerId = localStorage.getItem('game_traveler_id');
 const realmKey = localStorage.getItem('game_realm');
 
-let theLuc = parseInt(localStorage.getItem('game_the_luc')) || 0;
-let linhLuc = parseInt(localStorage.getItem('game_linh_luc')) || 0;
-let tinhLuc = parseInt(localStorage.getItem('game_tinh_luc')) || 0;
-let progTheLuc = parseFloat(localStorage.getItem('game_prog_the_luc')) || 0.0;
-let progLinhLuc = parseFloat(localStorage.getItem('game_prog_linh_luc')) || 0.0;
-let progTinhLuc = parseFloat(localStorage.getItem('game_prog_tinh_luc')) || 0.0;
-let currentPeriod = parseInt(localStorage.getItem('game_period')) || 1;
+let theLuc = Number(localStorage.getItem('game_the_luc')) || 0;
+let linhLuc = Number(localStorage.getItem('game_linh_luc')) || 0;
+let tinhLuc = Number(localStorage.getItem('game_tinh_luc')) || 0;
+let progTheLuc = Number(localStorage.getItem('game_prog_the_luc')) || 0;
+let progLinhLuc = Number(localStorage.getItem('game_prog_prog_linh_luc')) || 0;
+let progTinhLuc = Number(localStorage.getItem('game_prog_tinh_luc')) || 0;
+let currentPeriod = Number(localStorage.getItem('game_period')) || 1;
 let isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
 
-let itemStvl = parseInt(localStorage.getItem('item_stvl'));
+let itemStvl = Number(localStorage.getItem('item_stvl'));
 if (isNaN(itemStvl)) itemStvl = 5;
-let itemStp = parseInt(localStorage.getItem('item_stp'));
+let itemStp = Number(localStorage.getItem('item_stp'));
 if (isNaN(itemStp)) itemStp = 5;
-let itemDefVl = parseInt(localStorage.getItem('item_def_vl'));
+let itemDefVl = Number(localStorage.getItem('item_def_vl'));
 if (isNaN(itemDefVl)) itemDefVl = 3;
-let itemDefP = parseInt(localStorage.getItem('item_def_p'));
+let itemDefP = Number(localStorage.getItem('item_def_p'));
 if (isNaN(itemDefP)) itemDefP = 3;
 let itemDescName = localStorage.getItem('item_desc_name') || 'Mộc Đao Cũ Kỹ';
+
+let currentTitleEffect = { name: "🛡️ Bình Thường", desc: "Trạng thái ổn định." };
 
 if (!charName || !travelerId || !realmKey || !REALMS_DATA[realmKey]) {
   window.location.href = '/';
@@ -155,14 +149,12 @@ function checkAndTriggerBottleneck() {
   }
 }
 
-let currentTitleEffect = { name: "Bình Thường", desc: "Trạng thái ổn định." };
-
 function updateUI() {
   try {
     document.getElementById('d_label_traveler').innerText = "Lữ khách " + (travelerId || '---');
     document.getElementById('d_identity').innerText = charName || 'Vô danh';
     document.getElementById('d_realm').innerText = REALMS_DATA[realmKey] ? REALMS_DATA[realmKey].name : '---';
-    document.getElementById('d_rank').innerText = "Kỳ " + (currentPeriod || 1);
+    document.getElementById('d_rank').innerText = "Kỳ " + currentPeriod;
 
     document.getElementById('d_the_luc').innerText = theLuc;
     document.getElementById('d_linh_luc').innerText = linhLuc;
@@ -199,7 +191,6 @@ function updateUI() {
       dmgTypeStr = "Hỗn Hợp";
       atkVal = (itemStvl + (theLuc / 10)) * 2;
     } else {
-      currentTitleEffect = { name: "🛡️ Bình Thường", desc: "Trạng thái ổn định." };
       if (linhLuc > theLuc && linhLuc >= tinhLuc) {
         dmgTypeStr = "Pháp Thuật";
         atkVal = itemStp + (linhLuc / 10);
@@ -212,10 +203,9 @@ function updateUI() {
       }
     }
 
-    // --- CƠ CHẾ PHẢN CHẤN (Khi ATK thấp hơn DEF mẫu = 10) ---
     let sampleBossDef = 10;
     let netCombat = atkVal - sampleBossDef;
-    let displayAtk = isNaN(atkVal) ? "0.0" : atkVal.toFixed(1);
+    let displayAtk = isNaN(atkVal) ? "0.0" : Number(atkVal).toFixed(1);
 
     if (netCombat < 0) {
       displayAtk += ` (Phản chấn: ${Math.abs(netCombat).toFixed(1)})`;
@@ -225,11 +215,11 @@ function updateUI() {
     document.getElementById('d_atk_val').innerText = displayAtk;
     document.getElementById('d_def_vl').innerText = (itemDefVl + Math.floor(theLuc / 20));
     document.getElementById('d_def_p').innerText = (itemDefP + Math.floor(linhLuc / 20));
-    document.getElementById('d_speed').innerText = (((tinhLuc / 10) + currentPeriod)).toFixed(1);
+    document.getElementById('d_speed').innerText = Number((tinhLuc / 10) + currentPeriod).toFixed(1);
 
     renderEffectModalContent();
   } catch (err) {
-    console.error("Lỗi cập nhật UI:", err);
+    console.error("Lỗi cập nhật UI chi tiết:", err);
   }
 }
 
