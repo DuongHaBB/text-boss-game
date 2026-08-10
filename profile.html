@@ -15,7 +15,6 @@ hr { border: 0; border-top: 1px solid #333; margin: 10px 0; }
 button { width: 100%; padding: 10px; margin-top: 6px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 4px; font-size: 13px; }
 button:hover { background: #383838; }
 .combat-btn { background: #0f2a1a; border-color: #2ecc71; color: #2ecc71; font-weight: bold; }
-.break-btn { background: #3c2a0f; border-color: #d4af37; color: #d4af37; font-weight: bold; }
 
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 99; }
 .modal-content { background: #1a1a1a; padding: 25px; border-radius: 8px; width: 440px; border: 1px solid #2ecc71; text-align: center; }
@@ -63,7 +62,7 @@ button:hover { background: #383838; }
   Bạn chợt thấy 1 con heo rừng chạy băng qua. Bạn quyết định...
 </div>
 <div id="story-actions">
-  <button onclick="actionChaseBoar()" style="background: #0f2a1a; border-color: #2ecc71; color: #2ecc71; font-weight: bold;">🏃 Đuổi theo (Tốn 2 Hoạt Lực nếu hụt)</button>
+  <button onclick="actionChaseBoar()" style="background: #0f2a1a; border-color: #2ecc71; color: #2ecc71; font-weight: bold;">🏃 Đuổi theo</button>
   <button onclick="actionWalkAway()" style="background: #262626; border-color: #555; color: #aaa;">🚶 Đi tiếp (Bỏ qua)</button>
 </div>
 <button onclick="closeTestGameplay()" style="background: #333; margin-top: 15px; border: 1px solid #555; color: #ccc;">⬅ Quay lại Bảng Chính</button>
@@ -283,16 +282,13 @@ function actionChaseBoar() {
   let boarLinh = Math.floor((high - low) * 20);
   let boarTinh = 20 - boarThe - boarLinh;
 
-  // Tốc lực lợn rừng tính theo Tinh lực lợn / 10 + 1 (hoặc tương đương hệ thống)
   let boarSpeed = Number(((boarTinh / 10) + 1).toFixed(1));
 
   if (boarSpeed <= playerSpeed) {
-    // Đuổi kịp và combat thắng luôn
-    hoatLuc = Math.max(0, hoatLuc - 1); // Trừ 1 hoạt lực combat
+    hoatLuc = Math.max(0, hoatLuc - 1);
     localStorage.setItem('game_hoat_luc', hoatLuc);
     updateUI();
 
-    // Xử lý rơi đồ chuẩn tinh anh/thường (tạm dùng tỷ lệ cấp 2 Tinh anh)
     let matList = [{ name: 'Nguyên liệu A' }, { name: 'Nguyên liệu B' }, { name: 'Nguyên liệu C' }, { name: 'Nguyên liệu D' }];
     let totalDropCount = Math.floor(Math.random() * 5);
     let droppedItemsMap = {};
@@ -312,27 +308,23 @@ function actionChaseBoar() {
 
     document.getElementById('story-box').innerHTML = 
       `🏃 Bạn tăng tốc đuổi theo và tóm gọn được con Lợn Rừng!<br>` +
-      `⚡ Tốc lực bạn: ${playerSpeed} | Tốc lực Lợn: ${boarSpeed}<br>` +
       `⚔️ Đã tiêu diệt lợn rừng (Tốn 1 Hoạt Lực).<br><br>` +
-      `🎁 <b>Chiến lợi phẩm thu được:</b><br>` + (itemsListText.length > 0 ? itemsListText.join('<br>') : "Không rơi nguyên liệu nào.");
+      `🎁 <b>Chiến lợi phẩm nhận được:</b><br>` + (itemsListText.length > 0 ? itemsListText.join('<br>') : "Không rơi nguyên liệu nào.");
     document.getElementById('story-actions').style.display = 'none';
 
   } else {
-    // Không đuổi kịp, trừ 2 hoạt lực
     hoatLuc = Math.max(0, hoatLuc - 2);
     localStorage.setItem('game_hoat_luc', hoatLuc);
     updateUI();
 
     document.getElementById('story-box').innerHTML = 
-      `💨 Bạn chạy hết hơi cũng không đuổi theo kịp con lợn rừng!<br>` +
-      `⚡ Tốc lực bạn: ${playerSpeed} | Tốc lực Lợn: ${boarSpeed}<br>` +
-      `❌ Thể lực hao hụt, bạn bị trừ <b>2 Hoạt Lực</b>.`;
+      `Bạn đuổi theo mãi mà không kịp - 2 hoạt lực`;
     document.getElementById('story-actions').style.display = 'none';
   }
 }
 
 // ----------------------------------------------------
-// HỆ THỐNG COMBAT CHÍNH (GIỮ NGUYÊN TỶ LỆ)
+// HỆ THỐNG COMBAT CHÍNH
 // ----------------------------------------------------
 function startCombat(tier, rewardType) {
   if (isBottleneck) return;
@@ -402,7 +394,7 @@ function startCombat(tier, rewardType) {
     innerCoreFound = coreName + " (x1)";
   }
 
-  hoatLuc = Math.max(0, hoatLuc - 1); // Trừ 1 hoạt lực combat
+  hoatLuc = Math.max(0, hoatLuc - 1);
   localStorage.setItem('game_hoat_luc', hoatLuc);
 
   let baseGain = (tier === 1) ? 0.05 : (tier === 2 ? 0.2 : 0.4);
@@ -434,11 +426,9 @@ function startCombat(tier, rewardType) {
   }
 
   let report = `⚔️ KẾT QUẢ CHIẾN THẮNG QUÁI CẤP ${tier} (Tiêu hao 1 Hoạt Lực)!\n\n` +
-               `📊 Chỉ số quái (Random):\n` +
-               `- Thể: ${monsterThe} | Linh: ${monsterLinh} | Tinh: ${monsterTinh} (Tổng: ${totalPoints})\n\n` +
                `🎁 Chiến lợi phẩm nhận được (${itemsListText.length} món):\n` +
                (itemsListText.length > 0 ? itemsListText.join('\n') : `- Không rơi vật phẩm nguyên liệu nào`) + '\n\n' +
-               (innerCoreFound ? `🌟 BÁU VẬT THU ĐƯỢC:\n- Tìm thấy ${innerCoreFound}` : `🌟 BÁU VẬT THU ĐƯỢC:\n- Không rơi nội đan`);
+               (innerCoreFound ? `🌟 BÁU VẬT THU ĐƯỢC:\n- Tìm thấy ${innerCoreFound}` : ``);
 
   alert(report);
 }
