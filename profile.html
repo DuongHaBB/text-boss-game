@@ -69,7 +69,7 @@ button:hover { background: #383838; }
   </div>
 </div>
 <div class="monster-group">
-  <div class="monster-title">2. Quái Tinh Anh (Test Combat - Rơi nguyên liệu A, B, C, D)</div>
+  <div class="monster-title">2. Quái Tinh Anh (Test Combat - Rơi nguyên liệu ngẫu nhiên A, B, C, D)</div>
   <div class="monster-row">
     <button class="reward-btn" onclick="startCombat(2, 'the_luc')">⚡ Thể</button>
     <button class="reward-btn" onclick="startCombat(2, 'linh_luc')">💧 Linh</button>
@@ -225,7 +225,7 @@ function openDetailsModal() { document.getElementById('details-modal').style.dis
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
 // ----------------------------------------------------
-// HỆ THỐNG COMBAT & RƠI ĐỒ MỚI (CẬP NHẬT ĐỊNH DẠNG xN)
+// HỆ THỐNG COMBAT & RƠI ĐỒ ĐỘC LẬP (MỐC ĐỘT BIẾN > 70%)
 // ----------------------------------------------------
 function startCombat(tier, rewardType) {
   if (isBottleneck) return;
@@ -250,33 +250,34 @@ function startCombat(tier, rewardType) {
   if (maxVal === monsterLinh) dominantAttr = 'LINH';
   if (maxVal === monsterTinh) dominantAttr = 'TINH';
 
-  let isMutation = (maxVal > (totalPoints * 0.5));
+  // Yêu cầu mới: Chỉ số vượt trội > 70% tổng điểm phân phối mới tính là đột biến
+  let isMutation = (maxVal > (totalPoints * 0.7));
 
-  let matNames = {
-    'THE': 'Nguyên liệu A',
-    'LINH': 'Nguyên liệu B',
-    'TINH': 'Nguyên liệu C',
-    'HON_HOP': 'Nguyên liệu D'
-  };
+  // Danh sách nguyên liệu A, B, C, D
+  let matList = [
+    { name: 'Nguyên liệu A', attr: 'THE' },
+    { name: 'Nguyên liệu B', attr: 'LINH' },
+    { name: 'Nguyên liệu C', attr: 'TINH' },
+    { name: 'Nguyên liệu D', attr: 'HON_HOP' }
+  ];
 
-  let chosenMatKey = dominantAttr;
-  if (tier >= 2 && !isMutation) {
-    let spread = maxVal - Math.min(monsterThe, monsterLinh, monsterTinh);
-    if (spread < (totalPoints * 0.2)) chosenMatKey = 'HON_HOP';
-  }
-
-  // Số lượng rơi ngẫu nhiên tổng cộng từ 0 đến 4 món
+  // Số lượng món đồ rơi ngẫu nhiên từ 0 đến 4 cho 1 con quái
   let totalDropCount = Math.floor(Math.random() * 5); 
   let droppedItemsMap = {};
-  
-  if (totalDropCount > 0) {
-    let matName = matNames[chosenMatKey];
+
+  for (let i = 0; i < totalDropCount; i++) {
+    // Chọn ngẫu nhiên một loại nguyên liệu trong 4 loại A, B, C, D một cách độc lập
+    let randomMat = matList[Math.floor(Math.random() * matList.length)];
     let qualityTier = (tier === 2 && isMutation) ? "Thượng Phẩm" : "Phàm Phẩm";
-    let keyStr = matName + " [" + qualityTier + "]";
-    droppedItemsMap[keyStr] = totalDropCount;
+    let keyStr = randomMat.name + " [" + qualityTier + "]";
+    
+    if (!droppedItemsMap[keyStr]) {
+      droppedItemsMap[keyStr] = 0;
+    }
+    droppedItemsMap[keyStr] += 1; // Mỗi lần random trúng là x1 cho loại đó trên 1 con quái
   }
 
-  // Xử lý nội đan
+  // Xử lý nội đan (Chỉ quái cấp 2 khi có đột biến > 70% mới có tỷ lệ rơi)
   let innerCoreFound = null;
   if (tier === 2 && isMutation) {
     if (Math.random() < 0.3) {
@@ -285,8 +286,7 @@ function startCombat(tier, rewardType) {
       else if (dominantAttr === 'LINH') coreName = "Nguyên Khí Yêu Đan";
       else coreName = "Thần Phách Yêu Đan";
       
-      let coreCount = 1; // Thường rơi 1 viên, có thể mở rộng sau nếu có quái 2 đan
-      innerCoreFound = coreName + " (x" + coreCount + ") [Thượng Phẩm]";
+      innerCoreFound = coreName + " (x1) [Thượng Phẩm]";
     }
   }
 
@@ -316,15 +316,17 @@ function startCombat(tier, rewardType) {
 
   // 3. Chuẩn bị text báo cáo kết quả
   let itemsListText = [];
+  let actualTotalDrops = 0;
   for (let key in droppedItemsMap) {
+    actualTotalDrops += droppedItemsMap[key];
     itemsListText.push(`- ${key} (x${droppedItemsMap[key]})`);
   }
 
   let report = `⚔️ KẾT QUẢ CHIẾN THẮNG QUÁI CẤP ${tier}!\n\n` +
                `📊 Chỉ số quái (Random):\n` +
                `- Thể: ${monsterThe} | Linh: ${monsterLinh} | Tinh: ${monsterTinh} (Tổng: ${totalPoints})\n` +
-               `- Trạng thái đột biến (>50%): ${isMutation ? 'CÓ (Chỉ số áp đảo)' : 'KHÔNG (Rải đều bình thường)'}\n\n` +
-               `🎁 Chiến lợi phẩm nhận được (${totalDropCount} món):\n` +
+               `- Trạng thái đột biến (>70%): ${isMutation ? 'CÓ (Chỉ số áp đảo)' : 'KHÔNG (Chưa đạt mốc 70%)'}\n\n` +
+               `🎁 Chiến lợi phẩm nhận được (${actualTotalDrops} món):\n` +
                (itemsListText.length > 0 ? itemsListText.join('\n') : `- Không rơi vật phẩm nguyên liệu nào`) + '\n\n' +
                (innerCoreFound ? `🌟 BÁU VẬT THU ĐƯỢC:\n- Tìm thấy ${innerCoreFound}` : `🌟 BÁU VẬT THU ĐƯỢC:\n- Không tìm thấy nội đan`);
 
