@@ -129,7 +129,6 @@ let progTinhLuc = parseFloat(localStorage.getItem('game_prog_tinh_luc')) || 0.0;
 let currentPeriod = parseInt(localStorage.getItem('game_period')) || 1;
 let isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
 
-// Khởi tạo các chỉ số trang bị mặc định để tránh lỗi NaN
 let itemStvl = parseInt(localStorage.getItem('item_stvl'));
 if (isNaN(itemStvl)) itemStvl = 5;
 let itemStp = parseInt(localStorage.getItem('item_stp'));
@@ -187,33 +186,29 @@ function updateUI() {
     breakBtn.style.display = 'none';
   }
 
-  let dmgTypeStr = "";
-  let atkVal = 0;
-  let statsObj = { 'Thể': theLuc, 'Linh': linhLuc, 'Tinh': tinhLuc };
-  let maxVal = Math.max(theLuc, linhLuc, tinhLuc);
-  let highestKeys = Object.keys(statsObj).filter(k => statsObj[k] === maxVal);
+  let dmgTypeStr = "Vật Lý";
+  let atkVal = itemStvl + (theLuc / 10);
 
-  if (highestKeys.length >= 2 && maxVal > 0) {
-    if (highestKeys.length === 3) {
-      currentTitleEffect = { name: "👑 Tam Thanh Nhất Khí", desc: "Giảm 50% chỉ số địch, Sát thương x2." };
-      dmgTypeStr = "Hỗn Hợp Tuyệt Đối";
-      atkVal = (itemStvl + (theLuc / 10)) * 2;
-    } else {
-      currentTitleEffect = { name: "⚡ Lưỡng Nghi Đồng Nguyên", desc: "Cân bằng thuộc tính." };
-      dmgTypeStr = "Hỗn Hợp";
-      atkVal = (itemStvl + (theLuc / 10)) * 2;
-    }
+  // Kiểm tra hiệu ứng danh hiệu và hệ sát thương an toàn
+  if (theLuc === linhLuc && linhLuc === tinhLuc && maxStat > 0) {
+    currentTitleEffect = { name: "👑 Tam Thanh Nhất Khí", desc: "Giảm 50% chỉ số địch, Sát thương x2." };
+    dmgTypeStr = "Hỗn Hợp Tuyệt Đối";
+    atkVal = (itemStvl + (theLuc / 10)) * 2;
+  } else if ((theLuc === linhLuc && theLuc > tinhLuc) || (theLuc === tinhLuc && theLuc > linhLuc) || (linhLuc === tinhLuc && linhLuc > theLuc)) {
+    currentTitleEffect = { name: "⚡ Lưỡng Nghi Đồng Nguyên", desc: "Cân bằng thuộc tính." };
+    dmgTypeStr = "Hỗn Hợp";
+    atkVal = (itemStvl + (theLuc / 10)) * 2;
   } else {
     currentTitleEffect = { name: "🛡️ Bình Thường", desc: "Trạng thái ổn định." };
-    if (theLuc > linhLuc && theLuc >= tinhLuc) {
-      dmgTypeStr = "Vật Lý";
-      atkVal = itemStvl + (theLuc / 10);
-    } else if (linhLuc > theLuc && linhLuc >= tinhLuc) {
+    if (linhLuc > theLuc && linhLuc >= tinhLuc) {
       dmgTypeStr = "Pháp Thuật";
       atkVal = itemStp + (linhLuc / 10);
-    } else {
+    } else if (tinhLuc > theLuc && tinhLuc > linhLuc) {
       dmgTypeStr = "Tinh Thần";
       atkVal = itemStvl + (tinhLuc / 10);
+    } else {
+      dmgTypeStr = "Vật Lý";
+      atkVal = itemStvl + (theLuc / 10);
     }
   }
 
