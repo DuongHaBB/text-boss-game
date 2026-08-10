@@ -5,13 +5,7 @@ const server = http.createServer(app);
 
 app.use(express.json());
 
-// Bảng tra cứu mốc trần Bình Cảnh
-const BOTTLENECK_LIMITS = {
-  1: 20, 2: 50, 3: 100, 4: 200, 5: 400,
-  6: 800, 7: 1600, 8: 3200, 9: 6400, 10: 12800
-};
-
-// 1. Màn hình Khởi Tạo
+// 1. Màn hình Khởi Tạo (Tạo Nhân Vật)
 app.get('/', (req, res) => {
   res.send(`
 <!DOCTYPE html>
@@ -157,7 +151,7 @@ updateRealmBonus();
 `);
 });
 
-// 2. Màn hình Bảng Thông Số Nhân Vật (Đạo Tịch)
+// 2. Màn hình Bảng Thông Số Nhân Vật (Đạo Tịch) & Combat theo Khu Vực Quái
 app.get('/profile', (req, res) => {
   res.send(`
 <!DOCTYPE html>
@@ -183,16 +177,16 @@ button:hover { background: #383838; }
 
 /* Modal Combat */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
-.modal-content { background: #1a1a1a; padding: 25px; border-radius: 8px; width: 420px; border: 1px solid #2ecc71; text-align: center; }
+.modal-content { background: #1a1a1a; padding: 25px; border-radius: 8px; width: 440px; border: 1px solid #2ecc71; text-align: center; }
 .monster-group { margin: 10px 0; border: 1px solid #333; padding: 8px; border-radius: 6px; background: #141414; text-align: left; }
 .monster-title { font-size: 11px; color: #2ecc71; font-weight: bold; margin-bottom: 4px; }
 .reward-btn { width: 32%; padding: 6px 2px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 3px; font-size: 10px; text-align: center; font-family: inherit; }
 .reward-btn:hover { background: #383838; border-color: #d4af37; }
 .monster-row { display: flex; justify-content: space-between; }
 
-/* Trình bày Tab Hiệu Ứng / Danh Hiệu Nhỏ */
+/* Trình bày Tab Hiệu Ứng / Danh Hiệu */
 .effect-section-title { font-size: 11px; color: #2ecc71; margin-top: 6px; margin-bottom: 2px; font-weight: bold; }
-.effect-row-item { font-size: 11px; color: #ccc; padding: 2px 0; border-bottom: 1px dashed #222; display: flex; justify-content: space-between; }
+.effect-row-item { font-size: 11px; color: #ccc; padding: 4px 0; border-bottom: 1px dashed #222; display: flex; justify-content: space-between; }
 </style>
 </head>
 <body>
@@ -240,11 +234,20 @@ button:hover { background: #383838; }
 <button onclick="goBack()" style="background: #2a1111; border-color: #773333; color: #ff9999;">🔄 Đầu thai (Chuyển sinh lại)</button>
 </div>
 
-<!-- Modal Combat -->
+<!-- Modal Combat (Chọn khu vực săn quái) -->
 <div id="combat-modal" class="modal-overlay">
 <div class="modal-content">
-<h3 style="color: #2ecc71; margin-top: 0;">🎉 CHIẾN THẮNG COMBAT!</h3>
-<p style="color: #aaa; font-size: 11px; margin-bottom: 6px;">Chọn loại quái để nhận tiến độ:</p>
+<h3 style="color: #2ecc71; margin-top: 0;">⚔️ CHỌN KHU VỰC SĂN QUÁI</h3>
+<p style="color: #aaa; font-size: 11px; margin-bottom: 8px;">Mỗi khu vực có đặc tính yêu thú riêng:</p>
+
+<div style="margin-bottom: 10px; text-align: left;">
+  <label style="font-size: 12px; color: #d4af37; font-weight: bold;">Chọn Khu Vực Săn:</label>
+  <select id="combat-realm-select" style="margin-top: 4px;">
+    <option value="xich_hoa">🔥 Xích Hỏa Vực (Quái trâu máu, sát thương vật lý cao, tỉ lệ thiêu đốt)</option>
+    <option value="tam_sac">💧 Tam Sắc Phủ (Quái mạnh pháp thuật, linh lực dồi dào, phong tỏa)</option>
+    <option value="bach_ngoc">✨ Bạch Ngọc Đài (Quái tốc độ cao, né tránh tốt, tấn công dồn dập)</option>
+  </select>
+</div>
 
 <div class="monster-group">
   <div class="monster-title">1. Quái Thường [+0.05 pts]</div>
@@ -256,25 +259,16 @@ button:hover { background: #383838; }
 </div>
 
 <div class="monster-group">
-  <div class="monster-title">2. Quái Lớn / Cự Xà [+0.1 pts]</div>
+  <div class="monster-title">2. Quái Tinh Anh [+0.2 pts]</div>
   <div class="monster-row">
-    <button class="reward-btn" onclick="absorbCombat(0.1, 'the_luc')">⚡ Thể</button>
-    <button class="reward-btn" onclick="absorbCombat(0.1, 'linh_luc')">💧 Linh</button>
-    <button class="reward-btn" onclick="absorbCombat(0.1, 'tinh_luc')">✨ Tinh</button>
+    <button class="reward-btn" onclick="absorbCombat(0.2, 'the_luc')">⚡ Thể</button>
+    <button class="reward-btn" onclick="absorbCombat(0.2, 'linh_luc')">💧 Linh</button>
+    <button class="reward-btn" onclick="absorbCombat(0.2, 'tinh_luc')">✨ Tinh</button>
   </div>
 </div>
 
 <div class="monster-group">
-  <div class="monster-title">3. Tinh Anh / Đầu Đàn [+0.4 pts]</div>
-  <div class="monster-row">
-    <button class="reward-btn" onclick="absorbCombat(0.4, 'the_luc')">⚡ Thể</button>
-    <button class="reward-btn" onclick="absorbCombat(0.4, 'linh_luc')">💧 Linh</button>
-    <button class="reward-btn" onclick="absorbCombat(0.4, 'tinh_luc')">✨ Tinh</button>
-  </div>
-</div>
-
-<div class="monster-group">
-  <div class="monster-title">4. Boss / Đại Yêu Thú [+1.0 pts trọn vẹn]</div>
+  <div class="monster-title">3. Boss Đại Yêu Thú [+1.0 pts]</div>
   <div class="monster-row">
     <button class="reward-btn" onclick="absorbCombat(1.0, 'the_luc')">⚡ Thể</button>
     <button class="reward-btn" onclick="absorbCombat(1.0, 'linh_luc')">💧 Linh</button>
@@ -335,8 +329,7 @@ function checkAndTriggerBottleneck() {
   }
 }
 
-// Biến chứa thông tin chi tiết hiển thị trong Tab Hiệu Ứng
-let currentTitleEffect = { name: "Bình Thường", desc: "Chưa kích hoạt danh hiệu song/tam tu đặc biệt." };
+let currentTitleEffect = { name: "Bình Thường", desc: "Chưa kích hoạt danh hiệu đặc biệt." };
 let currentItemEffects = [
   { name: itemDescName, desc: `STVL: +${itemStvl} | STP: +${itemStp} | Kháng: +${itemDefVl}` }
 ];
@@ -373,7 +366,6 @@ function updateUI() {
   let dmgTypeStr = "";
   let atkVal = 0;
 
-  // Xác định danh hiệu & hiệu ứng động
   let statsObj = { 'Thể': theLuc, 'Linh': linhLuc, 'Tinh': tinhLuc };
   let maxVal = Math.max(theLuc, linhLuc, tinhLuc);
   let highestKeys = Object.keys(statsObj).filter(k => statsObj[k] === maxVal);
@@ -435,13 +427,13 @@ function updateUI() {
 function renderEffectTabContent() {
   let container = document.getElementById('effect-content-container');
   container.innerHTML = `
-    <div class="effect-section-title">🏆 Danh Hiệu & Hiệu Ứng Đang Nhận:</div>
+    <div class="effect-section-title">🏆 Danh Hiệu Đang Mang:</div>
     <div class="effect-row-item">
       <span style="color: #d4af37; font-weight: bold;">${currentTitleEffect.name}</span>
-      <span style="color: #aaa; text-align: right;">${currentTitleEffect.desc}</span>
+      <span style="color: #aaa; text-align: right; max-width: 200px;">${currentTitleEffect.desc}</span>
     </div>
 
-    <div class="effect-section-title" style="margin-top: 8px;">🎒 Chỉ Số Cộng Từ Trang Bị (Item):</div>
+    <div class="effect-section-title" style="margin-top: 8px;">🎒 Chỉ Số & Hiệu Ứng Từ Trang Bị:</div>
   `;
 
   currentItemEffects.forEach(item => {
@@ -466,7 +458,7 @@ function toggleEffectTab() {
 
 function openCombatModal() {
   if (isBottleneck) {
-    alert('Đang lâm vào bình cảnh! Không thể hấp thu nguyên khí nếu chưa phá vỡ cảnh giới.');
+    alert('Đang lâm vào bình cảnh! Không thể chiến đấu hấp thu nguyên khí nếu chưa phá vỡ cảnh giới.');
     return;
   }
   document.getElementById('combat-modal').style.display = 'flex';
@@ -482,13 +474,18 @@ function absorbCombat(baseAmount, type) {
     return;
   }
 
+  // Lấy khu vực săn quái người chơi chọn trong modal
+  let selectedCombatRealm = document.getElementById('combat-realm-select').value;
+
   let multiplier = 1;
+  // Nếu loại nguyên khí hấp thu trùng với thế mạnh bẩm sinh của khu vực khởi tạo nhân vật thì x2
   if (type === 'the_luc' && realmKey === 'xich_hoa') multiplier = 2;
   if (type === 'linh_luc' && realmKey === 'tam_sac') multiplier = 2;
   if (type === 'tinh_luc' && realmKey === 'bach_ngoc') multiplier = 2;
 
   let gained = baseAmount * multiplier;
   let statNameVi = (type === 'the_luc') ? 'Thể Lực' : (type === 'linh_luc') ? 'Linh Lực' : 'Tinh Lực';
+  let realmNameVi = (selectedCombatRealm === 'xich_hoa') ? 'Xích Hỏa Vực' : (selectedCombatRealm === 'tam_sac') ? 'Tam Sắc Phủ' : 'Bạch Ngọc Đài';
 
   if (type === 'the_luc') {
     progTheLuc += gained;
@@ -498,7 +495,7 @@ function absorbCombat(baseAmount, type) {
   } else if (type === 'linh_luc') {
     progLinhLuc += gained;
     while (progLinhLuc >= 1.0) { linhLuc += 1; progLinhLuc -= 1.0; }
-    localStorage.setItem('game_linh_luc', linhLin);
+    localStorage.setItem('game_linh_luc', linhLuc);
     localStorage.setItem('game_prog_linh_luc', progLinhLuc.toFixed(2));
   } else if (type === 'tinh_luc') {
     progTinhLuc += gained;
@@ -508,7 +505,7 @@ function absorbCombat(baseAmount, type) {
   }
 
   checkAndTriggerBottleneck();
-  alert('Hấp thu thành công! Nhận +' + gained.toFixed(2) + ' tiến độ ' + statNameVi);
+  alert('Chiến thắng yêu thú tại ' + realmNameVi + '! Nhận +' + gained.toFixed(2) + ' tiến độ ' + statNameVi);
   
   closeCombatModal();
   updateUI();
