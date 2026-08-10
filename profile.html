@@ -136,7 +136,7 @@ let progTinhLuc = Number(localStorage.getItem('game_prog_prog_tinh_luc')) || 0;
 let currentPeriod = Number(localStorage.getItem('game_period')) || 1;
 let isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
 
-let maxHoatLuc = 10 + currentPeriod * 10;
+let maxHoatLuc = Math.floor(10 + (tinhLuc / 10) + (currentPeriod * 10));
 let hoatLuc = Number(localStorage.getItem('game_hoat_luc'));
 if (isNaN(hoatLuc)) {
   hoatLuc = maxHoatLuc;
@@ -178,7 +178,7 @@ function updateUI() {
     document.getElementById('d_linh_luc').innerText = linhLuc;
     document.getElementById('d_tinh_luc').innerText = tinhLuc;
 
-    maxHoatLuc = 10 + currentPeriod * 10;
+    maxHoatLuc = Math.floor(10 + (tinhLuc / 10) + (currentPeriod * 10));
     if (hoatLuc > maxHoatLuc) hoatLuc = maxHoatLuc;
     document.getElementById('d_hoat_luc').innerText = hoatLuc + " / " + maxHoatLuc;
 
