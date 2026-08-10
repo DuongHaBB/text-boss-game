@@ -5,7 +5,21 @@ const server = http.createServer(app);
 
 app.use(express.json());
 
-// 1. Màn hình Khởi Tạo: Nhập Tên nhân vật & Chọn khu vực xuất thân
+// Bảng tra cứu mốc trần Bình Cảnh cho 10 Kỳ tu luyện
+const BOTTLENECK_LIMITS = {
+  1: 10,
+  2: 30,
+  3: 70,
+  4: 150,
+  5: 310,
+  6: 630,
+  7: 1270,
+  8: 2550,
+  9: 5110,
+  10: 10230
+};
+
+// 1. Màn hình Khởi Tạo: Nhập Tên & Chọn khu vực
 app.get('/', (req, res) => {
   res.send(`
 <!DOCTYPE html>
@@ -39,23 +53,16 @@ button:hover { background: #b89728; }
 function saveAndEnter() {
 const name = document.getElementById('username').value.trim();
 const realm = document.getElementById('realm-select').value;
-if (!name) {
-alert('Vui lòng nhập tên main!');
-return;
-}
+if (!name) { alert('Vui lòng nhập tên main!'); return; }
 let travelerId = '#' + Math.floor(Math.random() * 900 + 100);
 
 let theLuc = 10;
 let linhLuc = 10;
 let tinhLuc = 10;
 
-if (realm === 'xich_hoa') {
-  theLuc += 5;
-} else if (realm === 'tam_sac') {
-  linhLuc += 5;
-} else if (realm === 'bach_ngoc') {
-  tinhLuc += 5;
-}
+if (realm === 'xich_hoa') { theLuc += 5; }
+else if (realm === 'tam_sac') { linhLuc += 5; }
+else if (realm === 'bach_ngoc') { tinhLuc += 5; }
 
 localStorage.setItem('game_character_name', name);
 localStorage.setItem('game_traveler_id', travelerId);
@@ -64,10 +71,19 @@ localStorage.setItem('game_the_luc', theLuc);
 localStorage.setItem('game_linh_luc', linhLuc);
 localStorage.setItem('game_tinh_luc', tinhLuc);
 
-// Khởi tạo tiến độ hấp thu thập phân (dưới dạng float)
 localStorage.setItem('game_prog_the_luc', 0.0);
 localStorage.setItem('game_prog_linh_luc', 0.0);
 localStorage.setItem('game_prog_tinh_luc', 0.0);
+
+// Khởi tạo Kỳ tu luyện ban đầu là Kỳ 1, trạng thái chưa kẹt bình cảnh
+localStorage.setItem('game_period', 1);
+localStorage.setItem('game_is_bottleneck', 'false');
+
+// Mẫu Item giả lập để test công thức ATK và DEF
+localStorage.setItem('item_stvl', 5);
+localStorage.setItem('item_stp', 5);
+localStorage.setItem('item_def_vl', 3);
+localStorage.setItem('item_def_p', 3);
 
 window.location.href = '/profile';
 }
@@ -77,128 +93,120 @@ window.location.href = '/profile';
 `);
 });
 
-// 2. Màn hình Bảng Thông Số Nhân Vật (Đạo Tịch) tích hợp Test Combat theo cấp bậc quái
+// 2. Màn hình Bảng Thông Số Nhân Vật (Đạo Tịch) tích hợp toàn bộ hệ thống chiến đấu & cảnh giới
 app.get('/profile', (req, res) => {
   res.send(`
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Đạo Tịch & Test Combat Hệ Thống Tiến Độ</title>
+<title>Đạo Tịch - Hệ Thống Cảnh Giới & Combat</title>
 <style>
 body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-.panel { background: #1a1a1a; padding: 25px 30px; border-radius: 8px; width: 440px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); margin: 20px 0; }
-.stat-item { margin: 10px 0; color: #aaa; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
-.sub-stat { padding-left: 15px; font-size: 13px; color: #888; }
+.panel { background: #1a1a1a; padding: 25px 30px; border-radius: 8px; width: 460px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); margin: 20px 0; }
+.stat-item { margin: 8px 0; color: #aaa; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+.sub-stat { padding-left: 15px; font-size: 12px; color: #888; }
 .stat-value { color: #d4af37; font-weight: bold; }
 .prog-text { font-size: 11px; color: #666; font-style: italic; }
-hr { border: 0; border-top: 1px solid #333; margin: 12px 0; }
-button { width: 100%; padding: 10px; margin-top: 8px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 4px; font-size: 14px; }
+.warning-text { color: #e74c3c; font-weight: bold; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+hr { border: 0; border-top: 1px solid #333; margin: 10px 0; }
+button { width: 100%; padding: 10px; margin-top: 6px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 4px; font-size: 13px; }
 button:hover { background: #383838; }
 .combat-btn { background: #0f2a1a; border-color: #2ecc71; color: #2ecc71; font-weight: bold; }
-.combat-btn:hover { background: #143d24; }
-.sub-panel { background: #141414; border: 1px dashed #444; padding: 12px; margin-top: 15px; border-radius: 6px; display: none; }
-.sub-title { color: #d4af37; font-size: 13px; margin-bottom: 8px; text-align: center; font-weight: bold; }
+.break-btn { background: #3c2a0f; border-color: #d4af37; color: #d4af37; font-weight: bold; }
+.sub-panel { background: #141414; border: 1px dashed #444; padding: 10px; margin-top: 12px; border-radius: 6px; display: none; }
+.sub-title { color: #d4af37; font-size: 12px; margin-bottom: 6px; text-align: center; font-weight: bold; }
 
-/* Modal Test Combat theo cấp bậc quái */
+/* Modal Test Combat */
 #combat-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
 .modal-content { background: #1a1a1a; padding: 25px; border-radius: 8px; width: 420px; border: 1px solid #2ecc71; text-align: center; }
-.monster-group { margin: 12px 0; border: 1px solid #333; padding: 10px; border-radius: 6px; background: #141414; text-align: left; }
-.monster-title { font-size: 12px; color: #2ecc71; font-weight: bold; margin-bottom: 6px; }
-.reward-btn { width: 32%; padding: 8px 4px; margin: 2px 0; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 3px; font-size: 11px; text-align: center; font-family: inherit; }
+.monster-group { margin: 10px 0; border: 1px solid #333; padding: 8px; border-radius: 6px; background: #141414; text-align: left; }
+.monster-title { font-size: 11px; color: #2ecc71; font-weight: bold; margin-bottom: 4px; }
+.reward-btn { width: 32%; padding: 6px 2px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 3px; font-size: 10px; text-align: center; font-family: inherit; }
 .reward-btn:hover { background: #383838; border-color: #d4af37; }
 .monster-row { display: flex; justify-content: space-between; }
 </style>
 </head>
 <body>
 <div class="panel">
-<h2 style="text-align: center; color: #d4af37; margin-top: 0; margin-bottom: 15px;">ĐẠO TỊCH</h2>
+<h2 style="text-align: center; color: #d4af37; margin-top: 0; margin-bottom: 12px;">ĐẠO TỊCH</h2>
 <div class="stat-item"><span id="d_label_traveler">Lữ khách -</span> <span class="stat-value" id="d_identity">-</span></div>
 <div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d_realm">-</span></div>
-<div class="stat-item"><span>Cảnh Giới (Cấp độ):</span> <span class="stat-value" id="d_rank">Cấp 1</span></div>
-<hr>
-<h4 style="color: #888; margin: 8px 0 4px 0;">TIỀM NĂNG & TIẾN ĐỘ HẤP THU</h4>
-<div class="stat-item">
-  <div>Thể Lực: <span class="stat-value" id="d_the_luc">-</span> <span class="prog-text" id="p_the_luc">(0%)</span></div>
-</div>
-<div class="stat-item">
-  <div>Linh Lực: <span class="stat-value" id="d_linh_luc">-</span> <span class="prog-text" id="p_linh_luc">(0%)</span></div>
-</div>
-<div class="stat-item">
-  <div>Tinh Lực: <span class="stat-value" id="d_tinh_luc">-</span> <span class="prog-text" id="p_tinh_luc">(0%)</span></div>
-</div>
-<hr>
-<h4 style="color: #888; margin: 8px 0 4px 0;">TRANG BỊ</h4>
-<div class="stat-item"><span>Vũ khí:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
-<div class="stat-item"><span>Khôi giáp:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
-<div class="stat-item"><span>Bối giáp:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
-<div class="stat-item"><span>Hộ thủ:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
+<div class="stat-item"><span>Cảnh Giới:</span> <span class="stat-value" id="d_rank">Kỳ 1</span></div>
+<div class="stat-item" id="bottleneck-status-box" style="display: none;"><span>Trạng thái:</span> <span class="warning-text">Lâm vào bình cảnh!</span></div>
 
-<!-- Tab hiển thị chỉ số chiến đấu chi tiết -->
+<hr>
+<h4 style="color: #888; margin: 6px 0 4px 0;">TIỀM NĂNG & TIẾN ĐỘ</h4>
+<div class="stat-item"><span>Thể Lực:</span> <div><span class="stat-value" id="d_the_luc">-</span> <span class="prog-text" id="p_the_luc">(0%)</span></div></div>
+<div class="stat-item"><span>Linh Lực:</span> <div><span class="stat-value" id="d_linh_luc">-</span> <span class="prog-text" id="p_linh_luc">(0%)</span></div></div>
+<div class="stat-item"><span>Tinh Lực:</span> <div><span class="stat-value" id="d_tinh_luc">-</span> <span class="prog-text" id="p_tinh_luc">(0%)</span></div></div>
+
+<hr>
+<h4 style="color: #888; margin: 6px 0 4px 0;">CHỈ SỐ CHIẾN ĐẤU (ATK & DEF)</h4>
+<div class="stat-item"><span>Hệ Sát Thương:</span> <span class="stat-value" id="d_dmg_type" style="color: #3498db;">-</span></div>
+<div class="stat-item"><span>Chỉ Số Tấn Công (ATK):</span> <span class="stat-value" id="d_atk_val">-</span></div>
+<div class="stat-item"><span>Kháng Vật Lý:</span> <span class="stat-value" id="d_def_vl">-</span></div>
+<div class="stat-item"><span>Kháng Pháp Lực:</span> <span class="stat-value" id="d_def_p">-</span></div>
+<div class="stat-item"><span>Tốc Lực (Tinh Lực / 10 + Kỳ):</span> <span class="stat-value" id="d_speed">-</span></div>
+<div class="stat-item"><span>Danh Hiệu / Hiệu Ứng:</span> <span class="stat-value" id="d_title" style="color: #e67e22;">[Bình Thường]</span></div>
+
+<!-- Tab chi tiết nâng cao -->
 <div id="detail-box" class="sub-panel">
-<div class="sub-title">⚡ CHỈ SỐ CHI TIẾT CHIẾN ĐẤU ⚡</div>
-<div class="stat-item"><span>Hệ số Cảnh Giới:</span> <span class="stat-value" id="d_he_so">1.0x</span></div>
-<div class="stat-item"><span>Sinh Lực (HP / Thể chất):</span> <span class="stat-value" id="d_hp">-</span></div>
-<div class="stat-item" style="color: #00ffff; margin-top: 6px;"><span>Pháp Lực (MP giới hạn):</span> <span class="stat-value" id="d_mp" style="color: #00ffff;">-</span></div>
-<div class="stat-item sub-stat"><span>└─ Kháng Pháp (Phòng thủ phép):</span> <span class="stat-value" id="d_khang_phap">-</span></div>
-<div class="stat-item" style="color: #d4af37; margin-top: 8px;"><span>Tinh Lực Quy Đổi:</span> <span class="stat-value" id="d_tinh_tong">-</span></div>
-<div class="stat-item sub-stat"><span>├─ Cước Lực (Tốc/Né):</span> <span class="stat-value" id="d_cuoc_luc">-</span></div>
-<div class="stat-item sub-stat"><span>├─ May Mắn (Kỳ ngộ):</span> <span class="stat-value" id="d_may_man">-</span></div>
-<div class="stat-item sub-stat"><span>└─ Hoạt Lực (Chế đồ/Farm):</span> <span class="stat-value" id="d_hoat_luc">-</span></div>
+<div class="sub-title">⚡ CHI TIẾT TÍNH TOÁN ⚡</div>
+<div class="stat-item"><span>Trần điểm hiện tại:</span> <span class="stat-value" id="d_limit_val">10</span></div>
+<div class="stat-item"><span>Chỉ số cao nhất:</span> <span class="stat-value" id="d_max_stat">10</span></div>
 </div>
 
-<button class="combat-btn" onclick="openCombatModal()">⚔️ Test Combat (Chọn loại Quái & Hấp Thu)</button>
-<button onclick="toggleDetails()">📊 Xem chỉ số chi tiết</button>
+<button id="btn-break" class="break-btn" onclick="breakBottleneck()" style="display: none;">⚡ PHÁ VỠ BÌNH CẢNH</button>
+<button class="combat-btn" onclick="openCombatModal()">⚔️ Test Combat (Hấp Thu Nguyên Khí)</button>
+<button onclick="toggleDetails()">📊 Xem chi tiết giới hạn</button>
 <button onclick="goBack()" style="background: #2a1111; border-color: #773333; color: #ff9999;">🔄 Đầu thai (Chuyển sinh lại)</button>
 </div>
 
-<!-- Modal Giao diện Test Combat chọn cấp Quái -->
+<!-- Modal Test Combat chọn quái -->
 <div id="combat-modal">
 <div class="modal-content">
 <h3 style="color: #2ecc71; margin-top: 0;">🎉 CHIẾN THẮNG COMBAT!</h3>
-<p style="color: #aaa; font-size: 12px; margin-bottom: 8px;">Chọn cấp bậc quái đã hạ gục để nhận tiến độ nguyên khí:</p>
+<p style="color: #aaa; font-size: 11px; margin-bottom: 6px;">Chọn loại quái để nhận tiến độ (Bị kẹt bình cảnh sẽ không hấp thu được):</p>
 
-<!-- Cấp 1: Quái thường -->
 <div class="monster-group">
-  <div class="monster-title">1. Quái Thường (VD: Rắn Thường) [+0.05 pts]</div>
+  <div class="monster-title">1. Quái Thường [+0.05 pts]</div>
   <div class="monster-row">
-    <button class="reward-btn" onclick="absorbCombat(0.05, 'the_luc')">⚡ Thể Lực</button>
-    <button class="reward-btn" onclick="absorbCombat(0.05, 'linh_luc')">💧 Linh Lực</button>
-    <button class="reward-btn" onclick="absorbCombat(0.05, 'tinh_luc')">✨ Tinh Lực</button>
+    <button class="reward-btn" onclick="absorbCombat(0.05, 'the_luc')">⚡ Thể</button>
+    <button class="reward-btn" onclick="absorbCombat(0.05, 'linh_luc')">💧 Linh</button>
+    <button class="reward-btn" onclick="absorbCombat(0.05, 'tinh_luc')">✨ Tinh</button>
   </div>
 </div>
 
-<!-- Cấp 2: Quái to / Cự xà -->
 <div class="monster-group">
-  <div class="monster-title">2. Quái Lớn (VD: Cự Xà) [+0.1 pts]</div>
+  <div class="monster-title">2. Quái Lớn / Cự Xà [+0.1 pts]</div>
   <div class="monster-row">
-    <button class="reward-btn" onclick="absorbCombat(0.1, 'the_luc')">⚡ Thể Lực</button>
-    <button class="reward-btn" onclick="absorbCombat(0.1, 'linh_luc')">💧 Linh Lực</button>
-    <button class="reward-btn" onclick="absorbCombat(0.1, 'tinh_luc')">✨ Tinh Lực</button>
+    <button class="reward-btn" onclick="absorbCombat(0.1, 'the_luc')">⚡ Thể</button>
+    <button class="reward-btn" onclick="absorbCombat(0.1, 'linh_luc')">💧 Linh</button>
+    <button class="reward-btn" onclick="absorbCombat(0.1, 'tinh_luc')">✨ Tinh</button>
   </div>
 </div>
 
-<!-- Cấp 3: Tinh anh / Đầu đàn -->
 <div class="monster-group">
   <div class="monster-title">3. Tinh Anh / Đầu Đàn [+0.4 pts]</div>
   <div class="monster-row">
-    <button class="reward-btn" onclick="absorbCombat(0.4, 'the_luc')">⚡ Thể Lực</button>
-    <button class="reward-btn" onclick="absorbCombat(0.4, 'linh_luc')">💧 Linh Lực</button>
-    <button class="reward-btn" onclick="absorbCombat(0.4, 'tinh_luc')">✨ Tinh Lực</button>
+    <button class="reward-btn" onclick="absorbCombat(0.4, 'the_luc')">⚡ Thể</button>
+    <button class="reward-btn" onclick="absorbCombat(0.4, 'linh_luc')">💧 Linh</button>
+    <button class="reward-btn" onclick="absorbCombat(0.4, 'tinh_luc')">✨ Tinh</button>
   </div>
 </div>
 
-<!-- Cấp 4: Boss / Đại yêu thú -->
 <div class="monster-group">
   <div class="monster-title">4. Boss / Đại Yêu Thú [+1.0 pts trọn vẹn]</div>
   <div class="monster-row">
-    <button class="reward-btn" onclick="absorbCombat(1.0, 'the_luc')">⚡ Thể Lực</button>
-    <button class="reward-btn" onclick="absorbCombat(1.0, 'linh_luc')">💧 Linh Lực</button>
-    <button class="reward-btn" onclick="absorbCombat(1.0, 'tinh_luc')">✨ Tinh Lực</button>
+    <button class="reward-btn" onclick="absorbCombat(1.0, 'the_luc')">⚡ Thể</button>
+    <button class="reward-btn" onclick="absorbCombat(1.0, 'linh_luc')">💧 Linh</button>
+    <button class="reward-btn" onclick="absorbCombat(1.0, 'tinh_luc')">✨ Tinh</button>
   </div>
 </div>
 
-<button onclick="closeCombatModal()" style="background: #333; margin-top: 8px; border: 1px solid #555; color: #ccc; padding: 8px;">Đóng</button>
+<button onclick="closeCombatModal()" style="background: #333; margin-top: 6px; border: 1px solid #555; color: #ccc; padding: 6px;">Đóng</button>
 </div>
 </div>
 
@@ -207,6 +215,11 @@ const REALMS_DATA = {
   'xich_hoa': { name: 'Xích Hỏa Vực' },
   'tam_sac': { name: 'Tam Sắc Phủ' },
   'bach_ngoc': { name: 'Bạch Ngọc Đài' }
+};
+
+const BOTTLENECK_LIMITS = {
+  1: 10, 2: 30, 3: 70, 4: 150, 5: 310,
+  6: 630, 7: 1270, 8: 2550, 9: 5110, 10: 10230
 };
 
 const charName = localStorage.getItem('game_character_name');
@@ -221,53 +234,103 @@ let progTheLuc = parseFloat(localStorage.getItem('game_prog_the_luc')) || 0.0;
 let progLinhLuc = parseFloat(localStorage.getItem('game_prog_linh_luc')) || 0.0;
 let progTinhLuc = parseFloat(localStorage.getItem('game_prog_tinh_luc')) || 0.0;
 
+let currentPeriod = parseInt(localStorage.getItem('game_period')) || 1;
+let isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
+
+// Giả lập item lấy từ bộ nhớ
+let itemStvl = parseInt(localStorage.getItem('item_stvl')) || 5;
+let itemStp = parseInt(localStorage.getItem('item_stp')) || 5;
+let itemDefVl = parseInt(localStorage.getItem('item_def_vl')) || 3;
+let itemDefP = parseInt(localStorage.getItem('item_def_p')) || 3;
+
 if (!charName || !travelerId || !realmKey || !REALMS_DATA[realmKey]) {
   window.location.href = '/';
 } else {
+  checkAndTriggerBottleneck();
   updateUI();
+}
+
+function checkAndTriggerBottleneck() {
+  let maxStat = Math.max(theLuc, linhLuc, tinhLuc);
+  let limit = BOTTLENECK_LIMITS[currentPeriod] || 10;
+  if (maxStat >= limit && !isBottleneck) {
+    isBottleneck = true;
+    localStorage.setItem('game_is_bottleneck', 'true');
+  }
 }
 
 function updateUI() {
   document.getElementById('d_label_traveler').innerText = "Lữ khách " + travelerId;
   document.getElementById('d_identity').innerText = charName;
   document.getElementById('d_realm').innerText = REALMS_DATA[realmKey].name;
-  
+  document.getElementById('d_rank').innerText = "Kỳ " + currentPeriod;
+
   document.getElementById('d_the_luc').innerText = theLuc;
   document.getElementById('d_linh_luc').innerText = linhLuc;
   document.getElementById('d_tinh_luc').innerText = tinhLuc;
 
-  // Hiển thị phần trăm tiến độ thập phân (làm tròn 1-2 chữ số thập phân)
   document.getElementById('p_the_luc').innerText = "(" + Math.round(progTheLuc * 100) + "%)";
   document.getElementById('p_linh_luc').innerText = "(" + Math.round(progLinhLuc * 100) + "%)";
   document.getElementById('p_tinh_luc').innerText = "(" + Math.round(progTinhLuc * 100) + "%)";
 
   let maxStat = Math.max(theLuc, linhLuc, tinhLuc);
-  let level = Math.min(10, Math.floor((maxStat - 10) / 10) + 1);
-  if (level < 1) level = 1;
+  let limit = BOTTLENECK_LIMITS[currentPeriod] || 10;
+  document.getElementById('d_limit_val').innerText = limit;
+  document.getElementById('d_max_stat').innerText = maxStat;
 
-  let rankNames = [
-    "Cấp 1 - Thú Sơ Khai", "Cấp 2 - Khai Khiếu", "Cấp 3 - Luyện Cốt",
-    "Cấp 4 - Ngưng Thần", "Cấp 5 - Hóa Hình", "Cấp 6 - Thông Linh",
-    "Cấp 7 - Yêu Binh", "Cấp 8 - Yêu Tướng", "Cấp 9 - Yêu Vương", "Cấp 10 - Miêu Vương 👑"
-  ];
-  document.getElementById('d_rank').innerText = rankNames[level - 1];
+  // Hiển thị trạng thái bình cảnh & nút phá vỡ
+  let statusBox = document.getElementById('bottleneck-status-box');
+  let breakBtn = document.getElementById('btn-break');
+  if (isBottleneck) {
+    statusBox.style.display = 'flex';
+    breakBtn.style.display = 'block';
+  } else {
+    statusBox.style.display = 'none';
+    breakBtn.style.display = 'none';
+  }
 
-  let heSo = parseFloat((1.0 + (level - 1) * 0.222).toFixed(2));
-  if (level === 10) heSo = 3.0;
+  // --- TÍNH TOÁN ATK & HỆ THỐNG SÁT THƯƠNG ---
+  let dmgTypeStr = "";
+  let atkVal = 0;
+  let titleStr = "[Bình Thường]";
 
-  let sinhLucFinal = Math.floor(theLuc * heSo);
-  let phapLucFinal = Math.floor(linhLuc * heSo * 2);
-  let khangPhapFinal = Math.floor(linhLuc * heSo * 0.5);
-  let tinhLucFinal = Math.floor(tinhLuc * heSo);
+  // Kiểm tra các trường hợp bằng nhau tuyệt đối
+  if (theLuc === linhLuc && linhLuc === tinhLuc) {
+    titleStr = "👑 [Tam Thanh Nhất Khí - Giảm 50% chỉ số địch, x2 Dmg]";
+    dmgTypeStr = "Hỗn Hợp Tuyệt Đối (Tam Thanh)";
+    atkVal = (itemStvl + (theLuc / 10)) * 2;
+  } else if (theLuc === linhLuc) {
+    titleStr = "⚡ [Lưỡng Nghi Đồng Nguyên - Dmg x2 trừ kháng]";
+    dmgTypeStr = "Hỗn Hợp (Thể = Linh)";
+    atkVal = (itemStvl + (theLuc / 10)) * 2;
+  } else if (theLuc === tinhLuc) {
+    titleStr = "🗡️ [Thân Tinh Hợp Nhất - Xuyên 50% PTVL]";
+    dmgTypeStr = "Vật Lý (Thể = Tinh)";
+    atkVal = itemStvl + (theLuc / 10);
+  } else if (linhLuc === tinhLuc) {
+    titleStr = "🔮 [Linh Tinh Giao Hòa - Xuyên 50% Kháng Pháp]";
+    dmgTypeStr = "Pháp Thuật (Linh = Tinh)";
+    atkVal = itemStp + (linhLuc / 10);
+  } else if (theLuc > linhLuc) {
+    dmgTypeStr = "Vật Lý (STVL)";
+    atkVal = itemStvl + (theLuc / 10);
+  } else {
+    dmgTypeStr = "Pháp Thuật (STP)";
+    atkVal = itemStp + (linhLuc / 10);
+  }
 
-  document.getElementById('d_he_so').innerText = heSo + "x";
-  document.getElementById('d_hp').innerText = sinhLucFinal;
-  document.getElementById('d_mp').innerText = phapLucFinal;
-  document.getElementById('d_khang_phap').innerText = khangPhapFinal;
-  document.getElementById('d_tinh_tong').innerText = tinhLucFinal;
-  document.getElementById('d_cuoc_luc').innerText = Math.floor(tinhLucFinal * 0.4);
-  document.getElementById('d_may_man').innerText = Math.floor(tinhLucFinal * 0.2) + " pts";
-  document.getElementById('d_hoat_luc').innerText = Math.floor(tinhLucFinal * 0.4);
+  document.getElementById('d_dmg_type').innerText = dmgTypeStr;
+  document.getElementById('d_atk_val').innerText = atkVal.toFixed(1);
+  document.getElementById('d_title').innerText = titleStr;
+
+  // --- TÍNH TOÁN DEF & TỐC LỰC ---
+  let defVl = itemDefVl + Math.round(theLuc / 20);
+  let defP = itemDefP + Math.round(linhLuc / 20);
+  let speed = (tinhLuc / 10) + currentPeriod;
+
+  document.getElementById('d_def_vl').innerText = defVl;
+  document.getElementById('d_def_p').innerText = defP;
+  document.getElementById('d_speed').innerText = speed.toFixed(1);
 }
 
 function toggleDetails() {
@@ -276,6 +339,10 @@ function toggleDetails() {
 }
 
 function openCombatModal() {
+  if (isBottleneck) {
+    alert('Đang lâm vào bình cảnh! Không thể hấp thu nguyên khí nếu chưa phá vỡ cảnh giới.');
+    return;
+  }
   document.getElementById('combat-modal').style.display = 'flex';
 }
 
@@ -284,9 +351,12 @@ function closeCombatModal() {
 }
 
 function absorbCombat(baseAmount, type) {
-  let multiplier = 1;
+  if (isBottleneck) {
+    alert('Nhân vật đang bị kẹt bình cảnh!');
+    return;
+  }
 
-  // Kiểm tra thiên phú x2 theo khu vực xuất thân
+  let multiplier = 1;
   if (type === 'the_luc' && realmKey === 'xich_hoa') multiplier = 2;
   if (type === 'linh_luc' && realmKey === 'tam_sac') multiplier = 2;
   if (type === 'tinh_luc' && realmKey === 'bach_ngoc') multiplier = 2;
@@ -296,33 +366,47 @@ function absorbCombat(baseAmount, type) {
 
   if (type === 'the_luc') {
     progTheLuc += gained;
-    while (progTheLuc >= 1.0) {
-      theLuc += 1;
-      progTheLuc -= 1.0;
-    }
+    while (progTheLuc >= 1.0) { theLuc += 1; progTheLuc -= 1.0; }
     localStorage.setItem('game_the_luc', theLuc);
     localStorage.setItem('game_prog_the_luc', progTheLuc.toFixed(2));
   } else if (type === 'linh_luc') {
     progLinhLuc += gained;
-    while (progLinhLuc >= 1.0) {
-      linhLuc += 1;
-      progLinhLuc -= 1.0;
-    }
+    while (progLinhLuc >= 1.0) { linhLuc += 1; progLinhLuc -= 1.0; }
     localStorage.setItem('game_linh_luc', linhLuc);
     localStorage.setItem('game_prog_linh_luc', progLinhLuc.toFixed(2));
   } else if (type === 'tinh_luc') {
     progTinhLuc += gained;
-    while (progTinhLuc >= 1.0) {
-      tinhLuc += 1;
-      progTinhLuc -= 1.0;
-    }
+    while (progTinhLuc >= 1.0) { tinhLuc += 1; progTinhLuc -= 1.0; }
     localStorage.setItem('game_tinh_luc', tinhLuc);
     localStorage.setItem('game_prog_tinh_luc', progTinhLuc.toFixed(2));
   }
 
-  alert('Main hấp thu thành công! Nhận +' + gained.toFixed(2) + ' tiến độ ' + statNameVi + (multiplier > 2 || multiplier === 2 ? ' (Đã nhân đôi thiên phú khu vực x2)' : ''));
+  checkAndTriggerBottleneck();
+  alert('Hấp thu thành công! Nhận +' + gained.toFixed(2) + ' tiến độ ' + statNameVi);
   
   closeCombatModal();
+  updateUI();
+}
+
+// Cơ chế phá vỡ bình cảnh: mở khóa + tặng điểm toàn bộ chỉ số theo cấp kỳ (Kỳ 2 tặng +1, Kỳ 3 tặng +2,...)
+function breakBottleneck() {
+  let rewardBonus = currentPeriod - 1; 
+  if (rewardBonus < 1) rewardBonus = 1;
+
+  theLuc += rewardBonus;
+  linhLuc += rewardBonus;
+  tinhLuc += rewardBonus;
+
+  currentPeriod += 1;
+  isBottleneck = false;
+
+  localStorage.setItem('game_the_luc', theLuc);
+  localStorage.setItem('game_linh_luc', linhLuc);
+  localStorage.setItem('game_tinh_luc', tinhLuc);
+  localStorage.setItem('game_period', currentPeriod);
+  localStorage.setItem('game_is_bottleneck', 'false');
+
+  alert('🌟 PHÁ VỠ BÌNH CẢNH THÀNH CÔNG! Chuyển sang Kỳ ' + currentPeriod + '. Toàn bộ chỉ số tiềm năng tăng +' + rewardBonus + '!');
   updateUI();
 }
 
