@@ -60,7 +60,7 @@ button:hover { background: #383838; }
 <div class="modal-content" style="border-color: #2ecc71;">
 <h3 style="color: #2ecc71; margin-top: 0;">⚔️ CHỌN KHU VỰC SĂN QUÁI</h3>
 <div class="monster-group">
-  <div class="monster-title">1. Quái Thường (Tập dượt cơ bản)</div>
+  <div class="monster-title">1. Quái Thường (Tổng điểm: 15)</div>
   <div class="monster-row">
     <button class="reward-btn" onclick="startCombat(1, 'the_luc')">⚡ Thể</button>
     <button class="reward-btn" onclick="startCombat(1, 'linh_luc')">💧 Linh</button>
@@ -69,12 +69,21 @@ button:hover { background: #383838; }
   </div>
 </div>
 <div class="monster-group">
-  <div class="monster-title">2. Quái Tinh Anh (Test Combat - Rơi nguyên liệu ngẫu nhiên A, B, C, D)</div>
+  <div class="monster-title">2. Quái Tinh Anh (Tổng điểm: 30, Rơi Nội Đan: 50%)</div>
   <div class="monster-row">
     <button class="reward-btn" onclick="startCombat(2, 'the_luc')">⚡ Thể</button>
     <button class="reward-btn" onclick="startCombat(2, 'linh_luc')">💧 Linh</button>
     <button class="reward-btn" onclick="startCombat(2, 'tinh_luc')">✨ Tinh</button>
     <button class="reward-btn" onclick="startCombat(2, 'random')">🎲 Ngẫu nhiên</button>
+  </div>
+</div>
+<div class="monster-group">
+  <div class="monster-title">3. Quái Thủ Lĩnh (Tổng điểm: 50, Rơi Nội Đan: 75%)</div>
+  <div class="monster-row">
+    <button class="reward-btn" onclick="startCombat(3, 'the_luc')">⚡ Thể</button>
+    <button class="reward-btn" onclick="startCombat(3, 'linh_luc')">💧 Linh</button>
+    <button class="reward-btn" onclick="startCombat(3, 'tinh_luc')">✨ Tinh</button>
+    <button class="reward-btn" onclick="startCombat(3, 'random')">🎲 Ngẫu nhiên</button>
   </div>
 </div>
 <button onclick="closeModal('combat-modal')" style="background: #333; margin-top: 6px; border: 1px solid #555; color: #ccc; padding: 6px;">Đóng</button>
@@ -111,7 +120,7 @@ let linhLuc = Number(localStorage.getItem('game_linh_luc')) || 0;
 let tinhLuc = Number(localStorage.getItem('game_tinh_luc')) || 0;
 let progTheLuc = Number(localStorage.getItem('game_prog_the_luc')) || 0;
 let progLinhLuc = Number(localStorage.getItem('game_prog_linh_luc')) || 0;
-let progTinhLuc = Number(localStorage.getItem('game_prog_tinh_luc')) || 0;
+let progTinhLuc = Number(localStorage.getItem('game_prog_prog_tinh_luc')) || 0;
 let currentPeriod = Number(localStorage.getItem('game_period')) || 1;
 let isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
 
@@ -212,7 +221,7 @@ function renderEffectModalContent() {
   if (!container) return;
   container.innerHTML = '<div style="font-size: 11px; color: #2ecc71; font-weight: bold; margin-bottom:6px;">✨ HIỆU ỨNG:</div>' +
     '<div class="effect-row-item"><span style="color: #d4af37; font-weight: bold;">' + currentTitleEffect.name + '</span><span>' + currentTitleEffect.desc + '</span></div>' +
-    '<div style="font-size: 11px; color: #2ecc71; font-weight: bold; margin: 10px 0 6px 0;">🛡️ TRANG BỊ ĐANG MẶC:</div>' +
+    '<div style="font-size: 11px; color: #2ecc71; font-weight: bold; margin: 10px 0 6px 0;">🛡️ TRANG BỊ Đang MẶC:</div>' +
     '<div class="effect-row-item"><span style="color: #3498db; font-weight: bold;">' + itemDescName + '</span><span>STVL: +' + itemStvl + ' | STP: +' + itemStp + '<br>Kháng VL: +' + itemDefVl + ' | Kháng P: +' + itemDefP + '</span></div>';
 }
 
@@ -225,16 +234,14 @@ function openDetailsModal() { document.getElementById('details-modal').style.dis
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
 // ----------------------------------------------------
-// HỆ THỐNG COMBAT & RƠI ĐỒ ĐỘC LẬP (MỐC ĐỘT BIẾN > 70%)
+// HỆ THỐNG COMBAT: TỈ LỆ PHẨM CHẤT NGUYÊN LIỆU MỚI (TẬP TRUNG TỐC ĐỘ CÀY CUỐC)
 // ----------------------------------------------------
 function startCombat(tier, rewardType) {
   if (isBottleneck) return;
 
-  // 1. Sinh chỉ số quái ngẫu nhiên
-  let minPool = 10, maxPool = 20;
-  if (tier === 2) { minPool = 35; maxPool = 60; }
-
-  let totalPoints = Math.floor(Math.random() * (maxPool - minPool + 1)) + minPool;
+  let totalPoints = 15;
+  if (tier === 2) totalPoints = 30;
+  if (tier === 3) totalPoints = 50;
 
   let r1 = Math.random();
   let r2 = Math.random();
@@ -250,48 +257,60 @@ function startCombat(tier, rewardType) {
   if (maxVal === monsterLinh) dominantAttr = 'LINH';
   if (maxVal === monsterTinh) dominantAttr = 'TINH';
 
-  // Yêu cầu mới: Chỉ số vượt trội > 70% tổng điểm phân phối mới tính là đột biến
-  let isMutation = (maxVal > (totalPoints * 0.7));
-
-  // Danh sách nguyên liệu A, B, C, D
   let matList = [
-    { name: 'Nguyên liệu A', attr: 'THE' },
-    { name: 'Nguyên liệu B', attr: 'LINH' },
-    { name: 'Nguyên liệu C', attr: 'TINH' },
-    { name: 'Nguyên liệu D', attr: 'HON_HOP' }
+    { name: 'Nguyên liệu A' },
+    { name: 'Nguyên liệu B' },
+    { name: 'Nguyên liệu C' },
+    { name: 'Nguyên liệu D' }
   ];
 
-  // Số lượng món đồ rơi ngẫu nhiên từ 0 đến 4 cho 1 con quái
   let totalDropCount = Math.floor(Math.random() * 5); 
   let droppedItemsMap = {};
 
-  for (let i = 0; i < totalDropCount; i++) {
-    // Chọn ngẫu nhiên một loại nguyên liệu trong 4 loại A, B, C, D một cách độc lập
-    let randomMat = matList[Math.floor(Math.random() * matList.length)];
-    let qualityTier = (tier === 2 && isMutation) ? "Thượng Phẩm" : "Phàm Phẩm";
-    let keyStr = randomMat.name + " [" + qualityTier + "]";
+  let shuffledMats = [...matList].sort(() => 0.5 - Math.random());
+  let actualDropCount = Math.min(totalDropCount, shuffledMats.length);
+
+  for (let i = 0; i < actualDropCount; i++) {
+    let chosenMat = shuffledMats[i];
     
-    if (!droppedItemsMap[keyStr]) {
-      droppedItemsMap[keyStr] = 0;
+    let randQuality = Math.random() * 100;
+    let qualityTier = "Phàm Phẩm";
+
+    if (tier === 1) {
+      // Quái Thường: Thượng 0.2%, Trung 5.0%, Phàm 94.8%
+      if (randQuality < 0.2) qualityTier = "Thượng Phẩm";
+      else if (randQuality < 5.2) qualityTier = "Trung Phẩm";
+    } else if (tier === 2) {
+      // Quái Tinh Anh: Thượng 2.0%, Trung 33.0% (tăng nhẹ), Phàm 65.0%
+      if (randQuality < 2.0) qualityTier = "Thượng Phẩm";
+      else if (randQuality < 35.0) qualityTier = "Trung Phẩm";
+    } else if (tier === 3) {
+      // Quái Thủ Lĩnh: Thượng 5.0%, Trung 70.0%, Phàm 25.0% (Chuẩn 25 - 70 - 5)
+      if (randQuality < 5.0) qualityTier = "Thượng Phẩm";
+      else if (randQuality < 75.0) qualityTier = "Trung Phẩm";
     }
-    droppedItemsMap[keyStr] += 1; // Mỗi lần random trúng là x1 cho loại đó trên 1 con quái
+
+    let keyStr = chosenMat.name + " [" + qualityTier + "]";
+    droppedItemsMap[keyStr] = 1; 
   }
 
-  // Xử lý nội đan (Chỉ quái cấp 2 khi có đột biến > 70% mới có tỷ lệ rơi)
+  // Xử lý Nội Đan: Cấp 1 không có. Cấp 2 tỷ lệ 50%. Cấp 3 tỷ lệ 75%.
   let innerCoreFound = null;
-  if (tier === 2 && isMutation) {
-    if (Math.random() < 0.3) {
-      let coreName = "";
-      if (dominantAttr === 'THE') coreName = "Cốt Tủy Yêu Đan";
-      else if (dominantAttr === 'LINH') coreName = "Nguyên Khí Yêu Đan";
-      else coreName = "Thần Phách Yêu Đan";
-      
-      innerCoreFound = coreName + " (x1) [Thượng Phẩm]";
-    }
+  let coreDropChance = 0;
+  if (tier === 2) coreDropChance = 0.5;
+  if (tier === 3) coreDropChance = 0.75;
+
+  if (tier > 1 && Math.random() < coreDropChance) {
+    let coreName = "Yêu Đan";
+    if (dominantAttr === 'THE') coreName = "Cốt Tủy Yêu Đan";
+    else if (dominantAttr === 'LINH') coreName = "Nguyên Khí Yêu Đan";
+    else coreName = "Thần Phách Yêu Đan";
+    
+    innerCoreFound = coreName + " (x1)";
   }
 
-  // 2. Cập nhật tiến độ tu vi cho người chơi
-  let baseGain = (tier === 1) ? 0.05 : 0.2;
+  // Cập nhật tiến độ tu vi
+  let baseGain = (tier === 1) ? 0.05 : (tier === 2 ? 0.2 : 0.4);
   let targetProgType = rewardType;
   if (rewardType === 'random') {
     if (dominantAttr === 'THE') targetProgType = 'the_luc';
@@ -307,28 +326,24 @@ function startCombat(tier, rewardType) {
     localStorage.setItem('game_linh_luc', linhLuc); localStorage.setItem('game_prog_linh_luc', progLinhLuc.toFixed(2));
   } else {
     progTinhLuc += baseGain; while (progTinhLuc >= 1.0) { tinhLuc += 1; progTinhLuc -= 1.0; }
-    localStorage.setItem('game_tinh_luc', tinhLuc); localStorage.setItem('game_prog_tinh_luc', progTinhLuc.toFixed(2));
+    localStorage.setItem('game_tinh_luc', tinhLuc); localStorage.setItem('game_prog_prog_tinh_luc', progTinhLuc.toFixed(2));
   }
 
   checkAndTriggerBottleneck();
   closeModal('combat-modal');
   updateUI();
 
-  // 3. Chuẩn bị text báo cáo kết quả
   let itemsListText = [];
-  let actualTotalDrops = 0;
   for (let key in droppedItemsMap) {
-    actualTotalDrops += droppedItemsMap[key];
-    itemsListText.push(`- ${key} (x${droppedItemsMap[key]})`);
+    itemsListText.push(`- ${key} (x1)`);
   }
 
   let report = `⚔️ KẾT QUẢ CHIẾN THẮNG QUÁI CẤP ${tier}!\n\n` +
                `📊 Chỉ số quái (Random):\n` +
-               `- Thể: ${monsterThe} | Linh: ${monsterLinh} | Tinh: ${monsterTinh} (Tổng: ${totalPoints})\n` +
-               `- Trạng thái đột biến (>70%): ${isMutation ? 'CÓ (Chỉ số áp đảo)' : 'KHÔNG (Chưa đạt mốc 70%)'}\n\n` +
-               `🎁 Chiến lợi phẩm nhận được (${actualTotalDrops} món):\n` +
+               `- Thể: ${monsterThe} | Linh: ${monsterLinh} | Tinh: ${monsterTinh} (Tổng: ${totalPoints})\n\n` +
+               `🎁 Chiến lợi phẩm nhận được (${itemsListText.length} món):\n` +
                (itemsListText.length > 0 ? itemsListText.join('\n') : `- Không rơi vật phẩm nguyên liệu nào`) + '\n\n' +
-               (innerCoreFound ? `🌟 BÁU VẬT THU ĐƯỢC:\n- Tìm thấy ${innerCoreFound}` : `🌟 BÁU VẬT THU ĐƯỢC:\n- Không tìm thấy nội đan`);
+               (innerCoreFound ? `🌟 BÁU VẬT THU ĐƯỢC:\n- Tìm thấy ${innerCoreFound}` : `🌟 BÁU VẬT THU ĐƯỢC:\n- Không rơi nội đan (Rớt tỷ lệ xịt!)`);
 
   alert(report);
 }
