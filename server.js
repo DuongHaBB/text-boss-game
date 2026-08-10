@@ -27,11 +27,11 @@ button:hover { background: #b89728; }
 <h2>🐾 CỬU MỆNH 🐾</h2>
 <div class="label-title">1. Nhập Tên Main:</div>
 <input type="text" id="username" placeholder="Nhập tên của main...">
-<div class="label-title">2. Khu vực sinh ra (Buff x2 tốc độ hấp thu chỉ số tương ứng):</div>
+<div class="label-title">2. Khu vực sinh ra (+5 điểm ưu thế & Hấp thu x2):</div>
 <select id="realm-select">
-<option value="xich_hoa">Xích Hỏa Vực (Tốc độ hấp thu Thể Lực x2)</option>
-<option value="tam_sac">Tam Sắc Phủ (Tốc độ hấp thu Linh Lực x2)</option>
-<option value="bach_ngoc">Bạch Ngọc Đài (Tốc độ hấp thu Tinh Lực x2)</option>
+<option value="xich_hoa">Xích Hỏa Vực (+5 Thể Lực & Tốc độ hấp thu Thể Lực x2)</option>
+<option value="tam_sac">Tam Sắc Phủ (+5 Linh Lực & Tốc độ hấp thu Linh Lực x2)</option>
+<option value="bach_ngoc">Bạch Ngọc Đài (+5 Tinh Lực & Tốc độ hấp thu Tinh Lực x2)</option>
 </select>
 <button onclick="saveAndEnter()">NHẬP THẾ</button>
 </div>
@@ -44,12 +44,28 @@ alert('Vui lòng nhập tên main!');
 return;
 }
 let travelerId = '#' + Math.floor(Math.random() * 900 + 100);
+
+// Khởi tạo chỉ số cơ bản mặc định là 10
+let theLuc = 10;
+let linhLuc = 10;
+let tinhLuc = 10;
+
+// Cộng +5 điểm tiềm năng ưu thế dựa vào khu vực xuất thân
+if (realm === 'xich_hoa') {
+  theLuc += 5;
+} else if (realm === 'tam_sac') {
+  linhLuc += 5;
+} else if (realm === 'bach_ngoc') {
+  tinhLuc += 5;
+}
+
 localStorage.setItem('game_character_name', name);
 localStorage.setItem('game_traveler_id', travelerId);
 localStorage.setItem('game_realm', realm);
-localStorage.setItem('game_the_luc', 10);
-localStorage.setItem('game_linh_luc', 10);
-localStorage.setItem('game_tinh_luc', 10);
+localStorage.setItem('game_the_luc', theLuc);
+localStorage.setItem('game_linh_luc', linhLuc);
+localStorage.setItem('game_tinh_luc', tinhLuc);
+
 window.location.href = '/profile';
 }
 </script>
@@ -75,8 +91,6 @@ body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: fle
 hr { border: 0; border-top: 1px solid #333; margin: 12px 0; }
 button { width: 100%; padding: 10px; margin-top: 8px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 4px; font-size: 14px; }
 button:hover { background: #383838; }
-.action-btn { background: #332700; border-color: #d4af37; color: #d4af37; font-weight: bold; }
-.action-btn:hover { background: #4d3b00; }
 .combat-btn { background: #0f2a1a; border-color: #2ecc71; color: #2ecc71; font-weight: bold; }
 .combat-btn:hover { background: #143d24; }
 .sub-panel { background: #141414; border: 1px dashed #444; padding: 12px; margin-top: 15px; border-radius: 6px; display: none; }
