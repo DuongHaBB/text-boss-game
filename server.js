@@ -29,9 +29,9 @@ button:hover { background: #b89728; }
 <input type="text" id="username" placeholder="Nhập tên của main...">
 <div class="label-title">2. Khu vực sinh ra (+5 điểm ưu thế & Hấp thu x2):</div>
 <select id="realm-select">
-<option value="xich_hoa">Xích Hỏa Vực (+5 Thể Lực & Tốc độ hấp thu Thể Lực x2)</option>
-<option value="tam_sac">Tam Sắc Phủ (+5 Linh Lực & Tốc độ hấp thu Linh Lực x2)</option>
-<option value="bach_ngoc">Bạch Ngọc Đài (+5 Tinh Lực & Tốc độ hấp thu Tinh Lực x2)</option>
+<option value="xich_hoa">Xích Hỏa Vực (+5 Thể Lực & Hấp thu Thể Lực x2)</option>
+<option value="tam_sac">Tam Sắc Phủ (+5 Linh Lực & Hấp thu Linh Lực x2)</option>
+<option value="bach_ngoc">Bạch Ngọc Đài (+5 Tinh Lực & Hấp thu Tinh Lực x2)</option>
 </select>
 <button onclick="saveAndEnter()">NHẬP THẾ</button>
 </div>
@@ -45,12 +45,10 @@ return;
 }
 let travelerId = '#' + Math.floor(Math.random() * 900 + 100);
 
-// Khởi tạo chỉ số cơ bản mặc định là 10
 let theLuc = 10;
 let linhLuc = 10;
 let tinhLuc = 10;
 
-// Cộng +5 điểm tiềm năng ưu thế dựa vào khu vực xuất thân
 if (realm === 'xich_hoa') {
   theLuc += 5;
 } else if (realm === 'tam_sac') {
@@ -66,6 +64,11 @@ localStorage.setItem('game_the_luc', theLuc);
 localStorage.setItem('game_linh_luc', linhLuc);
 localStorage.setItem('game_tinh_luc', tinhLuc);
 
+// Khởi tạo tiến độ hấp thu thập phân (dưới dạng float)
+localStorage.setItem('game_prog_the_luc', 0.0);
+localStorage.setItem('game_prog_linh_luc', 0.0);
+localStorage.setItem('game_prog_tinh_luc', 0.0);
+
 window.location.href = '/profile';
 }
 </script>
@@ -74,20 +77,21 @@ window.location.href = '/profile';
 `);
 });
 
-// 2. Màn hình Bảng Thông Số Nhân Vật (Đạo Tịch) tích hợp Test Combat trực tiếp
+// 2. Màn hình Bảng Thông Số Nhân Vật (Đạo Tịch) tích hợp Test Combat theo cấp bậc quái
 app.get('/profile', (req, res) => {
   res.send(`
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Đạo Tịch & Test Combat</title>
+<title>Đạo Tịch & Test Combat Hệ Thống Tiến Độ</title>
 <style>
 body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
 .panel { background: #1a1a1a; padding: 25px 30px; border-radius: 8px; width: 440px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); margin: 20px 0; }
 .stat-item { margin: 10px 0; color: #aaa; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
 .sub-stat { padding-left: 15px; font-size: 13px; color: #888; }
 .stat-value { color: #d4af37; font-weight: bold; }
+.prog-text { font-size: 11px; color: #666; font-style: italic; }
 hr { border: 0; border-top: 1px solid #333; margin: 12px 0; }
 button { width: 100%; padding: 10px; margin-top: 8px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 4px; font-size: 14px; }
 button:hover { background: #383838; }
@@ -95,12 +99,15 @@ button:hover { background: #383838; }
 .combat-btn:hover { background: #143d24; }
 .sub-panel { background: #141414; border: 1px dashed #444; padding: 12px; margin-top: 15px; border-radius: 6px; display: none; }
 .sub-title { color: #d4af37; font-size: 13px; margin-bottom: 8px; text-align: center; font-weight: bold; }
-/* Modal Test Combat */
+
+/* Modal Test Combat theo cấp bậc quái */
 #combat-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
-.modal-content { background: #1a1a1a; padding: 25px; border-radius: 8px; width: 400px; border: 1px solid #2ecc71; text-align: center; }
-.reward-btn { width: 100%; padding: 12px; margin: 8px 0; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 4px; font-size: 13px; text-align: left; display: flex; justify-content: space-between; align-items: center; font-family: inherit; }
+.modal-content { background: #1a1a1a; padding: 25px; border-radius: 8px; width: 420px; border: 1px solid #2ecc71; text-align: center; }
+.monster-group { margin: 12px 0; border: 1px solid #333; padding: 10px; border-radius: 6px; background: #141414; text-align: left; }
+.monster-title { font-size: 12px; color: #2ecc71; font-weight: bold; margin-bottom: 6px; }
+.reward-btn { width: 32%; padding: 8px 4px; margin: 2px 0; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 3px; font-size: 11px; text-align: center; font-family: inherit; }
 .reward-btn:hover { background: #383838; border-color: #d4af37; }
-.buff-tag { color: #d4af37; font-size: 11px; font-weight: bold; }
+.monster-row { display: flex; justify-content: space-between; }
 </style>
 </head>
 <body>
@@ -110,10 +117,16 @@ button:hover { background: #383838; }
 <div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d_realm">-</span></div>
 <div class="stat-item"><span>Cảnh Giới (Cấp độ):</span> <span class="stat-value" id="d_rank">Cấp 1</span></div>
 <hr>
-<h4 style="color: #888; margin: 8px 0 4px 0;">TIỀM NĂNG</h4>
-<div class="stat-item"><span>Thể Lực:</span> <span class="stat-value" id="d_the_luc">-</span></div>
-<div class="stat-item"><span>Linh Lực:</span> <span class="stat-value" id="d_linh_luc">-</span></div>
-<div class="stat-item"><span>Tinh Lực:</span> <span class="stat-value" id="d_tinh_luc">-</span></div>
+<h4 style="color: #888; margin: 8px 0 4px 0;">TIỀM NĂNG & TIẾN ĐỘ HẤP THU</h4>
+<div class="stat-item">
+  <div>Thể Lực: <span class="stat-value" id="d_the_luc">-</span> <span class="prog-text" id="p_the_luc">(0%)</span></div>
+</div>
+<div class="stat-item">
+  <div>Linh Lực: <span class="stat-value" id="d_linh_luc">-</span> <span class="prog-text" id="p_linh_luc">(0%)</span></div>
+</div>
+<div class="stat-item">
+  <div>Tinh Lực: <span class="stat-value" id="d_tinh_luc">-</span> <span class="prog-text" id="p_tinh_luc">(0%)</span></div>
+</div>
 <hr>
 <h4 style="color: #888; margin: 8px 0 4px 0;">TRANG BỊ</h4>
 <div class="stat-item"><span>Vũ khí:</span> <span class="stat-value" style="color: #666;">[Chưa có]</span></div>
@@ -134,33 +147,58 @@ button:hover { background: #383838; }
 <div class="stat-item sub-stat"><span>└─ Hoạt Lực (Chế đồ/Farm):</span> <span class="stat-value" id="d_hoat_luc">-</span></div>
 </div>
 
-<button class="combat-btn" onclick="openCombatModal()">⚔️ Test Combat (Thắng & Hấp Thu)</button>
+<button class="combat-btn" onclick="openCombatModal()">⚔️ Test Combat (Chọn loại Quái & Hấp Thu)</button>
 <button onclick="toggleDetails()">📊 Xem chỉ số chi tiết</button>
 <button onclick="goBack()" style="background: #2a1111; border-color: #773333; color: #ff9999;">🔄 Đầu thai (Chuyển sinh lại)</button>
 </div>
 
-<!-- Modal Giao diện Test Combat & Lựa chọn hấp thu -->
+<!-- Modal Giao diện Test Combat chọn cấp Quái -->
 <div id="combat-modal">
 <div class="modal-content">
 <h3 style="color: #2ecc71; margin-top: 0;">🎉 CHIẾN THẮNG COMBAT!</h3>
-<p style="color: #aaa; font-size: 13px;">Main đã hạ gục đối thủ. Hãy chọn 1 trong 3 chỉ số để hấp thu nguyên khí:</p>
+<p style="color: #aaa; font-size: 12px; margin-bottom: 8px;">Chọn cấp bậc quái đã hạ gục để nhận tiến độ nguyên khí:</p>
 
-<button class="reward-btn" onclick="absorb('the_luc')">
-<span>⚡ Hấp thu Thể Lực</span>
-<span class="buff-tag" id="tag-the-luc">Cơ bản: +3</span>
-</button>
+<!-- Cấp 1: Quái thường -->
+<div class="monster-group">
+  <div class="monster-title">1. Quái Thường (VD: Rắn Thường) [+0.05 pts]</div>
+  <div class="monster-row">
+    <button class="reward-btn" onclick="absorbCombat(0.05, 'the_luc')">⚡ Thể Lực</button>
+    <button class="reward-btn" onclick="absorbCombat(0.05, 'linh_luc')">💧 Linh Lực</button>
+    <button class="reward-btn" onclick="absorbCombat(0.05, 'tinh_luc')">✨ Tinh Lực</button>
+  </div>
+</div>
 
-<button class="reward-btn" onclick="absorb('linh_luc')">
-<span>💧 Hấp thu Linh Lực</span>
-<span class="buff-tag" id="tag-linh-luc">Cơ bản: +3</span>
-</button>
+<!-- Cấp 2: Quái to / Cự xà -->
+<div class="monster-group">
+  <div class="monster-title">2. Quái Lớn (VD: Cự Xà) [+0.1 pts]</div>
+  <div class="monster-row">
+    <button class="reward-btn" onclick="absorbCombat(0.1, 'the_luc')">⚡ Thể Lực</button>
+    <button class="reward-btn" onclick="absorbCombat(0.1, 'linh_luc')">💧 Linh Lực</button>
+    <button class="reward-btn" onclick="absorbCombat(0.1, 'tinh_luc')">✨ Tinh Lực</button>
+  </div>
+</div>
 
-<button class="reward-btn" onclick="absorb('tinh_luc')">
-<span>✨ Hấp thu Tinh Lực</span>
-<span class="buff-tag" id="tag-tinh-luc">Cơ bản: +3</span>
-</button>
+<!-- Cấp 3: Tinh anh / Đầu đàn -->
+<div class="monster-group">
+  <div class="monster-title">3. Tinh Anh / Đầu Đàn [+0.4 pts]</div>
+  <div class="monster-row">
+    <button class="reward-btn" onclick="absorbCombat(0.4, 'the_luc')">⚡ Thể Lực</button>
+    <button class="reward-btn" onclick="absorbCombat(0.4, 'linh_luc')">💧 Linh Lực</button>
+    <button class="reward-btn" onclick="absorbCombat(0.4, 'tinh_luc')">✨ Tinh Lực</button>
+  </div>
+</div>
 
-<button onclick="closeCombatModal()" style="background: #333; margin-top: 12px; border: 1px solid #555; color: #ccc;">Đóng / Hủy</button>
+<!-- Cấp 4: Boss / Đại yêu thú -->
+<div class="monster-group">
+  <div class="monster-title">4. Boss / Đại Yêu Thú [+1.0 pts trọn vẹn]</div>
+  <div class="monster-row">
+    <button class="reward-btn" onclick="absorbCombat(1.0, 'the_luc')">⚡ Thể Lực</button>
+    <button class="reward-btn" onclick="absorbCombat(1.0, 'linh_luc')">💧 Linh Lực</button>
+    <button class="reward-btn" onclick="absorbCombat(1.0, 'tinh_luc')">✨ Tinh Lực</button>
+  </div>
+</div>
+
+<button onclick="closeCombatModal()" style="background: #333; margin-top: 8px; border: 1px solid #555; color: #ccc; padding: 8px;">Đóng</button>
 </div>
 </div>
 
@@ -174,24 +212,34 @@ const REALMS_DATA = {
 const charName = localStorage.getItem('game_character_name');
 const travelerId = localStorage.getItem('game_traveler_id');
 const realmKey = localStorage.getItem('game_realm');
+
 let theLuc = parseInt(localStorage.getItem('game_the_luc')) || 10;
 let linhLuc = parseInt(localStorage.getItem('game_linh_luc')) || 10;
 let tinhLuc = parseInt(localStorage.getItem('game_tinh_luc')) || 10;
+
+let progTheLuc = parseFloat(localStorage.getItem('game_prog_the_luc')) || 0.0;
+let progLinhLuc = parseFloat(localStorage.getItem('game_prog_linh_luc')) || 0.0;
+let progTinhLuc = parseFloat(localStorage.getItem('game_prog_tinh_luc')) || 0.0;
 
 if (!charName || !travelerId || !realmKey || !REALMS_DATA[realmKey]) {
   window.location.href = '/';
 } else {
   updateUI();
-  initCombatBuffTags();
 }
 
 function updateUI() {
   document.getElementById('d_label_traveler').innerText = "Lữ khách " + travelerId;
   document.getElementById('d_identity').innerText = charName;
   document.getElementById('d_realm').innerText = REALMS_DATA[realmKey].name;
+  
   document.getElementById('d_the_luc').innerText = theLuc;
   document.getElementById('d_linh_luc').innerText = linhLuc;
   document.getElementById('d_tinh_luc').innerText = tinhLuc;
+
+  // Hiển thị phần trăm tiến độ thập phân (làm tròn 1-2 chữ số thập phân)
+  document.getElementById('p_the_luc').innerText = "(" + Math.round(progTheLuc * 100) + "%)";
+  document.getElementById('p_linh_luc').innerText = "(" + Math.round(progLinhLuc * 100) + "%)";
+  document.getElementById('p_tinh_luc').innerText = "(" + Math.round(progTinhLuc * 100) + "%)";
 
   let maxStat = Math.max(theLuc, linhLuc, tinhLuc);
   let level = Math.min(10, Math.floor((maxStat - 10) / 10) + 1);
@@ -227,16 +275,6 @@ function toggleDetails() {
   box.style.display = box.style.display === 'block' ? 'none' : 'block';
 }
 
-function initCombatBuffTags() {
-  if (realmKey === 'xich_hoa') {
-    document.getElementById('tag-the-luc').innerText = "🔥 [Xích Hỏa Vực x2]: +6";
-  } else if (realmKey === 'tam_sac') {
-    document.getElementById('tag-linh-luc').innerText = "💧 [Tam Sắc Phủ x2]: +6";
-  } else if (realmKey === 'bach_ngoc') {
-    document.getElementById('tag-tinh-luc').innerText = "✨ [Bạch Ngọc Đài x2]: +6";
-  }
-}
-
 function openCombatModal() {
   document.getElementById('combat-modal').style.display = 'flex';
 }
@@ -245,26 +283,45 @@ function closeCombatModal() {
   document.getElementById('combat-modal').style.display = 'none';
 }
 
-function absorb(type) {
-  let baseGain = 3;
+function absorbCombat(baseAmount, type) {
+  let multiplier = 1;
+
+  // Kiểm tra thiên phú x2 theo khu vực xuất thân
+  if (type === 'the_luc' && realmKey === 'xich_hoa') multiplier = 2;
+  if (type === 'linh_luc' && realmKey === 'tam_sac') multiplier = 2;
+  if (type === 'tinh_luc' && realmKey === 'bach_ngoc') multiplier = 2;
+
+  let gained = baseAmount * multiplier;
+  let statNameVi = (type === 'the_luc') ? 'Thể Lực' : (type === 'linh_luc') ? 'Linh Lực' : 'Tinh Lực';
 
   if (type === 'the_luc') {
-    let multiplier = (realmKey === 'xich_hoa') ? 2 : 1;
-    theLuc += baseGain * multiplier;
+    progTheLuc += gained;
+    while (progTheLuc >= 1.0) {
+      theLuc += 1;
+      progTheLuc -= 1.0;
+    }
     localStorage.setItem('game_the_luc', theLuc);
-    alert('Main đã hấp thu thành công Thể Lực! (+' + (baseGain * multiplier) + ')');
+    localStorage.setItem('game_prog_the_luc', progTheLuc.toFixed(2));
   } else if (type === 'linh_luc') {
-    let multiplier = (realmKey === 'tam_sac') ? 2 : 1;
-    linhLuc += baseGain * multiplier;
+    progLinhLuc += gained;
+    while (progLinhLuc >= 1.0) {
+      linhLuc += 1;
+      progLinhLuc -= 1.0;
+    }
     localStorage.setItem('game_linh_luc', linhLuc);
-    alert('Main đã hấp thu thành công Linh Lực! (+' + (baseGain * multiplier) + ')');
+    localStorage.setItem('game_prog_linh_luc', progLinhLuc.toFixed(2));
   } else if (type === 'tinh_luc') {
-    let multiplier = (realmKey === 'bach_ngoc') ? 2 : 1;
-    tinhLuc += baseGain * multiplier;
+    progTinhLuc += gained;
+    while (progTinhLuc >= 1.0) {
+      tinhLuc += 1;
+      progTinhLuc -= 1.0;
+    }
     localStorage.setItem('game_tinh_luc', tinhLuc);
-    alert('Main đã hấp thu thành công Tinh Lực! (+' + (baseGain * multiplier) + ')');
+    localStorage.setItem('game_prog_tinh_luc', progTinhLuc.toFixed(2));
   }
 
+  alert('Main hấp thu thành công! Nhận +' + gained.toFixed(2) + ' tiến độ ' + statNameVi + (multiplier > 2 || multiplier === 2 ? ' (Đã nhân đôi thiên phú khu vực x2)' : ''));
+  
   closeCombatModal();
   updateUI();
 }
