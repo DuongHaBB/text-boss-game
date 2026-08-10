@@ -151,7 +151,7 @@ updateRealmBonus();
 `);
 });
 
-// 2. Màn hình Bảng Thông Số Nhân Vật (Đạo Tịch) & Combat theo Khu Vực Quái
+// 2. Màn hình Bảng Thông Số Nhân Vật (Đạo Tịch)
 app.get('/profile', (req, res) => {
   res.send(`
 <!DOCTYPE html>
@@ -172,11 +172,9 @@ button { width: 100%; padding: 10px; margin-top: 6px; background: #262626; color
 button:hover { background: #383838; }
 .combat-btn { background: #0f2a1a; border-color: #2ecc71; color: #2ecc71; font-weight: bold; }
 .break-btn { background: #3c2a0f; border-color: #d4af37; color: #d4af37; font-weight: bold; }
-.sub-panel { background: #141414; border: 1px dashed #444; padding: 10px; margin-top: 8px; border-radius: 6px; display: none; }
-.sub-title { color: #d4af37; font-size: 12px; margin-bottom: 6px; text-align: center; font-weight: bold; }
 
-/* Modal Combat */
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
+/* Modal chung (Popup) */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 99; }
 .modal-content { background: #1a1a1a; padding: 25px; border-radius: 8px; width: 440px; border: 1px solid #2ecc71; text-align: center; }
 .monster-group { margin: 10px 0; border: 1px solid #333; padding: 8px; border-radius: 6px; background: #141414; text-align: left; }
 .monster-title { font-size: 11px; color: #2ecc71; font-weight: bold; margin-bottom: 4px; }
@@ -184,9 +182,8 @@ button:hover { background: #383838; }
 .reward-btn:hover { background: #383838; border-color: #d4af37; }
 .monster-row { display: flex; justify-content: space-between; }
 
-/* Trình bày Tab Hiệu Ứng / Danh Hiệu */
-.effect-section-title { font-size: 11px; color: #2ecc71; margin-top: 6px; margin-bottom: 2px; font-weight: bold; }
-.effect-row-item { font-size: 11px; color: #ccc; padding: 4px 0; border-bottom: 1px dashed #222; display: flex; justify-content: space-between; }
+/* Hiệu ứng item trong popup */
+.effect-row-item { font-size: 12px; color: #ccc; padding: 6px 0; border-bottom: 1px dashed #333; display: flex; justify-content: space-between; text-align: left; }
 </style>
 </head>
 <body>
@@ -210,42 +207,28 @@ button:hover { background: #383838; }
 <div class="stat-item"><span>Kháng Vật Lý:</span> <span class="stat-value" id="d_def_vl">-</span></div>
 <div class="stat-item"><span>Kháng Pháp Lực:</span> <span class="stat-value" id="d_def_p">-</span></div>
 <div class="stat-item"><span>Tốc Lực (Tinh Lực / 10 + Kỳ):</span> <span class="stat-value" id="d_speed">-</span></div>
-<div class="stat-item"><span>Danh Hiệu / Hiệu Ứng:</span> <span class="stat-value" id="d_title_tag" style="color: #e67e22;">[Bình Thường]</span></div>
+<div class="stat-item"><span>Hiệu Ứng:</span> <span class="stat-value" id="d_title_tag" style="color: #e67e22;">[Bình Thường]</span></div>
 
-<!-- Tab Chi Tiết Giới Hạn -->
-<button onclick="toggleDetails()" style="background: #1f1f1f; border-color: #444; font-size: 12px;">📊 Xem chi tiết giới hạn kỳ</button>
-<div id="detail-box" class="sub-panel">
-<div class="sub-title">⚡ CHI TIẾT GIỚI HẠN KỲ ⚡</div>
-<div class="stat-item"><span>Trần điểm hiện tại:</span> <span class="stat-value" id="d_limit_val">20</span></div>
-<div class="stat-item"><span>Chỉ số cao nhất:</span> <span class="stat-value" id="d_max_stat">10</span></div>
-</div>
-
-<!-- Tab Danh Hiệu & Hiệu Ứng Trực Tiếp -->
-<button onclick="toggleEffectTab()" style="background: #251d08; border-color: #d4af37; color: #d4af37; font-size: 12px;">📜 Hệ Thống Danh Hiệu & Hiệu Ứng (Tab)</button>
-<div id="effect-tab-box" class="sub-panel" style="border-color: #d4af37;">
-<div class="sub-title" style="color: #d4af37;">📜 TỔNG HỢP HIỆU ỨNG & TRANG BỊ 📜</div>
-<div id="effect-content-container">
-  <!-- Nội dung load qua JS -->
-</div>
-</div>
-
-<button id="btn-break" class="break-btn" onclick="breakBottleneck()" style="display: none;">⚡ PHÁ VỠ BÌNH CẢNH</button>
+<!-- Các Nút Chức Năng Mở Popup -->
 <button class="combat-btn" onclick="openCombatModal()">⚔️ Test Combat (Hấp Thu Nguyên Khí)</button>
+<button onclick="openEffectModal()" style="background: #251d08; border-color: #d4af37; color: #d4af37;">📜 Xem Bảng Hiệu Ứng & Trang Bị</button>
+<button onclick="openDetailsModal()" style="background: #1f1f1f; border-color: #444;">📊 Xem Chi Tiết Giới Hạn Kỳ</button>
+<button id="btn-break" class="break-btn" onclick="breakBottleneck()" style="display: none;">⚡ PHÁ VỠ BÌNH CẢNH</button>
 <button onclick="goBack()" style="background: #2a1111; border-color: #773333; color: #ff9999;">🔄 Đầu thai (Chuyển sinh lại)</button>
 </div>
 
-<!-- Modal Combat (Chọn khu vực săn quái) -->
+<!-- POPUP 1: Test Combat -->
 <div id="combat-modal" class="modal-overlay">
-<div class="modal-content">
+<div class="modal-content" style="border-color: #2ecc71;">
 <h3 style="color: #2ecc71; margin-top: 0;">⚔️ CHỌN KHU VỰC SĂN QUÁI</h3>
-<p style="color: #aaa; font-size: 11px; margin-bottom: 8px;">Mỗi khu vực có đặc tính yêu thú riêng:</p>
+<p style="color: #aaa; font-size: 11px; margin-bottom: 8px;">Mỗi khu vực có đặc tính yêu thú riêng biệt:</p>
 
 <div style="margin-bottom: 10px; text-align: left;">
   <label style="font-size: 12px; color: #d4af37; font-weight: bold;">Chọn Khu Vực Săn:</label>
   <select id="combat-realm-select" style="margin-top: 4px;">
-    <option value="xich_hoa">🔥 Xích Hỏa Vực (Quái trâu máu, sát thương vật lý cao, tỉ lệ thiêu đốt)</option>
-    <option value="tam_sac">💧 Tam Sắc Phủ (Quái mạnh pháp thuật, linh lực dồi dào, phong tỏa)</option>
-    <option value="bach_ngoc">✨ Bạch Ngọc Đài (Quái tốc độ cao, né tránh tốt, tấn công dồn dập)</option>
+    <option value="xich_hoa">🔥 Xích Hỏa Vực (Quái trâu máu, STVL cao, hiệu ứng thiêu đốt)</option>
+    <option value="tam_sac">💧 Tam Sắc Phủ (Quái mạnh phép thuật, phong tỏa linh lực)</option>
+    <option value="bach_ngoc">✨ Bạch Ngọc Đài (Quái tốc độ cao, né tránh tốt)</option>
   </select>
 </div>
 
@@ -276,7 +259,28 @@ button:hover { background: #383838; }
   </div>
 </div>
 
-<button onclick="closeCombatModal()" style="background: #333; margin-top: 6px; border: 1px solid #555; color: #ccc; padding: 6px;">Đóng</button>
+<button onclick="closeModal('combat-modal')" style="background: #333; margin-top: 6px; border: 1px solid #555; color: #ccc; padding: 6px;">Đóng</button>
+</div>
+</div>
+
+<!-- POPUP 2: Hiệu Ứng & Trang Bị -->
+<div id="effect-modal" class="modal-overlay">
+<div class="modal-content" style="border-color: #d4af37;">
+<h3 style="color: #d4af37; margin-top: 0;">📜 HIỆU ỨNG & TRANG BỊ</h3>
+<div id="effect-content-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;">
+  <!-- Load động qua JS -->
+</div>
+<button onclick="closeModal('effect-modal')" style="background: #333; border: 1px solid #555; color: #ccc; padding: 8px;">Đóng</button>
+</div>
+</div>
+
+<!-- POPUP 3: Chi Tiết Giới Hạn -->
+<div id="details-modal" class="modal-overlay">
+<div class="modal-content" style="border-color: #3498db;">
+<h3 style="color: #3498db; margin-top: 0;">📊 CHI TIẾT GIỚI HẠN KỲ</h3>
+<div class="stat-item"><span>Trần điểm hiện tại:</span> <span class="stat-value" id="d_limit_val">20</span></div>
+<div class="stat-item"><span>Chỉ số cao nhất:</span> <span class="stat-value" id="d_max_stat">10</span></div>
+<button onclick="closeModal('details-modal')" style="background: #333; margin-top: 15px; border: 1px solid #555; color: #ccc; padding: 8px;">Đóng</button>
 </div>
 </div>
 
@@ -329,7 +333,7 @@ function checkAndTriggerBottleneck() {
   }
 }
 
-let currentTitleEffect = { name: "Bình Thường", desc: "Chưa kích hoạt danh hiệu đặc biệt." };
+let currentTitleEffect = { name: "Bình Thường", desc: "Trạng thái ổn định, chưa kích hoạt hiệu ứng đặc biệt." };
 let currentItemEffects = [
   { name: itemDescName, desc: `STVL: +${itemStvl} | STP: +${itemStp} | Kháng: +${itemDefVl}` }
 ];
@@ -372,28 +376,28 @@ function updateUI() {
 
   if (highestKeys.length >= 2 && maxVal > 0) {
     if (highestKeys.length === 3) {
-      currentTitleEffect = { name: "👑 Tam Thanh Nhất Khí", desc: "Giảm 50% chỉ số địch, Sát thương x2 toàn diện." };
+      currentTitleEffect = { name: "👑 Tam Thanh Nhất Khí", desc: "Hiệu ứng toàn diện: Giảm 50% chỉ số địch, Sát thương x2." };
       document.getElementById('d_title_tag').innerText = "[Tam Thanh Nhất Khí]";
       dmgTypeStr = "Hỗn Hợp Tuyệt Đối (Tam Thanh)";
       atkVal = (itemStvl + (theLuc / 10)) * 2;
     } else if (highestKeys.includes('Thể') && highestKeys.includes('Linh')) {
-      currentTitleEffect = { name: "⚡ Lưỡng Nghi Đồng Nguyên", desc: "Sát thương x2 trừ kháng (Thể = Linh)." };
+      currentTitleEffect = { name: "⚡ Lưỡng Nghi Đồng Nguyên", desc: "Hiệu ứng cân bằng: Sát thương x2 trừ kháng." };
       document.getElementById('d_title_tag').innerText = "[Lưỡng Nghi Đồng Nguyên]";
       dmgTypeStr = "Hỗn Hợp (Thể = Linh)";
       atkVal = (itemStvl + (theLuc / 10)) * 2;
     } else if (highestKeys.includes('Thể') && highestKeys.includes('Tinh')) {
-      currentTitleEffect = { name: "🗡️ Thân Tinh Hợp Nhất", desc: "Xuyên 50% Kháng Vật Lý (Thể = Tinh)." };
+      currentTitleEffect = { name: "🗡️ Thân Tinh Hợp Nhất", desc: "Hiệu ứng sắc bén: Xuyên 50% Kháng Vật Lý." };
       document.getElementById('d_title_tag').innerText = "[Thân Tinh Hợp Nhất]";
       dmgTypeStr = "Vật Lý (Thể = Tinh)";
       atkVal = itemStvl + (theLuc / 10);
     } else if (highestKeys.includes('Linh') && highestKeys.includes('Tinh')) {
-      currentTitleEffect = { name: "🔮 Linh Tinh Giao Hòa", desc: "Xuyên 50% Kháng Pháp (Linh = Tinh)." };
+      currentTitleEffect = { name: "🔮 Linh Tinh Giao Hòa", desc: "Hiệu ứng huyền ảo: Xuyên 50% Kháng Pháp." };
       document.getElementById('d_title_tag').innerText = "[Linh Tinh Giao Hòa]";
       dmgTypeStr = "Pháp Thuật (Linh = Tinh)";
       atkVal = itemStp + (linhLuc / 10);
     }
   } else {
-    currentTitleEffect = { name: "🛡️ Bình Thường", desc: "Chưa kích hoạt danh hiệu song/tam tu đặc biệt." };
+    currentTitleEffect = { name: "🛡️ Bình Thường", desc: "Trạng thái ổn định, chưa kích hoạt hiệu ứng đặc biệt." };
     document.getElementById('d_title_tag').innerText = "[Bình Thường]";
     if (theLuc > linhLuc && theLuc >= tinhLuc) {
       dmgTypeStr = "Vật Lý (STVL)";
@@ -421,39 +425,29 @@ function updateUI() {
   document.getElementById('d_def_p').innerText = defP;
   document.getElementById('d_speed').innerText = speed.toFixed(1);
 
-  renderEffectTabContent();
+  renderEffectModalContent();
 }
 
-function renderEffectTabContent() {
+function renderEffectModalContent() {
   let container = document.getElementById('effect-content-container');
   container.innerHTML = `
-    <div class="effect-section-title">🏆 Danh Hiệu Đang Mang:</div>
+    <div style="font-size: 11px; color: #2ecc71; font-weight: bold; margin-bottom: 4px;">✨ HIỆU ỨNG ĐANG KÍCH HOẠT:</div>
     <div class="effect-row-item">
       <span style="color: #d4af37; font-weight: bold;">${currentTitleEffect.name}</span>
-      <span style="color: #aaa; text-align: right; max-width: 200px;">${currentTitleEffect.desc}</span>
+      <span style="color: #aaa; text-align: right; max-width: 220px;">${currentTitleEffect.desc}</span>
     </div>
 
-    <div class="effect-section-title" style="margin-top: 8px;">🎒 Chỉ Số & Hiệu Ứng Từ Trang Bị:</div>
+    <div style="font-size: 11px; color: #3498db; font-weight: bold; margin-top: 10px; margin-bottom: 4px;">🎒 CHỈ SỐ CỘNG THÊM TỪ TRANG BỊ:</div>
   `;
 
   currentItemEffects.forEach(item => {
     container.innerHTML += `
       <div class="effect-row-item">
-        <span style="color: #3498db; font-weight: bold;">${item.name}</span>
+        <span style="color: #fff; font-weight: bold;">${item.name}</span>
         <span style="color: #888; text-align: right;">${item.desc}</span>
       </div>
     `;
   });
-}
-
-function toggleDetails() {
-  let box = document.getElementById('detail-box');
-  box.style.display = box.style.display === 'block' ? 'none' : 'block';
-}
-
-function toggleEffectTab() {
-  let box = document.getElementById('effect-tab-box');
-  box.style.display = box.style.display === 'block' ? 'none' : 'block';
 }
 
 function openCombatModal() {
@@ -464,8 +458,16 @@ function openCombatModal() {
   document.getElementById('combat-modal').style.display = 'flex';
 }
 
-function closeCombatModal() {
-  document.getElementById('combat-modal').style.display = 'none';
+function openEffectModal() {
+  document.getElementById('effect-modal').style.display = 'flex';
+}
+
+function openDetailsModal() {
+  document.getElementById('details-modal').style.display = 'flex';
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).style.display = 'none';
 }
 
 function absorbCombat(baseAmount, type) {
@@ -474,11 +476,8 @@ function absorbCombat(baseAmount, type) {
     return;
   }
 
-  // Lấy khu vực săn quái người chơi chọn trong modal
   let selectedCombatRealm = document.getElementById('combat-realm-select').value;
-
   let multiplier = 1;
-  // Nếu loại nguyên khí hấp thu trùng với thế mạnh bẩm sinh của khu vực khởi tạo nhân vật thì x2
   if (type === 'the_luc' && realmKey === 'xich_hoa') multiplier = 2;
   if (type === 'linh_luc' && realmKey === 'tam_sac') multiplier = 2;
   if (type === 'tinh_luc' && realmKey === 'bach_ngoc') multiplier = 2;
@@ -507,7 +506,7 @@ function absorbCombat(baseAmount, type) {
   checkAndTriggerBottleneck();
   alert('Chiến thắng yêu thú tại ' + realmNameVi + '! Nhận +' + gained.toFixed(2) + ' tiến độ ' + statNameVi);
   
-  closeCombatModal();
+  closeModal('combat-modal');
   updateUI();
 }
 
