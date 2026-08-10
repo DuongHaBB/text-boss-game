@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Cửu Mệnh - Hệ Thống Cảnh Giới & Combat</title>
+<title>Đạo Tịch - Hệ Thống Cảnh Giới & Combat</title>
 <style>
 body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
 .panel { background: #1a1a1a; padding: 25px 30px; border-radius: 8px; width: 460px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); margin: 20px 0; }
@@ -28,7 +28,7 @@ button:hover { background: #383838; }
 </head>
 <body>
 <div class="panel" id="main-panel">
-<h2 style="text-align: center; color: #d4af37; margin-top: 0; margin-bottom: 12px;">CỬU MỆNH</h2>
+<h2 style="text-align: center; color: #d4af37; margin-top: 0; margin-bottom: 12px;">ĐẠO TỊCH</h2>
 <div class="stat-item"><span id="d_label_traveler">Lữ khách -</span> <span class="stat-value" id="d_identity">-</span></div>
 <div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d_realm">-</span></div>
 <div class="stat-item"><span>Cảnh Giới:</span> <span class="stat-value" id="d_rank">Kỳ 1</span></div>
@@ -41,13 +41,15 @@ button:hover { background: #383838; }
 <div class="stat-item"><span>Tinh Lực:</span> <div><span class="stat-value" id="d_tinh_luc">0</span> <span class="prog-text" id="p_tinh_luc">(0%)</span></div></div>
 
 <hr>
-<h4 style="color: #888; margin: 6px 0 4px 0;">CHỈ SỐ CHIẾN ĐẤU (ATK & DEF)</h4>
-<div class="stat-item"><span>Hệ Sát Thương:</span> <span class="stat-value" id="d_dmg_type" style="color: #3498db;">Vật Lý</span></div>
-<div class="stat-item"><span>Chỉ Số Tấn Công (ATK):</span> <span class="stat-value" id="d_atk_val">0</span></div>
-<div class="stat-item"><span>Kháng Vật Lý:</span> <span class="stat-value" id="d_def_vl">0</span></div>
-<div class="stat-item"><span>Kháng Pháp Lực:</span> <span class="stat-value" id="d_def_p">0</span></div>
-<div class="stat-item"><span>Tốc Lực:</span> <span class="stat-value" id="d_speed">0</span></div>
+<h4 style="color: #888; margin: 6px 0 4px 0;">CHỈ SỐ CHIẾN ĐẤU</h4>
+<div class="stat-item"><span>Huyết Khí (HP):</span> <span class="stat-value" id="d_hp" style="color: #e74c3c;">100 / 100</span></div>
+<div class="stat-item"><span>Linh Khí (MP):</span> <span class="stat-value" id="d_mp" style="color: #3498db;">100 / 100</span></div>
 <div class="stat-item"><span>Hoạt Lực:</span> <span class="stat-value" id="d_hoat_luc" style="color: #2ecc71;">21 / 21</span></div>
+<div class="stat-item"><span>Tốc Lực:</span> <span class="stat-value" id="d_speed">0</span></div>
+<div class="stat-item"><span>Hệ Sát Thương:</span> <span class="stat-value" id="d_dmg_type" style="color: #3498db;">Vật Lý</span></div>
+<div class="stat-item"><span>Sát Thương:</span> <span class="stat-value" id="d_atk_val">0</span></div>
+<div class="stat-item"><span>Kháng Vật Lý:</span> <span class="stat-value" id="d_def_vl">0</span></div>
+<div class="stat-item"><span>Kháng Pháp:</span> <span class="stat-value" id="d_def_p">0</span></div>
 
 <button class="combat-btn" onclick="openCombatModal()">⚔️ Săn Quái & Hấp Thu Nguyên Khí</button>
 <button onclick="openEffectModal()" style="background: #251d08; border-color: #d4af37; color: #d4af37;">📜 Xem Bảng Hiệu Ứng & Trang Bị</button>
@@ -139,7 +141,6 @@ let isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
 let maxHoatLuc = Math.floor(10 + (tinhLuc / 10) + (currentPeriod * 10));
 let hoatLuc = Number(localStorage.getItem('game_hoat_luc'));
 
-// Nếu chưa có hoặc lưu giá trị 0/âm hoặc lớn hơn max mới thì khởi tạo bằng mức tối đa
 if (isNaN(hoatLuc) || hoatLuc <= 0 || hoatLuc > maxHoatLuc) {
   hoatLuc = maxHoatLuc;
   localStorage.setItem('game_hoat_luc', hoatLuc);
@@ -183,7 +184,6 @@ function updateUI() {
     let oldMaxHoatLuc = maxHoatLuc;
     maxHoatLuc = Math.floor(10 + (tinhLuc / 10) + (currentPeriod * 10));
     
-    // Nếu trần hoạt lực tăng lên (do tăng Tinh Lực), tự động cộng thêm phần chênh lệch cho điểm hiện tại
     if (maxHoatLuc > oldMaxHoatLuc) {
       hoatLuc += (maxHoatLuc - oldMaxHoatLuc);
     }
@@ -191,6 +191,12 @@ function updateUI() {
     localStorage.setItem('game_hoat_luc', hoatLuc);
 
     document.getElementById('d_hoat_luc').innerText = hoatLuc + " / " + maxHoatLuc;
+
+    // Tính toán HP (Huyết Khí) và MP (Linh Khí) cơ bản
+    let maxHp = 100 + (theLuc * 10) + (currentPeriod * 50);
+    let maxMp = 100 + (linhLuc * 10) + (currentPeriod * 50);
+    document.getElementById('d_hp').innerText = maxHp + " / " + maxHp;
+    document.getElementById('d_mp').innerText = maxMp + " / " + maxMp;
 
     document.getElementById('p_the_luc').innerText = "(" + Math.round(progTheLuc * 100) + "%)";
     document.getElementById('p_linh_luc').innerText = "(" + Math.round(progLinhLuc * 100) + "%)";
@@ -263,9 +269,6 @@ function openEffectModal() { document.getElementById('effect-modal').style.displ
 function openDetailsModal() { document.getElementById('details-modal').style.display = 'flex'; }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-// ----------------------------------------------------
-// TEST GAMEPLAY & SỰ KIỆN LỢN RỪNG
-// ----------------------------------------------------
 function openTestGameplay() {
   document.getElementById('main-panel').style.display = 'none';
   document.getElementById('test-gameplay-panel').style.display = 'block';
@@ -285,7 +288,6 @@ function actionWalkAway() {
 
 function actionChaseBoar() {
   let playerSpeed = Number(((tinhLuc / 10) + currentPeriod).toFixed(1));
-  
   let r1 = Math.random();
   let r2 = Math.random();
   let low = Math.min(r1, r2);
@@ -293,7 +295,6 @@ function actionChaseBoar() {
   let boarThe = Math.floor(low * 20);
   let boarLinh = Math.floor((high - low) * 20);
   let boarTinh = 20 - boarThe - boarLinh;
-
   let boarSpeed = Number(((boarTinh / 10) + 1).toFixed(1));
 
   if (boarSpeed <= playerSpeed) {
@@ -323,21 +324,16 @@ function actionChaseBoar() {
       `⚔️ Đã tiêu diệt lợn rừng (Tốn 1 Hoạt Lực).<br><br>` +
       `🎁 <b>Chiến lợi phẩm nhận được:</b><br>` + (itemsListText.length > 0 ? itemsListText.join('<br>') : "Không rơi nguyên liệu nào.");
     document.getElementById('story-actions').style.display = 'none';
-
   } else {
     hoatLuc = Math.max(0, hoatLuc - 2);
     localStorage.setItem('game_hoat_luc', hoatLuc);
     updateUI();
 
-    document.getElementById('story-box').innerHTML = 
-      `Bạn đuổi theo mãi mà không kịp - 2 hoạt lực`;
+    document.getElementById('story-box').innerHTML = `Bạn đuổi theo mãi mà không kịp - 2 hoạt lực`;
     document.getElementById('story-actions').style.display = 'none';
   }
 }
 
-// ----------------------------------------------------
-// HỆ THỐNG COMBAT CHÍNH
-// ----------------------------------------------------
 function startCombat(tier, rewardType) {
   if (isBottleneck) return;
 
@@ -368,7 +364,6 @@ function startCombat(tier, rewardType) {
 
   let totalDropCount = Math.floor(Math.random() * 5); 
   let droppedItemsMap = {};
-
   let shuffledMats = [...matList].sort(() => 0.5 - Math.random());
   let actualDropCount = Math.min(totalDropCount, shuffledMats.length);
 
