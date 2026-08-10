@@ -121,15 +121,12 @@ let progTinhLuc = Number(localStorage.getItem('game_prog_tinh_luc')) || 0;
 let currentPeriod = Number(localStorage.getItem('game_period')) || 1;
 let isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
 
-let itemStvl = Number(localStorage.getItem('item_stvl'));
-if (isNaN(itemStvl)) itemStvl = 5;
-let itemStp = Number(localStorage.getItem('item_stp'));
-if (isNaN(itemStp)) itemStp = 5;
-let itemDefVl = Number(localStorage.getItem('item_def_vl'));
-if (isNaN(itemDefVl)) itemDefVl = 3;
-let itemDefP = Number(localStorage.getItem('item_def_p'));
-if (isNaN(itemDefP)) itemDefP = 3;
-let itemDescName = localStorage.getItem('item_desc_name') || 'Mộc Đao Cũ Kỹ';
+// Bắt đầu từ bàn tay trắng (chưa có trang bị, các chỉ số đồ = 0)
+let itemStvl = Number(localStorage.getItem('item_stvl')) || 0;
+let itemStp = Number(localStorage.getItem('item_stp')) || 0;
+let itemDefVl = Number(localStorage.getItem('item_def_vl')) || 0;
+let itemDefP = Number(localStorage.getItem('item_def_p')) || 0;
+let itemDescName = localStorage.getItem('item_desc_name') || 'Chưa có (Tay không)';
 
 let currentTitleEffect = { name: "🛡️ Bình Thường", desc: "Trạng thái ổn định." };
 
