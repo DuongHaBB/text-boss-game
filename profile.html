@@ -158,79 +158,84 @@ function checkAndTriggerBottleneck() {
 let currentTitleEffect = { name: "Bình Thường", desc: "Trạng thái ổn định." };
 
 function updateUI() {
-  document.getElementById('d_label_traveler').innerText = "Lữ khách " + travelerId;
-  document.getElementById('d_identity').innerText = charName;
-  document.getElementById('d_realm').innerText = REALMS_DATA[realmKey].name;
-  document.getElementById('d_rank').innerText = "Kỳ " + currentPeriod;
+  try {
+    document.getElementById('d_label_traveler').innerText = "Lữ khách " + (travelerId || '---');
+    document.getElementById('d_identity').innerText = charName || 'Vô danh';
+    document.getElementById('d_realm').innerText = REALMS_DATA[realmKey] ? REALMS_DATA[realmKey].name : '---';
+    document.getElementById('d_rank').innerText = "Kỳ " + (currentPeriod || 1);
 
-  document.getElementById('d_the_luc').innerText = theLuc;
-  document.getElementById('d_linh_luc').innerText = linhLuc;
-  document.getElementById('d_tinh_luc').innerText = tinhLuc;
+    document.getElementById('d_the_luc').innerText = theLuc;
+    document.getElementById('d_linh_luc').innerText = linhLuc;
+    document.getElementById('d_tinh_luc').innerText = tinhLuc;
 
-  document.getElementById('p_the_luc').innerText = "(" + Math.round(progTheLuc * 100) + "%)";
-  document.getElementById('p_linh_luc').innerText = "(" + Math.round(progLinhLuc * 100) + "%)";
-  document.getElementById('p_tinh_luc').innerText = "(" + Math.round(progTinhLuc * 100) + "%)";
+    document.getElementById('p_the_luc').innerText = "(" + Math.round(progTheLuc * 100) + "%)";
+    document.getElementById('p_linh_luc').innerText = "(" + Math.round(progLinhLuc * 100) + "%)";
+    document.getElementById('p_tinh_luc').innerText = "(" + Math.round(progTinhLuc * 100) + "%)";
 
-  let maxStat = Math.max(theLuc, linhLuc, tinhLuc);
-  let limit = BOTTLENECK_LIMITS[currentPeriod] || 20;
-  document.getElementById('d_limit_val').innerText = limit;
-  document.getElementById('d_max_stat').innerText = maxStat;
+    let maxStat = Math.max(theLuc, linhLuc, tinhLuc);
+    let limit = BOTTLENECK_LIMITS[currentPeriod] || 20;
+    document.getElementById('d_limit_val').innerText = limit;
+    document.getElementById('d_max_stat').innerText = maxStat;
 
-  let statusBox = document.getElementById('bottleneck-status-box');
-  let breakBtn = document.getElementById('btn-break');
-  if (isBottleneck) {
-    statusBox.style.display = 'flex';
-    breakBtn.style.display = 'block';
-  } else {
-    statusBox.style.display = 'none';
-    breakBtn.style.display = 'none';
-  }
-
-  let dmgTypeStr = "Vật Lý";
-  let atkVal = itemStvl + (theLuc / 10);
-
-  if (theLuc === linhLuc && linhLuc === tinhLuc && maxStat > 0) {
-    currentTitleEffect = { name: "👑 Tam Thanh Nhất Khí", desc: "Giảm 50% chỉ số địch, Sát thương x2." };
-    dmgTypeStr = "Hỗn Hợp Tuyệt Đối";
-    atkVal = (itemStvl + (theLuc / 10)) * 2;
-  } else if ((theLuc === linhLuc && theLuc > tinhLuc) || (theLuc === tinhLuc && theLuc > linhLuc) || (linhLuc === tinhLuc && linhLuc > theLuc)) {
-    currentTitleEffect = { name: "⚡ Lưỡng Nghi Đồng Nguyên", desc: "Cân bằng thuộc tính." };
-    dmgTypeStr = "Hỗn Hợp";
-    atkVal = (itemStvl + (theLuc / 10)) * 2;
-  } else {
-    currentTitleEffect = { name: "🛡️ Bình Thường", desc: "Trạng thái ổn định." };
-    if (linhLuc > theLuc && linhLuc >= tinhLuc) {
-      dmgTypeStr = "Pháp Thuật";
-      atkVal = itemStp + (linhLuc / 10);
-    } else if (tinhLuc > theLuc && tinhLuc > linhLuc) {
-      dmgTypeStr = "Tinh Thần";
-      atkVal = itemStvl + (tinhLuc / 10);
+    let statusBox = document.getElementById('bottleneck-status-box');
+    let breakBtn = document.getElementById('btn-break');
+    if (isBottleneck) {
+      statusBox.style.display = 'flex';
+      breakBtn.style.display = 'block';
     } else {
-      dmgTypeStr = "Vật Lý";
-      atkVal = itemStvl + (theLuc / 10);
+      statusBox.style.display = 'none';
+      breakBtn.style.display = 'none';
     }
+
+    let dmgTypeStr = "Vật Lý";
+    let atkVal = itemStvl + (theLuc / 10);
+
+    if (theLuc === linhLuc && linhLuc === tinhLuc && maxStat > 0) {
+      currentTitleEffect = { name: "👑 Tam Thanh Nhất Khí", desc: "Giảm 50% chỉ số địch, Sát thương x2." };
+      dmgTypeStr = "Hỗn Hợp Tuyệt Đối";
+      atkVal = (itemStvl + (theLuc / 10)) * 2;
+    } else if ((theLuc === linhLuc && theLuc > tinhLuc) || (theLuc === tinhLuc && theLuc > linhLuc) || (linhLuc === tinhLuc && linhLuc > theLuc)) {
+      currentTitleEffect = { name: "⚡ Lưỡng Nghi Đồng Nguyên", desc: "Cân bằng thuộc tính." };
+      dmgTypeStr = "Hỗn Hợp";
+      atkVal = (itemStvl + (theLuc / 10)) * 2;
+    } else {
+      currentTitleEffect = { name: "🛡️ Bình Thường", desc: "Trạng thái ổn định." };
+      if (linhLuc > theLuc && linhLuc >= tinhLuc) {
+        dmgTypeStr = "Pháp Thuật";
+        atkVal = itemStp + (linhLuc / 10);
+      } else if (tinhLuc > theLuc && tinhLuc > linhLuc) {
+        dmgTypeStr = "Tinh Thần";
+        atkVal = itemStvl + (tinhLuc / 10);
+      } else {
+        dmgTypeStr = "Vật Lý";
+        atkVal = itemStvl + (theLuc / 10);
+      }
+    }
+
+    // --- CƠ CHẾ PHẢN CHẤN (Khi ATK thấp hơn DEF mẫu = 10) ---
+    let sampleBossDef = 10;
+    let netCombat = atkVal - sampleBossDef;
+    let displayAtk = isNaN(atkVal) ? "0.0" : atkVal.toFixed(1);
+
+    if (netCombat < 0) {
+      displayAtk += ` (Phản chấn: ${Math.abs(netCombat).toFixed(1)})`;
+    }
+
+    document.getElementById('d_dmg_type').innerText = dmgTypeStr;
+    document.getElementById('d_atk_val').innerText = displayAtk;
+    document.getElementById('d_def_vl').innerText = (itemDefVl + Math.floor(theLuc / 20));
+    document.getElementById('d_def_p').innerText = (itemDefP + Math.floor(linhLuc / 20));
+    document.getElementById('d_speed').innerText = (((tinhLuc / 10) + currentPeriod)).toFixed(1);
+
+    renderEffectModalContent();
+  } catch (err) {
+    console.error("Lỗi cập nhật UI:", err);
   }
-
-  // --- MÔ PHỎNG PHẢN CHẤN (Khi ATK thấp hơn DEF của mục tiêu mẫu = 10) ---
-  let sampleBossDef = 10;
-  let netCombat = atkVal - sampleBossDef;
-  let displayAtk = atkVal.toFixed(1);
-
-  if (netCombat < 0) {
-    displayAtk = atkVal.toFixed(1) + ` (Phản chấn: ${Math.abs(netCombat).toFixed(1)})`;
-  }
-
-  document.getElementById('d_dmg_type').innerText = dmgTypeStr;
-  document.getElementById('d_atk_val').innerText = displayAtk;
-  document.getElementById('d_def_vl').innerText = itemDefVl + Math.round(theLuc / 20);
-  document.getElementById('d_def_p').innerText = itemDefP + Math.round(linhLuc / 20);
-  document.getElementById('d_speed').innerText = ((tinhLuc / 10) + currentPeriod).toFixed(1);
-
-  renderEffectModalContent();
 }
 
 function renderEffectModalContent() {
   let container = document.getElementById('effect-content-container');
+  if (!container) return;
   container.innerHTML = '<div style="font-size: 11px; color: #2ecc71; font-weight: bold; margin-bottom:6px;">✨ HIỆU ỨNG:</div>' +
     '<div class="effect-row-item"><span style="color: #d4af37; font-weight: bold;">' + currentTitleEffect.name + '</span><span>' + currentTitleEffect.desc + '</span></div>' +
     '<div style="font-size: 11px; color: #2ecc71; font-weight: bold; margin: 10px 0 6px 0;">🛡️ TRANG BỊ ĐANG MẶC:</div>' +
