@@ -2,11 +2,12 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Đạo Tịch - Khởi Đầu Tu Tiên</title>
+<title>Cưu Mệnh - Khởi Đầu Tu Tiên</title>
 <style>
 body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-.panel { background: #1a1a1a; padding: 30px; border-radius: 8px; width: 420px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); text-align: center; }
-h2 { color: #d4af37; margin-top: 0; letter-spacing: 2px; }
+.panel { background: #1a1a1a; padding: 25px 30px; border-radius: 8px; width: 440px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); text-align: center; }
+h2 { color: #d4af37; margin-top: 0; margin-bottom: 4px; letter-spacing: 2px; }
+.subtitle { font-size: 12px; color: #888; font-style: italic; margin-bottom: 20px; letter-spacing: 1px; }
 
 /* Hệ thống Tab */
 .tab-container { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
@@ -19,18 +20,28 @@ h2 { color: #d4af37; margin-top: 0; letter-spacing: 2px; }
 .tab-content.active { display: block; }
 
 /* Form Elements */
-label { display: block; margin-top: 12px; font-size: 12px; color: #aaa; }
-input, select { width: 100%; padding: 10px; margin-top: 5px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; font-family: inherit; box-sizing: border-box; }
+label { display: block; margin-top: 10px; font-size: 12px; color: #aaa; }
+input, select { width: 100%; padding: 9px; margin-top: 4px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; font-family: inherit; box-sizing: border-box; font-size: 13px; }
 button.action-btn { width: 100%; padding: 12px; margin-top: 20px; background: #0f2a1a; color: #2ecc71; border: 1px solid #2ecc71; cursor: pointer; border-radius: 4px; font-size: 14px; font-weight: bold; font-family: inherit; }
 button.action-btn:hover { background: #153822; }
+
 .save-info { background: #141414; padding: 12px; border: 1px solid #333; border-radius: 4px; margin-bottom: 15px; font-size: 13px; color: #ccc; }
 .empty-save { color: #e74c3c; font-style: italic; text-align: center; padding: 20px 0; }
+
+/* Phân phối điểm tiềm năng */
+.stat-allocator { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; background: #141414; padding: 6px 10px; border: 1px solid #333; border-radius: 4px; }
+.stat-allocator span { font-size: 13px; color: #d4af37; }
+.stat-controls { display: flex; align-items: center; gap: 8px; }
+.stat-controls button { width: 26px; height: 26px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 3px; font-weight: bold; }
+.stat-controls button:hover { background: #383838; }
+.points-left { color: #2ecc71; font-weight: bold; }
 </style>
 </head>
 <body>
 
 <div class="panel">
-    <h2>ĐẠO TỊCH</h2>
+    <h2>CƯU MỆNH</h2>
+    <div class="subtitle">Quyển 1: Xuân Thu Như Mộng</div>
     
     <!-- Thanh Tab -->
     <div class="tab-container">
@@ -40,33 +51,64 @@ button.action-btn:hover { background: #153822; }
 
     <!-- TAB 1: CHƠI TIẾP -->
     <div id="tab-continue" class="tab-content active">
-        <div id="save-game-info">
-            <!-- Dữ liệu lưu sẽ load vào đây bằng JS -->
-        </div>
+        <div id="save-game-info"></div>
         <button id="btn-resume" class="action-btn" onclick="resumeGame()" style="display:none; background: #15202b; border-color: #3498db; color: #3498db;">🚀 Tiếp Tịch Hành Trình</button>
     </div>
 
     <!-- TAB 2: TRÙNG SINH (Tạo Nhân Vật Mới) -->
     <div id="tab-reborn" class="tab-content">
-        <div style="font-size: 12px; color: #aaa; margin-bottom: 10px;">Lựa chọn thân xác và thế lực khởi đầu cho vòng đời mới:</div>
+        <div style="font-size: 12px; color: #aaa; margin-bottom: 8px;">Lựa chọn thân xác và thế lực khởi đầu:</div>
+        
         <label>Đạo Hiệu / Tên Nhân Vật:</label>
         <input type="text" id="char_name" placeholder="Nhập đạo hiệu của ngươi..." value="Mèo Đen">
 
-        <label>Mã Lữ Khách:</label>
-        <input type="text" id="traveler_id" value="395">
-
         <label>Xuất Thân Vực Giới:</label>
         <select id="realm_select">
-            <option value="xich_hoa">Xích Hỏa Vực (Tân Thủ Thôn)</option>
-            <option value="tam_sac">Tam Sắc Phủ</option>
-            <option value="bach_ngoc">Bạch Ngọc Đài</option>
+            <option value="xich_hoa">Xích Hỏa Vực (Tăng mạnh Thể Lực, kháng hỏa độc)</option>
+            <option value="tam_sac">Tam Sắc Phủ (+5 Tinh Lực, x2 tốc độ thu thập)</option>
+            <option value="bach_ngoc">Bạch Ngọc Đài (+5 Linh Lực, tăng ngộ tính)</option>
         </select>
+
+        <div style="margin-top: 12px; display: flex; justify-content: space-between; font-size: 12px; color: #ccc;">
+            <span>Phân bổ điểm Tiềm Năng:</span>
+            <span>Còn lại: <span id="pts_left" class="points-left">10</span> điểm</span>
+        </div>
+
+        <div class="stat-allocator">
+            <span>Thể Lực:</span>
+            <div class="stat-controls">
+                <button onclick="adjustStat('the_luc', -1)">-</button>
+                <span id="val_the_luc" style="width: 20px; text-align: center;">0</span>
+                <button onclick="adjustStat('the_luc', 1)">+</button>
+            </div>
+        </div>
+
+        <div class="stat-allocator">
+            <span>Linh Lực:</span>
+            <div class="stat-controls">
+                <button onclick="adjustStat('linh_luc', -1)">-</button>
+                <span id="val_linh_luc" style="width: 20px; text-align: center;">0</span>
+                <button onclick="adjustStat('linh_luc', 1)">+</button>
+            </div>
+        </div>
+
+        <div class="stat-allocator">
+            <span>Tinh Lực:</span>
+            <div class="stat-controls">
+                <button onclick="adjustStat('tinh_luc', -1)">-</button>
+                <span id="val_tinh_luc" style="width: 20px; text-align: center;">0</span>
+                <button onclick="adjustStat('tinh_luc', 1)">+</button>
+            </div>
+        </div>
 
         <button class="action-btn" onclick="createNewCharacter()">✨ Bắt Đầu Trùng Sinh</button>
     </div>
 </div>
 
 <script>
+let availablePoints = 10;
+let allocated = { the_luc: 0, linh_luc: 0, tinh_luc: 0 };
+
 window.onload = function() {
     checkSaveData();
 };
@@ -85,20 +127,35 @@ function switchTab(tabName) {
     }
 }
 
+function adjustStat(statName, amount) {
+    if (amount > 0 && availablePoints > 0) {
+        allocated[statName] += 1;
+        availablePoints -= 1;
+    } else if (amount < 0 && allocated[statName] > 0) {
+        allocated[statName] -= 1;
+        availablePoints += 1;
+    }
+    document.getElementById('pts_left').innerText = availablePoints;
+    document.getElementById('val_' + statName).innerText = allocated[statName];
+}
+
 function checkSaveData() {
     const savedName = localStorage.getItem('game_character_name');
     const saveContainer = document.getElementById('save-game-info');
     const resumeBtn = document.getElementById('btn-resume');
 
     if (!savedName) {
-        saveContainer.innerHTML = `<div class="empty-save">Chưa phát hiện linh hồn ký ức nào.<br>Hãy chọn "Trùng Sinh" để bắt đầu bước chân vào Đạo Tịch.</div>`;
+        saveContainer.innerHTML = `<div class="empty-save">Chưa phát hiện linh hồn ký ức nào.<br>Hãy chọn "Trùng Sinh" để bắt đầu bước chân vào Cưu Mệnh.</div>`;
         resumeBtn.style.display = 'none';
     } else {
-        const travelerId = localStorage.getItem('game_traveler_id') || '---';
+        const travelerId = localStorage.getItem('game_traveler_id') || '395';
         const realmKey = localStorage.getItem('game_realm') || 'xich_hoa';
-        const realmsMap = { 'xich_hoa': 'Xích Hỏa Vực', 'tam_sac': 'Tam Sắc Phủ', 'bach_ngoc': 'Bạch Ngọc Đài' };
+        const realmsMap = { 
+            'xich_hoa': 'Xích Hỏa Vực (Tăng mạnh Thể Lực, kháng hỏa độc)', 
+            'tam_sac': 'Tam Sắc Phủ (+5 Tinh Lực, x2 tốc độ thu thập)', 
+            'bach_ngoc': 'Bạch Ngọc Đài (+5 Linh Lực, tăng ngộ tính)' 
+        };
         const theLuc = localStorage.getItem('game_the_luc') || 0;
-        const period = localStorage.getItem('game_period') || 1;
 
         saveContainer.innerHTML = `
             <div class="save-info">
@@ -114,13 +171,11 @@ function checkSaveData() {
 }
 
 function resumeGame() {
-    // Chuyển thẳng sang giao diện chính profile.html
     window.location.href = 'profile.html';
 }
 
 function createNewCharacter() {
     const name = document.getElementById('char_name').value.trim();
-    const travelerId = document.getElementById('traveler_id').value.trim();
     const realm = document.getElementById('realm_select').value;
 
     if (!name) {
@@ -128,26 +183,24 @@ function createNewCharacter() {
         return;
     }
 
-    // Ghi dữ liệu khởi tạo mới vào localStorage
+    const randomTravelerId = Math.floor(Math.random() * 111) + 390;
+
     localStorage.setItem('game_character_name', name);
-    localStorage.setItem('game_traveler_id', travelerId);
+    localStorage.setItem('game_traveler_id', randomTravelerId);
     localStorage.setItem('game_realm', realm);
     
-    // Reset các chỉ số cơ bản cho nhân vật mới
-    localStorage.setItem('game_the_luc', 0);
-    localStorage.setItem('game_linh_luc', 0);
-    localStorage.setItem('game_tinh_luc', 0);
+    localStorage.setItem('game_the_luc', allocated.the_luc);
+    localStorage.setItem('game_linh_luc', allocated.linh_luc);
+    localStorage.setItem('game_tinh_luc', allocated.tinh_luc);
+    
     localStorage.setItem('game_prog_the_luc', 0);
     localStorage.setItem('game_prog_linh_luc', 0);
     localStorage.setItem('game_prog_prog_tinh_luc', 0);
     localStorage.setItem('game_period', 1);
     localStorage.setItem('game_is_bottleneck', 'false');
     localStorage.setItem('game_hoat_luc', 20);
-    
-    // Thiết lập node cốt truyện ban đầu (Tân Thủ Thôn - Gặp Lão Sư)
     localStorage.setItem('game_current_node', 'node_intro_01');
 
-    // Chuyển vào game
     window.location.href = 'profile.html';
 }
 </script>
