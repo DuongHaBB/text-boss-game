@@ -2,169 +2,184 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Đạo Tịch - Hệ Thống Cảnh Giới & Combat</title>
+<title>Cửu Mệnh - Đạo Tịch</title>
 <style>
 body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-.panel { background: #1a1a1a; padding: 25px 30px; border-radius: 8px; width: 460px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); margin: 20px 0; }
-.stat-item { margin: 8px 0; color: #aaa; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
-.stat-value { color: #d4af37; font-weight: bold; }
-.prog-text { font-size: 11px; color: #666; font-style: italic; }
-.warning-text { color: #e74c3c; font-weight: bold; animation: pulse 1.5s infinite; }
-@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-hr { border: 0; border-top: 1px solid #333; margin: 10px 0; }
-button { width: 100%; padding: 10px; margin-top: 6px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 4px; font-size: 13px; font-family: inherit; }
-button:hover { background: #383838; }
-.combat-btn { background: #0f2a1a; border-color: #2ecc71; color: #2ecc71; font-weight: bold; }
+.panel { background: #1a1a1a; padding: 25px 30px; border-radius: 8px; width: 480px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+h2 { color: #d4af37; text-align: center; margin-top: 0; margin-bottom: 20px; letter-spacing: 2px; }
 
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 99; }
-.modal-content { background: #1a1a1a; padding: 25px; border-radius: 8px; width: 440px; border: 1px solid #2ecc71; text-align: center; }
-.monster-group { margin: 10px 0; border: 1px solid #333; padding: 8px; border-radius: 6px; background: #141414; text-align: left; }
-.monster-title { font-size: 11px; color: #2ecc71; font-weight: bold; margin-bottom: 4px; }
-.reward-btn { width: 23%; padding: 6px 2px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 3px; font-size: 10px; text-align: center; font-family: inherit; }
-.reward-btn:hover { background: #383838; border-color: #d4af37; }
-.monster-row { display: flex; justify-content: space-between; }
-.stat-val-wrap { display: flex; align-items: center; gap: 4px; }
-.modifier { font-size: 0.9em; color: #9ca3af; }
+.section-box { background: #141414; border: 1px solid #333; border-radius: 4px; padding: 12px 15px; margin-bottom: 15px; font-size: 13px; }
+.row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.row:last-child { margin-bottom: 0; }
+.label { color: #aaa; }
+.value { color: #fff; font-weight: bold; }
+.highlight { color: #d4af37; }
+
+button.action-btn { width: 100%; padding: 11px; margin-top: 8px; cursor: pointer; border-radius: 4px; font-size: 13px; font-weight: bold; font-family: inherit; border: 1px solid; text-align: center; }
+.btn-green { background: #0f2a1a; color: #2ecc71; border-color: #2ecc71; }
+.btn-green:hover { background: #153822; }
+.btn-blue { background: #15202b; color: #3498db; border-color: #3498db; }
+.btn-blue:hover { background: #1c2b3a; }
+.btn-yellow { background: #2a250f; color: #f1c40f; border-color: #f1c40f; }
+.btn-yellow:hover { background: #383114; }
+.btn-red { background: #2a0f0f; color: #e74c3c; border-color: #e74c3c; }
+.btn-red:hover { background: #381515; }
 </style>
 </head>
 <body>
 
-<div class="panel" id="main-panel">
-<h2 style="text-align: center; color: #d4af37; margin-top: 0; margin-bottom: 12px;">ĐẠO TỊCH</h2>
-<div class="stat-item"><span id="d_label_traveler">Lữ khách -</span> <span class="stat-value" id="d_identity">-</span></div>
-<div class="stat-item"><span>Xuất Thân:</span> <span class="stat-value" id="d_realm">-</span></div>
-<div class="stat-item"><span>Cảnh Giới:</span> <span class="stat-value" id="d_rank">Phàm Kỳ</span></div>
-<div class="stat-item" id="bottleneck-status-box" style="display: none;"><span>Trạng thái:</span> <span class="warning-text">Lâm vào bình cảnh!</span></div>
+<div class="panel">
+    <h2>ĐẠO TỊCH</h2>
+    
+    <div class="section-box">
+        <div class="row">
+            <span class="label">Lữ khách:</span>
+            <span class="value" id="info_traveler">#---</span>
+        </div>
+        <div class="row">
+            <span class="label">Danh xưng:</span>
+            <span class="value highlight" id="info_name">---</span>
+        </div>
+        <div class="row">
+            <span class="label">Xuất Thân:</span>
+            <span class="value" id="info_realm" style="color: #e67e22;">---</span>
+        </div>
+        <div class="row">
+            <span class="label">Cảnh Giới:</span>
+            <span class="value" id="info_period">Phàm Kỳ (1)</span>
+        </div>
+    </div>
 
-<hr>
-<h4 style="color: #888; margin: 6px 0 4px 0;">TIỀM NĂNG & TIẾN ĐỘ</h4>
-<div class="stat-item"><span>Thể Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_the_luc">0</span><span class="prog-text" id="p_the_luc">(0%)</span></div></div>
-<div class="stat-item"><span>Linh Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_linh_luc">0</span><span class="prog-text" id="p_linh_luc">(0%)</span></div></div>
-<div class="stat-item"><span>Tinh Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_tinh_luc">0</span><span class="prog-text" id="p_tinh_luc">(0%)</span></div></div>
+    <div class="section-box">
+        <div style="font-weight: bold; color: #d4af37; margin-bottom: 8px;">TIỀM NĂNG & TIẾN ĐỘ</div>
+        <div class="row">
+            <span class="label">Thể Lực:</span>
+            <span class="value" id="stat_the_luc">0 <span style="font-size:11px; color:#888;">(0%)</span></span>
+        </div>
+        <div class="row">
+            <span class="label">Linh Lực:</span>
+            <span class="value" id="stat_linh_luc">0 <span style="font-size:11px; color:#888;">(0%)</span></span>
+        </div>
+        <div class="row">
+            <span class="label">Tinh Lực:</span>
+            <span class="value" id="stat_tinh_luc">0 <span style="font-size:11px; color:#888;">(0%)</span></span>
+        </div>
+    </div>
 
-<hr>
-<h4 style="color: #888; margin: 6px 0 4px 0;">CHỈ SỐ CHIẾN ĐẤU</h4>
-<div class="stat-item"><span>Huyết Khí:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_hp" style="color: #e74c3c;">100 / 100</span><span class="modifier" id="mod_hp">(+0)</span></div></div>
-<div class="stat-item"><span>Linh Khí:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_mp" style="color: #3498db;">100 / 100</span><span class="modifier" id="mod_mp">(+0)</span></div></div>
-<div class="stat-item"><span>Hoạt Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_hoat_luc" style="color: #2ecc71;">21 / 21</span><span class="modifier" id="mod_hoat_luc">(+0)</span></div></div>
-<div class="stat-item"><span>Tốc Lực:</span> <span class="stat-value" id="d_speed">0</span></div>
-<div class="stat-item"><span>Hệ Sát Thương:</span> <span class="stat-value" id="d_dmg_type" style="color: #3498db;">Vật Lý</span></div>
-<div class="stat-item"><span>Sát Thương:</span> <span class="stat-value" id="d_atk_val">0</span></div>
+    <div class="section-box">
+        <div style="font-weight: bold; color: #d4af37; margin-bottom: 8px;">CHỈ SỐ CHIẾN ĐẤU</div>
+        <div class="row">
+            <span class="label">Huyết Khí:</span>
+            <span class="value" style="color: #e74c3c;"><span id="val_huyet_khi">100</span> / 100</span>
+        </div>
+        <div class="row">
+            <span class="label">Linh Khí:</span>
+            <span class="value" style="color: #3498db;"><span id="val_linh_khi">100</span> / 100</span>
+        </div>
+        <div class="row">
+            <span class="label">Hoạt Lực:</span>
+            <span class="value" style="color: #2ecc71;"><span id="val_hoat_luc">20</span> / 20</span>
+        </div>
+        <div class="row">
+            <span class="label">Tốc Lực (Speed):</span>
+            <span class="value" id="val_toc_luc">0</span>
+        </div>
+        <div class="row">
+            <span class="label">Sát Thương (ATK - VL):</span>
+            <span class="value" style="color: #e67e22;" id="val_atk_vl">0</span>
+        </div>
+        <div class="row">
+            <span class="label">Kháng Vật Lý (Def VL):</span>
+            <span class="value" id="val_def_vl">0</span>
+        </div>
+        <div class="row">
+            <span class="label">Kháng Pháp Lực (Def P):</span>
+            <span class="value" id="val_def_p">0</span>
+        </div>
+    </div>
 
-<button class="combat-btn" onclick="openCombatModal()">⚔️ Săn Quái & Hấp Thu Nguyên Khí</button>
-<button onclick="openCombatTest()" style="background: #15202b; border-color: #3498db; color: #3498db;">🧪 Combat Test</button>
-<button onclick="openInventory()" style="background: #201a0e; border-color: #d4af37; color: #d4af37;">🎒 Hành Trang</button>
-<button onclick="resetGameData()" style="background: #2a1111; border-color: #e74c3c; color: #e74c3c; margin-top: 15px;">🔄 Tạo Lại Nhân Vật Khác</button>
-</div>
-
-<!-- Modal Săn Quái -->
-<div id="combat-modal" class="modal-overlay">
-<div class="modal-content" style="border-color: #2ecc71;">
-<h3 style="color: #2ecc71; margin-top: 0;">⚔️ CHỌN KHU VỰC SĂN QUÁI</h3>
-<div class="monster-group">
-  <div class="monster-title">1. Quái Thường (Tổng điểm: 15)</div>
-  <div class="monster-row">
-    <button class="reward-btn" onclick="startCombat(1, 'the_luc')">⚡ Thể</button>
-    <button class="reward-btn" onclick="startCombat(1, 'linh_luc')">💧 Linh</button>
-    <button class="reward-btn" onclick="startCombat(1, 'tinh_luc')">✨ Tinh</button>
-    <button class="reward-btn" onclick="startCombat(1, 'random')">🎲 Ngẫu nhiên</button>
-  </div>
-</div>
-<button onclick="closeModal('combat-modal')" style="background: #333; margin-top: 6px; border: 1px solid #555; color: #ccc; padding: 6px;">Đóng</button>
-</div>
+    <button class="action-btn btn-green" onclick="alert('Tính năng đang phát triển!')">⚔️ Săn Quái & Hấp Thu Nguyên Khí</button>
+    <button class="action-btn btn-blue" onclick="alert('Combat Test đang cập nhật!')">🧪 Combat Test</button>
+    <button class="action-btn btn-yellow" onclick="alert('Hành trang trống!')">🎒 Hành Trang</button>
+    <button class="action-btn btn-red" onclick="resetCharacter()">🔄 Tạo Lại Nhân Vật Khác</button>
 </div>
 
 <script>
-const REALMS_DATA = { 'xich_hoa': { name: 'Xích Hỏa Vực' }, 'tam_sac': { name: 'Tam Sắc Phủ' }, 'bach_ngoc': { name: 'Bạch Ngọc Đài' } };
-const BOTTLENECK_LIMITS = { 1: 20, 2: 30, 3: 40, 4: 50, 5: 60 };
-
-let theLuc = 0, linhLuc = 0, tinhLuc = 0;
-let progTheLuc = 0, progLinhLuc = 0, progTinhLuc = 0;
-let currentPeriod = 1, isBottleneck = false;
-let maxHoatLuc = 20, hoatLuc = 20;
-let charName = '', travelerId = '', realmKey = '';
-
 window.onload = function() {
-  if (!localStorage.getItem('game_character_name')) {
-    window.location.href = 'index.html';
-    return;
-  }
-  initGame();
+    loadProfileData();
 };
 
-function initGame() {
-  charName = localStorage.getItem('game_character_name');
-  travelerId = localStorage.getItem('game_traveler_id');
-  realmKey = localStorage.getItem('game_realm');
+function loadProfileData() {
+    const name = localStorage.getItem('game_character_name') || 'Vô Danh';
+    const travelerId = localStorage.getItem('game_traveler_id') || '430';
+    const realmKey = localStorage.getItem('game_realm') || 'xich_hoa';
 
-  theLuc = Number(localStorage.getItem('game_the_luc')) || 0;
-  linhLuc = Number(localStorage.getItem('game_linh_luc')) || 0;
-  tinhLuc = Number(localStorage.getItem('game_tinh_luc')) || 0;
-  progTheLuc = Number(localStorage.getItem('game_prog_the_luc')) || 0;
-  progLinhLuc = Number(localStorage.getItem('game_prog_linh_luc')) || 0;
-  progTinhLuc = Number(localStorage.getItem('game_prog_prog_tinh_luc')) || 0;
-  currentPeriod = Number(localStorage.getItem('game_period')) || 1;
-  isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
+    let baseTheLuc = parseInt(localStorage.getItem('game_the_luc')) || 0;
+    let baseLinhLuc = parseInt(localStorage.getItem('game_linh_luc')) || 0;
+    let baseTinhLuc = parseInt(localStorage.getItem('game_tinh_luc')) || 0;
 
-  maxHoatLuc = Math.floor(10 + (tinhLuc / 10) + (currentPeriod * 10));
-  hoatLuc = Number(localStorage.getItem('game_hoat_luc'));
-  if (isNaN(hoatLuc) || hoatLuc <= 0) hoatLuc = maxHoatLuc;
+    let realmName = '';
+    if (realmKey === 'xich_hoa') {
+        baseTheLuc += 5; // Xích Hỏa Vực +5 Thể lực
+        realmName = 'Xích Hỏa Vực (+5 Thể lực, x2 tốc độ tu luyện thể lực)';
+    } else if (realmKey === 'tam_sac') {
+        baseTinhLuc += 5; 
+        realmName = 'Tam Sắc Phủ (+5 Tinh Lực, x2 tốc độ thu thập)';
+    } else if (realmKey === 'bach_ngoc') {
+        baseLinhLuc += 5; 
+        realmName = 'Bạch Ngọc Đài (+5 Linh Lực, tăng ngộ tính)';
+    } else {
+        realmName = 'Xích Hỏa Vực (+5 Thể lực, x2 tốc độ tu luyện thể lực)';
+        baseTheLuc += 5;
+    }
 
-  updateUI();
+    document.getElementById('info_traveler').innerText = '#' + travelerId;
+    document.getElementById('info_name').innerText = name;
+    document.getElementById('info_realm').innerText = realmName;
+    
+    document.getElementById('stat_the_luc').innerHTML = `${baseTheLuc} <span style="font-size:11px; color:#888;">(0%)</span>`;
+    document.getElementById('stat_linh_luc').innerHTML = `${baseLinhLuc} <span style="font-size:11px; color:#888;">(0%)</span>`;
+    document.getElementById('stat_tinh_luc').innerHTML = `${baseTinhLuc} <span style="font-size:11px; color:#888;">(0%)</span>`;
+
+    // Chỉ số cơ bản & trang bị tạm tính (item = 0 nếu chưa có đồ)
+    const itemSTVL = 0;
+    const itemDefVL = 0;
+    const itemDefP = 0;
+    const canhGioiKỳ = 1; // Mặc định Phàm Kỳ (1)
+
+    // Công thức tính toán mới theo đúng tài liệu
+    const huyetKhi = 100 + (baseTheLuc * 10);
+    const linhKhi = 100 + (baseLinhLuc * 10);
+    const hoatLuc = parseInt(localStorage.getItem('game_hoat_luc')) || 20;
+
+    // Tốc Lực = (Tinh Lực / 10) + Cảnh Giới (Kỳ)
+    const tocLuc = (baseTinhLuc / 10) + canhGioiKỳ;
+
+    // ATK Hệ Vật Lý = Item_STVL + (Thể Lực / 10)
+    const atkVL = itemSTVL + (baseTheLuc / 10);
+
+    // Kháng Vật Lý = Item_DefVL + round(Thể Lực / 20)
+    const defVL = itemDefVL + Math.round(baseTheLuc / 20);
+
+    // Kháng Pháp Lực = Item_DefP + round(Linh Lực / 20)
+    const defP = itemDefP + Math.round(baseLinhLuc / 20);
+
+    document.getElementById('val_huyet_khi').innerText = huyetKhi;
+    document.getElementById('val_linh_khi').innerText = linhKhi;
+    document.getElementById('val_hoat_luc').innerText = hoatLuc;
+    document.getElementById('val_toc_luc').innerText = tocLuc.toFixed(1);
+    document.getElementById('val_atk_vl').innerText = atkVL.toFixed(1);
+    document.getElementById('val_def_vl').innerText = defVL;
+    document.getElementById('val_def_p').innerText = defP;
 }
 
-function resetGameData() {
-  localStorage.clear();
-  window.location.href = 'index.html';
-}
-
-function updateUI() {
-  document.getElementById('d_label_traveler').innerText = "Lữ khách " + (travelerId || '---');
-  document.getElementById('d_identity').innerText = charName || 'Vô danh';
-  document.getElementById('d_realm').innerText = REALMS_DATA[realmKey] ? REALMS_DATA[realmKey].name : '---';
-
-  let maxStat = Math.max(theLuc, linhLuc, tinhLuc);
-  document.getElementById('d_rank').innerText = `Phàm Kỳ (${maxStat})`;
-
-  document.getElementById('d_the_luc').innerText = theLuc;
-  document.getElementById('d_linh_luc').innerText = linhLuc;
-  document.getElementById('d_tinh_luc').innerText = tinhLuc;
-
-  document.getElementById('d_hoat_luc').innerText = `${hoatLuc} / ${maxHoatLuc}`;
-  document.getElementById('mod_hoat_luc').innerText = "(+0)";
-  document.getElementById('mod_hp').innerText = "(+0)";
-  document.getElementById('mod_mp').innerText = "(+0)";
-
-  document.getElementById('p_the_luc').innerText = "(" + Math.round(progTheLuc * 100) + "%)";
-  document.getElementById('p_linh_luc').innerText = "(" + Math.round(progLinhLuc * 100) + "%)";
-  document.getElementById('p_tinh_luc').innerText = "(" + Math.round(progTinhLuc * 100) + "%)";
-}
-
-function openCombatModal() { document.getElementById('combat-modal').style.display = 'flex'; }
-function openCombatTest() { alert('Chức năng Combat Test đang để trống, tối chúng ta làm tiếp!'); }
-function openInventory() { alert('Chức năng Hành Trang đang để trống, tối chúng ta làm tiếp!'); }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-function startCombat(tier, rewardType) {
-  hoatLuc = Math.max(0, hoatLuc - 1);
-  localStorage.setItem('game_hoat_luc', hoatLuc);
-
-  let baseGain = 0.05;
-  if (rewardType === 'the_luc') {
-    progTheLuc += baseGain; while (progTheLuc >= 1.0) { theLuc += 1; progTheLuc -= 1.0; }
-    localStorage.setItem('game_the_luc', theLuc); localStorage.setItem('game_prog_the_luc', progTheLuc.toFixed(2));
-  } else if (rewardType === 'linh_luc') {
-    progLinhLuc += baseGain; while (progLinhLuc >= 1.0) { linhLuc += 1; progLinhLuc -= 1.0; }
-    localStorage.setItem('game_linh_luc', linhLuc); localStorage.setItem('game_prog_linh_luc', progLinhLuc.toFixed(2));
-  } else {
-    progTinhLuc += baseGain; while (progTinhLuc >= 1.0) { tinhLuc += 1; progTinhLuc -= 1.0; }
-    localStorage.setItem('game_tinh_luc', tinhLuc); localStorage.setItem('game_prog_prog_tinh_luc', progTinhLuc.toFixed(2));
-  }
-
-  closeModal('combat-modal');
-  updateUI();
-  alert(`⚔️ Chiến thắng quái! Nhận tiến độ tu luyện.`);
+function resetCharacter() {
+    if (confirm('Ngươi có chắc muốn bỏ đi ký ức hiện tại để Trùng Sinh?')) {
+        localStorage.clear();
+        window.location.href = 'index.html';
+    }
 }
 </script>
+
 </body>
 </html>
