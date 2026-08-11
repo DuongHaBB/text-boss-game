@@ -23,8 +23,8 @@ button:hover { background: #383838; }
 .reward-btn { width: 23%; padding: 6px 2px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 3px; font-size: 10px; text-align: center; font-family: inherit; }
 .reward-btn:hover { background: #383838; border-color: #d4af37; }
 .monster-row { display: flex; justify-content: space-between; }
-.effect-row-item { font-size: 12px; color: #ccc; padding: 6px 0; border-bottom: 1px dashed #333; display: flex; justify-content: space-between; text-align: left; }
 .stat-val-wrap { display: flex; align-items: center; gap: 4px; }
+.modifier { font-size: 0.9em; color: #9ca3af; }
 </style>
 </head>
 <body>
@@ -44,14 +44,16 @@ button:hover { background: #383838; }
 
 <hr>
 <h4 style="color: #888; margin: 6px 0 4px 0;">CHỈ SỐ CHIẾN ĐẤU</h4>
-<div class="stat-item"><span>Huyết Khí:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_hp" style="color: #e74c3c;">100 / 100</span></div></div>
-<div class="stat-item"><span>Linh Khí:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_mp" style="color: #3498db;">100 / 100</span></div></div>
-<div class="stat-item"><span>Hoạt Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_hoat_luc" style="color: #2ecc71;">21 / 21</span></div></div>
+<div class="stat-item"><span>Huyết Khí:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_hp" style="color: #e74c3c;">100 / 100</span><span class="modifier" id="mod_hp">(+0)</span></div></div>
+<div class="stat-item"><span>Linh Khí:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_mp" style="color: #3498db;">100 / 100</span><span class="modifier" id="mod_mp">(+0)</span></div></div>
+<div class="stat-item"><span>Hoạt Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_hoat_luc" style="color: #2ecc71;">21 / 21</span><span class="modifier" id="mod_hoat_luc">(+0)</span></div></div>
 <div class="stat-item"><span>Tốc Lực:</span> <span class="stat-value" id="d_speed">0</span></div>
 <div class="stat-item"><span>Hệ Sát Thương:</span> <span class="stat-value" id="d_dmg_type" style="color: #3498db;">Vật Lý</span></div>
 <div class="stat-item"><span>Sát Thương:</span> <span class="stat-value" id="d_atk_val">0</span></div>
 
 <button class="combat-btn" onclick="openCombatModal()">⚔️ Săn Quái & Hấp Thu Nguyên Khí</button>
+<button onclick="openCombatTest()" style="background: #15202b; border-color: #3498db; color: #3498db;">🧪 Combat Test</button>
+<button onclick="openInventory()" style="background: #201a0e; border-color: #d4af37; color: #d4af37;">🎒 Hành Trang</button>
 <button onclick="resetGameData()" style="background: #2a1111; border-color: #e74c3c; color: #e74c3c; margin-top: 15px;">🔄 Tạo Lại Nhân Vật Khác</button>
 </div>
 
@@ -129,12 +131,18 @@ function updateUI() {
   document.getElementById('d_tinh_luc').innerText = tinhLuc;
 
   document.getElementById('d_hoat_luc').innerText = `${hoatLuc} / ${maxHoatLuc}`;
+  document.getElementById('mod_hoat_luc').innerText = "(+0)";
+  document.getElementById('mod_hp').innerText = "(+0)";
+  document.getElementById('mod_mp').innerText = "(+0)";
+
   document.getElementById('p_the_luc').innerText = "(" + Math.round(progTheLuc * 100) + "%)";
   document.getElementById('p_linh_luc').innerText = "(" + Math.round(progLinhLuc * 100) + "%)";
   document.getElementById('p_tinh_luc').innerText = "(" + Math.round(progTinhLuc * 100) + "%)";
 }
 
 function openCombatModal() { document.getElementById('combat-modal').style.display = 'flex'; }
+function openCombatTest() { alert('Chức năng Combat Test đang để trống, tối chúng ta làm tiếp!'); }
+function openInventory() { alert('Chức năng Hành Trang đang để trống, tối chúng ta làm tiếp!'); }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
 function startCombat(tier, rewardType) {
