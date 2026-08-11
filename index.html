@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Cưu Mệnh - Khởi Đầu Tu Tiên</title>
+<title>Cửu Mệnh - Quyển 1: Xuân Thu Như Mộng</title>
 <style>
 body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
 .panel { background: #1a1a1a; padding: 25px 30px; border-radius: 8px; width: 440px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); text-align: center; }
@@ -40,7 +40,7 @@ button.action-btn:hover { background: #153822; }
 <body>
 
 <div class="panel">
-    <h2>CƯU MỆNH</h2>
+    <h2>CỬU MỆNH</h2>
     <div class="subtitle">Quyển 1: Xuân Thu Như Mộng</div>
     
     <!-- Thanh Tab -->
@@ -55,16 +55,16 @@ button.action-btn:hover { background: #153822; }
         <button id="btn-resume" class="action-btn" onclick="resumeGame()" style="display:none; background: #15202b; border-color: #3498db; color: #3498db;">🚀 Tiếp Tịch Hành Trình</button>
     </div>
 
-    <!-- TAB 2: TRÙNG SINH (Tạo Nhân Vật Mới) -->
+    <!-- TAB 2: TRÙNG SINH -->
     <div id="tab-reborn" class="tab-content">
         <div style="font-size: 12px; color: #aaa; margin-bottom: 8px;">Lựa chọn thân xác và thế lực khởi đầu:</div>
         
-        <label>Đạo Hiệu / Tên Nhân Vật:</label>
-        <input type="text" id="char_name" placeholder="Nhập đạo hiệu của ngươi..." value="Mèo Đen">
+        <label>Danh Xưng:</label>
+        <input type="text" id="char_name" placeholder="Nhập danh xưng của ngươi..." value="Mèo Đen">
 
         <label>Xuất Thân Vực Giới:</label>
         <select id="realm_select">
-            <option value="xich_hoa">Xích Hỏa Vực (Tăng mạnh Thể Lực, kháng hỏa độc)</option>
+            <option value="xich_hoa">Xích Hỏa Vực (+5 Thể lực, x2 tốc độ tu luyện thể lực)</option>
             <option value="tam_sac">Tam Sắc Phủ (+5 Tinh Lực, x2 tốc độ thu thập)</option>
             <option value="bach_ngoc">Bạch Ngọc Đài (+5 Linh Lực, tăng ngộ tính)</option>
         </select>
@@ -145,13 +145,13 @@ function checkSaveData() {
     const resumeBtn = document.getElementById('btn-resume');
 
     if (!savedName) {
-        saveContainer.innerHTML = `<div class="empty-save">Chưa phát hiện linh hồn ký ức nào.<br>Hãy chọn "Trùng Sinh" để bắt đầu bước chân vào Cưu Mệnh.</div>`;
+        saveContainer.innerHTML = `<div class="empty-save">Chưa phát hiện linh hồn ký ức nào.<br>Hãy chọn "Trùng Sinh" để bắt đầu bước chân vào Cửu Mệnh.</div>`;
         resumeBtn.style.display = 'none';
     } else {
         const travelerId = localStorage.getItem('game_traveler_id') || '395';
         const realmKey = localStorage.getItem('game_realm') || 'xich_hoa';
         const realmsMap = { 
-            'xich_hoa': 'Xích Hỏa Vực (Tăng mạnh Thể Lực, kháng hỏa độc)', 
+            'xich_hoa': 'Xích Hỏa Vực (+5 Thể lực, x2 tốc độ tu luyện thể lực)', 
             'tam_sac': 'Tam Sắc Phủ (+5 Tinh Lực, x2 tốc độ thu thập)', 
             'bach_ngoc': 'Bạch Ngọc Đài (+5 Linh Lực, tăng ngộ tính)' 
         };
@@ -160,7 +160,7 @@ function checkSaveData() {
         saveContainer.innerHTML = `
             <div class="save-info">
                 <div><b>Lữ khách:</b> #${travelerId}</div>
-                <div><b>Đạo hiệu:</b> <span style="color:#d4af37">${savedName}</span></div>
+                <div><b>Danh xưng:</b> <span style="color:#d4af37">${savedName}</span></div>
                 <div><b>Vực giới:</b> ${realmsMap[realmKey]}</div>
                 <div><b>Cảnh giới:</b> Phàm Kỳ (${theLuc})</div>
                 <div style="font-size:11px; color:#888; margin-top:6px;">Tiến trình: Tân Thủ Thôn - Khởi đầu</div>
@@ -179,7 +179,7 @@ function createNewCharacter() {
     const realm = document.getElementById('realm_select').value;
 
     if (!name) {
-        alert('Vui lòng nhập đạo hiệu cho nhân vật!');
+        alert('Vui lòng nhập danh xưng cho nhân vật!');
         return;
     }
 
@@ -195,7 +195,7 @@ function createNewCharacter() {
     
     localStorage.setItem('game_prog_the_luc', 0);
     localStorage.setItem('game_prog_linh_luc', 0);
-    localStorage.setItem('game_prog_prog_tinh_luc', 0);
+    localStorage.setItem('game_prog_tinh_luc', 0);
     localStorage.setItem('game_period', 1);
     localStorage.setItem('game_is_bottleneck', 'false');
     localStorage.setItem('game_hoat_luc', 20);
