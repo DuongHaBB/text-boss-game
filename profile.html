@@ -12,7 +12,7 @@ body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: fle
 .warning-text { color: #e74c3c; font-weight: bold; animation: pulse 1.5s infinite; }
 @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 hr { border: 0; border-top: 1px solid #333; margin: 10px 0; }
-button { width: 100%; padding: 10px; margin-top: 6px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 4px; font-size: 13px; }
+button { width: 100%; padding: 10px; margin-top: 6px; background: #262626; color: #fff; border: 1px solid #555; cursor: pointer; border-radius: 4px; font-size: 13px; font-family: inherit; }
 button:hover { background: #383838; }
 .combat-btn { background: #0f2a1a; border-color: #2ecc71; color: #2ecc71; font-weight: bold; }
 
@@ -24,59 +24,38 @@ button:hover { background: #383838; }
 .reward-btn:hover { background: #383838; border-color: #d4af37; }
 .monster-row { display: flex; justify-content: space-between; }
 .effect-row-item { font-size: 12px; color: #ccc; padding: 6px 0; border-bottom: 1px dashed #333; display: flex; justify-content: space-between; text-align: left; }
-
-/* CSS hỗ trợ hiển thị modifier cộng/trừ chỉ số */
 .stat-val-wrap { display: flex; align-items: center; gap: 4px; }
-.modifier { font-size: 0.9em; }
-.modifier.positive { color: #4ade80; }
-.modifier.negative { color: #f87171; }
-.modifier.neutral { color: #9ca3af; }
 </style>
 </head>
 <body>
+
 <div class="panel" id="main-panel">
 <h2 style="text-align: center; color: #d4af37; margin-top: 0; margin-bottom: 12px;">ĐẠO TỊCH</h2>
 <div class="stat-item"><span id="d_label_traveler">Lữ khách -</span> <span class="stat-value" id="d_identity">-</span></div>
-<div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d_realm">-</span></div>
+<div class="stat-item"><span>Xuất Thân:</span> <span class="stat-value" id="d_realm">-</span></div>
 <div class="stat-item"><span>Cảnh Giới:</span> <span class="stat-value" id="d_rank">Phàm Kỳ</span></div>
 <div class="stat-item" id="bottleneck-status-box" style="display: none;"><span>Trạng thái:</span> <span class="warning-text">Lâm vào bình cảnh!</span></div>
 
 <hr>
 <h4 style="color: #888; margin: 6px 0 4px 0;">TIỀM NĂNG & TIẾN ĐỘ</h4>
-<div class="stat-item"><span>Thể Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_the_luc">0</span><span class="modifier neutral" id="mod_the_luc">(+0)</span> <span class="prog-text" id="p_the_luc">(0%)</span></div></div>
-<div class="stat-item"><span>Linh Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_linh_luc">0</span><span class="modifier neutral" id="mod_linh_luc">(+0)</span> <span class="prog-text" id="p_linh_luc">(0%)</span></div></div>
-<div class="stat-item"><span>Tinh Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_tinh_luc">0</span><span class="modifier neutral" id="mod_tinh_luc">(+0)</span> <span class="prog-text" id="p_tinh_luc">(0%)</span></div></div>
+<div class="stat-item"><span>Thể Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_the_luc">0</span><span class="prog-text" id="p_the_luc">(0%)</span></div></div>
+<div class="stat-item"><span>Linh Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_linh_luc">0</span><span class="prog-text" id="p_linh_luc">(0%)</span></div></div>
+<div class="stat-item"><span>Tinh Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_tinh_luc">0</span><span class="prog-text" id="p_tinh_luc">(0%)</span></div></div>
 
 <hr>
 <h4 style="color: #888; margin: 6px 0 4px 0;">CHỈ SỐ CHIẾN ĐẤU</h4>
-<div class="stat-item"><span>Huyết Khí:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_hp" style="color: #e74c3c;">100 / 100</span><span class="modifier neutral" id="mod_hp">(+0)</span></div></div>
-<div class="stat-item"><span>Linh Khí:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_mp" style="color: #3498db;">100 / 100</span><span class="modifier neutral" id="mod_mp">(+0)</span></div></div>
-<div class="stat-item"><span>Hoạt Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_hoat_luc" style="color: #2ecc71;">21 / 21</span><span class="modifier neutral" id="mod_hoat_luc">(+0)</span></div></div>
+<div class="stat-item"><span>Huyết Khí:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_hp" style="color: #e74c3c;">100 / 100</span></div></div>
+<div class="stat-item"><span>Linh Khí:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_mp" style="color: #3498db;">100 / 100</span></div></div>
+<div class="stat-item"><span>Hoạt Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_hoat_luc" style="color: #2ecc71;">21 / 21</span></div></div>
 <div class="stat-item"><span>Tốc Lực:</span> <span class="stat-value" id="d_speed">0</span></div>
 <div class="stat-item"><span>Hệ Sát Thương:</span> <span class="stat-value" id="d_dmg_type" style="color: #3498db;">Vật Lý</span></div>
 <div class="stat-item"><span>Sát Thương:</span> <span class="stat-value" id="d_atk_val">0</span></div>
-<div class="stat-item"><span>Kháng Vật Lý:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_def_vl">0</span><span class="modifier neutral" id="mod_def_vl">(+0)</span></div></div>
-<div class="stat-item"><span>Kháng Pháp:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_def_p">0</span><span class="modifier neutral" id="mod_def_p">(+0)</span></div></div>
 
 <button class="combat-btn" onclick="openCombatModal()">⚔️ Săn Quái & Hấp Thu Nguyên Khí</button>
-<button onclick="openEffectModal()" style="background: #251d08; border-color: #d4af37; color: #d4af37;">📜 Xem Bảng Hiệu Ứng & Trang Bị</button>
-<button onclick="openDetailsModal()" style="background: #1f1f1f; border-color: #444;">📊 Xem Chi Tiết Giới Hạn Kỳ</button>
-<button onclick="openTestGameplay()" style="background: #11252a; border-color: #3498db; color: #3498db; font-weight: bold;">🧪 Test Gameplay (Sự Kiện)</button>
+<button onclick="resetGameData()" style="background: #2a1111; border-color: #e74c3c; color: #e74c3c; margin-top: 15px;">🔄 Tạo Lại Nhân Vật Khác</button>
 </div>
 
-<!-- Giao diện Test Gameplay -->
-<div class="panel" id="test-gameplay-panel" style="display: none;">
-<h3 style="text-align: center; color: #3498db; margin-top: 0;">🧪 SỰ KIỆN KHÁM PHÁ</h3>
-<div id="story-box" style="background: #141414; padding: 15px; border-radius: 6px; border: 1px solid #333; font-size: 13px; line-height: 1.5; margin-bottom: 15px; color: #ddd;">
-  Bạn chợt thấy 1 con heo rừng chạy băng qua. Bạn quyết định...
-</div>
-<div id="story-actions">
-  <button onclick="actionChaseBoar()" style="background: #0f2a1a; border-color: #2ecc71; color: #2ecc71; font-weight: bold;">🏃 Đuổi theo</button>
-  <button onclick="actionWalkAway()" style="background: #262626; border-color: #555; color: #aaa;">🚶 Đi tiếp (Bỏ qua)</button>
-</div>
-<button onclick="closeTestGameplay()" style="background: #333; margin-top: 15px; border: 1px solid #555; color: #ccc;">⬅ Quay lại Bảng Chính</button>
-</div>
-
+<!-- Modal Săn Quái -->
 <div id="combat-modal" class="modal-overlay">
 <div class="modal-content" style="border-color: #2ecc71;">
 <h3 style="color: #2ecc71; margin-top: 0;">⚔️ CHỌN KHU VỰC SĂN QUÁI</h3>
@@ -89,388 +68,84 @@ button:hover { background: #383838; }
     <button class="reward-btn" onclick="startCombat(1, 'random')">🎲 Ngẫu nhiên</button>
   </div>
 </div>
-<div class="monster-group">
-  <div class="monster-title">2. Quái Tinh Anh (Tổng điểm: 30, Rơi Nội Đan: 50%)</div>
-  <div class="monster-row">
-    <button class="reward-btn" onclick="startCombat(2, 'the_luc')">⚡ Thể</button>
-    <button class="reward-btn" onclick="startCombat(2, 'linh_luc')">💧 Linh</button>
-    <button class="reward-btn" onclick="startCombat(2, 'tinh_luc')">✨ Tinh</button>
-    <button class="reward-btn" onclick="startCombat(2, 'random')">🎲 Ngẫu nhiên</button>
-  </div>
-</div>
-<div class="monster-group">
-  <div class="monster-title">3. Quái Thủ Lĩnh (Tổng điểm: 50, Rơi Nội Đan: 75%)</div>
-  <div class="monster-row">
-    <button class="reward-btn" onclick="startCombat(3, 'the_luc')">⚡ Thể</button>
-    <button class="reward-btn" onclick="startCombat(3, 'linh_luc')">💧 Linh</button>
-    <button class="reward-btn" onclick="startCombat(3, 'tinh_luc')">✨ Tinh</button>
-    <button class="reward-btn" onclick="startCombat(3, 'random')">🎲 Ngẫu nhiên</button>
-  </div>
-</div>
 <button onclick="closeModal('combat-modal')" style="background: #333; margin-top: 6px; border: 1px solid #555; color: #ccc; padding: 6px;">Đóng</button>
-</div>
-</div>
-
-<div id="effect-modal" class="modal-overlay">
-<div class="modal-content" style="border-color: #d4af37;">
-<h3 style="color: #d4af37; margin-top: 0;">📜 HIỆU ỨNG & TRANG BỊ</h3>
-<div id="effect-content-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div>
-<button onclick="closeModal('effect-modal')" style="background: #333; border: 1px solid #555; color: #ccc; padding: 8px;">Đóng</button>
-</div>
-</div>
-
-<div id="details-modal" class="modal-overlay">
-<div class="modal-content" style="border-color: #3498db;">
-<h3 style="color: #3498db; margin-top: 0;">📊 CHI TIẾT GIỚI HẠN KỲ</h3>
-<div class="stat-item"><span>Trần điểm hiện tại:</span> <span class="stat-value" id="d_limit_val">20</span></div>
-<div class="stat-item"><span>Chỉ số cao nhất:</span> <span class="stat-value" id="d_max_stat">0</span></div>
-<button onclick="closeModal('details-modal')" style="background: #333; margin-top: 15px; border: 1px solid #555; color: #ccc; padding: 8px;">Đóng</button>
 </div>
 </div>
 
 <script>
 const REALMS_DATA = { 'xich_hoa': { name: 'Xích Hỏa Vực' }, 'tam_sac': { name: 'Tam Sắc Phủ' }, 'bach_ngoc': { name: 'Bạch Ngọc Đài' } };
-const BOTTLENECK_LIMITS = { 1: 20, 2: 30, 3: 40, 4: 50, 5: 60, 6: 70, 7: 80, 8: 100, 9: 100 };
+const BOTTLENECK_LIMITS = { 1: 20, 2: 30, 3: 40, 4: 50, 5: 60 };
 
-function getRealmNameAndPoint(period, maxStat) {
-  let name = "Phàm Kỳ";
-  if (period === 2) name = "Khai Khiếu Kỳ";
-  else if (period === 3) name = "Bồi Nguyên Kỳ";
-  else if (period === 4) name = "Nội Liễm Kỳ";
-  else if (period === 5) name = "Thăng Hoa Kỳ";
-  else if (period === 6) name = "Đoán Tạo Kỳ";
-  else if (period === 7) name = "Quy Tông Kỳ";
-  else if (period === 8) name = "Hóa Cực Kỳ";
-  else if (period >= 9) name = "Đại Thừa Kỳ";
-  
-  return `${name} (${maxStat})`;
-}
+let theLuc = 0, linhLuc = 0, tinhLuc = 0;
+let progTheLuc = 0, progLinhLuc = 0, progTinhLuc = 0;
+let currentPeriod = 1, isBottleneck = false;
+let maxHoatLuc = 20, hoatLuc = 20;
+let charName = '', travelerId = '', realmKey = '';
 
-const charName = localStorage.getItem('game_character_name');
-const travelerId = localStorage.getItem('game_traveler_id');
-const realmKey = localStorage.getItem('game_realm');
+window.onload = function() {
+  if (!localStorage.getItem('game_character_name')) {
+    window.location.href = 'index.html';
+    return;
+  }
+  initGame();
+};
 
-let theLuc = Number(localStorage.getItem('game_the_luc')) || 0;
-let linhLuc = Number(localStorage.getItem('game_linh_luc')) || 0;
-let tinhLuc = Number(localStorage.getItem('game_tinh_luc')) || 0;
-let progTheLuc = Number(localStorage.getItem('game_prog_the_luc')) || 0;
-let progLinhLuc = Number(localStorage.getItem('game_prog_linh_luc')) || 0;
-let progTinhLuc = Number(localStorage.getItem('game_prog_prog_tinh_luc')) || 0;
-let currentPeriod = Number(localStorage.getItem('game_period')) || 1;
-let isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
+function initGame() {
+  charName = localStorage.getItem('game_character_name');
+  travelerId = localStorage.getItem('game_traveler_id');
+  realmKey = localStorage.getItem('game_realm');
 
-let maxHoatLuc = Math.floor(10 + (tinhLuc / 10) + (currentPeriod * 10));
-let hoatLuc = Number(localStorage.getItem('game_hoat_luc'));
+  theLuc = Number(localStorage.getItem('game_the_luc')) || 0;
+  linhLuc = Number(localStorage.getItem('game_linh_luc')) || 0;
+  tinhLuc = Number(localStorage.getItem('game_tinh_luc')) || 0;
+  progTheLuc = Number(localStorage.getItem('game_prog_the_luc')) || 0;
+  progLinhLuc = Number(localStorage.getItem('game_prog_linh_luc')) || 0;
+  progTinhLuc = Number(localStorage.getItem('game_prog_prog_tinh_luc')) || 0;
+  currentPeriod = Number(localStorage.getItem('game_period')) || 1;
+  isBottleneck = localStorage.getItem('game_is_bottleneck') === 'true';
 
-if (isNaN(hoatLuc) || hoatLuc <= 0 || hoatLuc > maxHoatLuc) {
-  hoatLuc = maxHoatLuc;
-  localStorage.setItem('game_hoat_luc', hoatLuc);
-}
+  maxHoatLuc = Math.floor(10 + (tinhLuc / 10) + (currentPeriod * 10));
+  hoatLuc = Number(localStorage.getItem('game_hoat_luc'));
+  if (isNaN(hoatLuc) || hoatLuc <= 0) hoatLuc = maxHoatLuc;
 
-let itemStvl = Number(localStorage.getItem('item_stvl')) || 0;
-let itemStp = Number(localStorage.getItem('item_stp')) || 0;
-let itemDefVl = Number(localStorage.getItem('item_def_vl')) || 0;
-let itemDefP = Number(localStorage.getItem('item_def_p')) || 0;
-let itemDescName = localStorage.getItem('item_desc_name') || 'Chưa có (Tay không)';
-
-let currentTitleEffect = { name: "🛡️ Bình Thường", desc: "Trạng thái ổn định." };
-
-if (!charName || !travelerId || !realmKey || !REALMS_DATA[realmKey]) {
-  window.location.href = '/';
-} else {
-  checkAndTriggerBottleneck();
   updateUI();
 }
 
-function checkAndTriggerBottleneck() {
-  let maxStat = Math.max(theLuc, linhLuc, tinhLuc);
-  let limit = BOTTLENECK_LIMITS[currentPeriod] || 20;
-  if (maxStat >= limit && !isBottleneck) {
-    isBottleneck = true;
-    localStorage.setItem('game_is_bottleneck', 'true');
-  }
+function resetGameData() {
+  localStorage.clear();
+  window.location.href = 'index.html';
 }
 
 function updateUI() {
-  try {
-    document.getElementById('d_label_traveler').innerText = "Lữ khách " + (travelerId || '---');
-    document.getElementById('d_identity').innerText = charName || 'Vô danh';
-    document.getElementById('d_realm').innerText = REALMS_DATA[realmKey] ? REALMS_DATA[realmKey].name : '---';
+  document.getElementById('d_label_traveler').innerText = "Lữ khách " + (travelerId || '---');
+  document.getElementById('d_identity').innerText = charName || 'Vô danh';
+  document.getElementById('d_realm').innerText = REALMS_DATA[realmKey] ? REALMS_DATA[realmKey].name : '---';
 
-    let maxStat = Math.max(theLuc, linhLuc, tinhLuc);
-    
-    if (theLuc >= 100 && linhLuc >= 100 && tinhLuc >= 100) {
-      document.getElementById('d_rank').innerText = `Hỗn Nguyên Tôn Giả (${maxStat})`;
-    } else {
-      document.getElementById('d_rank').innerText = getRealmNameAndPoint(currentPeriod, maxStat);
-    }
+  let maxStat = Math.max(theLuc, linhLuc, tinhLuc);
+  document.getElementById('d_rank').innerText = `Phàm Kỳ (${maxStat})`;
 
-    document.getElementById('d_the_luc').innerText = theLuc;
-    document.getElementById('d_linh_luc').innerText = linhLuc;
-    document.getElementById('d_tinh_luc').innerText = tinhLuc;
+  document.getElementById('d_the_luc').innerText = theLuc;
+  document.getElementById('d_linh_luc').innerText = linhLuc;
+  document.getElementById('d_tinh_luc').innerText = tinhLuc;
 
-    let oldMaxHoatLuc = maxHoatLuc;
-    maxHoatLuc = Math.floor(10 + (tinhLuc / 10) + (currentPeriod * 10));
-    
-    if (maxHoatLuc > oldMaxHoatLuc) {
-      hoatLuc += (maxHoatLuc - oldMaxHoatLuc);
-    }
-    if (hoatLuc > maxHoatLuc) hoatLuc = maxHoatLuc;
-    localStorage.setItem('game_hoat_luc', hoatLuc);
-
-    // Cập nhật giá trị Hoạt Lực cơ bản & modifier mẫu
-    let baseHoatLuc = hoatLuc;
-    let modHoatLuc = 0; // Thay đổi bằng giá trị item/công pháp nếu có
-    document.getElementById('d_hoat_luc').innerText = `${baseHoatLuc} / ${maxHoatLuc}`;
-    let elModHoatLuc = document.getElementById('mod_hoat_luc');
-    elModHoatLuc.innerText = (modHoatLuc >= 0 ? `(+${modHoatLuc})` : `(${modHoatLuc})`);
-    elModHoatLuc.className = "modifier " + (modHoatLuc > 0 ? "positive" : (modHoatLuc < 0 ? "negative" : "neutral"));
-
-    // Cập nhật Huyết Khí (HP) và Linh Khí (MP) không kèm chữ HP/MP
-    let baseHp = 100 + (theLuc * 10) + (currentPeriod * 50);
-    let baseMp = 100 + (linhLuc * 10) + (currentPeriod * 50);
-    let modHp = 0; // Thay đổi bằng giá trị item nếu có
-    let modMp = 0; // Thay đổi bằng giá trị item nếu có
-
-    document.getElementById('d_hp').innerText = `${baseHp} / ${baseHp}`;
-    let elModHp = document.getElementById('mod_hp');
-    elModHp.innerText = (modHp >= 0 ? `(+${modHp})` : `(${modHp})`);
-    elModHp.className = "modifier " + (modHp > 0 ? "positive" : (modHp < 0 ? "negative" : "neutral"));
-
-    document.getElementById('d_mp').innerText = `${baseMp} / ${baseMp}`;
-    let elModMp = document.getElementById('mod_mp');
-    elModMp.innerText = (modMp >= 0 ? `(+${modMp})` : `(${modMp})`);
-    elModMp.className = "modifier " + (modMp > 0 ? "positive" : (modMp < 0 ? "negative" : "neutral"));
-
-    document.getElementById('p_the_luc').innerText = "(" + Math.round(progTheLuc * 100) + "%)";
-    document.getElementById('p_linh_luc').innerText = "(" + Math.round(progLinhLuc * 100) + "%)";
-    document.getElementById('p_tinh_luc').innerText = "(" + Math.round(progTinhLuc * 100) + "%)";
-
-    let limit = BOTTLENECK_LIMITS[currentPeriod] || 20;
-    document.getElementById('d_limit_val').innerText = limit;
-    document.getElementById('d_max_stat').innerText = maxStat;
-
-    let statusBox = document.getElementById('bottleneck-status-box');
-    if (isBottleneck) {
-      statusBox.style.display = 'flex';
-    } else {
-      statusBox.style.display = 'none';
-    }
-
-    let dmgTypeStr = "Vật Lý";
-    let atkVal = itemStvl + (theLuc / 10);
-
-    if (theLuc === linhLuc && linhLuc === tinhLuc && maxStat > 0) {
-      currentTitleEffect = { name: "👑 Tam Thanh Nhất Khí", desc: "Giảm 50% chỉ số địch, Sát thương x2." };
-      dmgTypeStr = "Hỗn Hợp Tuyệt Đối";
-      atkVal = (itemStvl + (theLuc / 10)) * 2;
-    } else if ((theLuc === linhLuc && theLuc > tinhLuc) || (theLuc === tinhLuc && theLuc > linhLuc) || (linhLuc === tinhLuc && linhLuc > theLuc)) {
-      currentTitleEffect = { name: "⚡ Lưỡng Nghi Đồng Nguyên", desc: "Cân bằng thuộc tính." };
-      dmgTypeStr = "Hỗn Hợp";
-      atkVal = (itemStvl + (theLuc / 10)) * 2;
-    } else {
-      if (linhLuc > theLuc && linhLuc >= tinhLuc) {
-        dmgTypeStr = "Pháp Thuật";
-        atkVal = itemStp + (linhLuc / 10);
-      } else if (tinhLuc > theLuc && tinhLuc > linhLuc) {
-        dmgTypeStr = "Tinh Thần";
-        atkVal = itemStvl + (tinhLuc / 10);
-      } else {
-        dmgTypeStr = "Vật Lý";
-        atkVal = itemStvl + (theLuc / 10);
-      }
-    }
-
-    let displayAtk = isNaN(atkVal) ? "0.0" : Number(atkVal).toFixed(1);
-
-    document.getElementById('d_dmg_type').innerText = dmgTypeStr;
-    document.getElementById('d_atk_val').innerText = displayAtk;
-    
-    document.getElementById('d_def_vl').innerText = (Math.floor(theLuc / 20));
-    document.getElementById('d_def_p').innerText = (Math.floor(linhLuc / 20));
-    
-    let modDefVl = itemDefVl;
-    let elModVl = document.getElementById('mod_def_vl');
-    elModVl.innerText = (modDefVl >= 0 ? `(+${modDefVl})` : `(${modDefVl})`);
-    elModVl.className = "modifier " + (modDefVl > 0 ? "positive" : (modDefVl < 0 ? "negative" : "neutral"));
-
-    let modDefP = itemDefP;
-    let elModP = document.getElementById('mod_def_p');
-    elModP.innerText = (modDefP >= 0 ? `(+${modDefP})` : `(${modDefP})`);
-    elModP.className = "modifier " + (modDefP > 0 ? "positive" : (modDefP < 0 ? "negative" : "neutral"));
-
-    document.getElementById('d_speed').innerText = Number((tinhLuc / 10) + currentPeriod).toFixed(1);
-
-    renderEffectModalContent();
-  } catch (err) {
-    console.error("Lỗi cập nhật UI chi tiết:", err);
-  }
+  document.getElementById('d_hoat_luc').innerText = `${hoatLuc} / ${maxHoatLuc}`;
+  document.getElementById('p_the_luc').innerText = "(" + Math.round(progTheLuc * 100) + "%)";
+  document.getElementById('p_linh_luc').innerText = "(" + Math.round(progLinhLuc * 100) + "%)";
+  document.getElementById('p_tinh_luc').innerText = "(" + Math.round(progTinhLuc * 100) + "%)";
 }
 
-function renderEffectModalContent() {
-  let container = document.getElementById('effect-content-container');
-  if (!container) return;
-  container.innerHTML = '<div style="font-size: 11px; color: #2ecc71; font-weight: bold; margin-bottom:6px;">✨ HIỆU ỨNG:</div>' +
-    '<div class="effect-row-item"><span style="color: #d4af37; font-weight: bold;">' + currentTitleEffect.name + '</span><span>' + currentTitleEffect.desc + '</span></div>' +
-    '<div style="font-size: 11px; color: #2ecc71; font-weight: bold; margin: 10px 0 6px 0;">🛡️ TRANG BỊ Đang MẶC:</div>' +
-    '<div class="effect-row-item"><span style="color: #3498db; font-weight: bold;">' + itemDescName + '</span><span>STVL: +' + itemStvl + ' | STP: +' + itemStp + '<br>Kháng VL: +' + itemDefVl + ' | Kháng P: +' + itemDefP + '</span></div>';
-}
-
-function openCombatModal() {
-  if (isBottleneck) { alert('Đang lâm vào bình cảnh!'); return; }
-  document.getElementById('combat-modal').style.display = 'flex';
-}
-function openEffectModal() { document.getElementById('effect-modal').style.display = 'flex'; }
-function openDetailsModal() { document.getElementById('details-modal').style.display = 'flex'; }
+function openCombatModal() { document.getElementById('combat-modal').style.display = 'flex'; }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-function openTestGameplay() {
-  document.getElementById('main-panel').style.display = 'none';
-  document.getElementById('test-gameplay-panel').style.display = 'block';
-  document.getElementById('story-box').innerHTML = "Bạn chợt thấy 1 con heo rừng chạy băng qua. Bạn quyết định...";
-  document.getElementById('story-actions').style.display = 'block';
-}
-
-function closeTestGameplay() {
-  document.getElementById('test-gameplay-panel').style.display = 'none';
-  document.getElementById('main-panel').style.display = 'block';
-}
-
-function actionWalkAway() {
-  document.getElementById('story-box').innerHTML = "Bạn quyết định bỏ qua và tiếp tục bước đi trên con đường của mình...";
-  document.getElementById('story-actions').style.display = 'none';
-}
-
-function actionChaseBoar() {
-  let playerSpeed = Number(((tinhLuc / 10) + currentPeriod).toFixed(1));
-  let r1 = Math.random();
-  let r2 = Math.random();
-  let low = Math.min(r1, r2);
-  let high = Math.max(r1, r2);
-  let boarThe = Math.floor(low * 20);
-  let boarLinh = Math.floor((high - low) * 20);
-  let boarTinh = 20 - boarThe - boarLinh;
-  let boarSpeed = Number(((boarTinh / 10) + 1).toFixed(1));
-
-  if (boarSpeed <= playerSpeed) {
-    hoatLuc = Math.max(0, hoatLuc - 1);
-    localStorage.setItem('game_hoat_luc', hoatLuc);
-    updateUI();
-
-    let matList = [{ name: 'Nguyên liệu A' }, { name: 'Nguyên liệu B' }, { name: 'Nguyên liệu C' }, { name: 'Nguyên liệu D' }];
-    let totalDropCount = Math.floor(Math.random() * 5);
-    let droppedItemsMap = {};
-    let shuffledMats = [...matList].sort(() => 0.5 - Math.random());
-    let actualDropCount = Math.min(totalDropCount, shuffledMats.length);
-
-    for (let i = 0; i < actualDropCount; i++) {
-      let randQuality = Math.random() * 100;
-      let qualityTier = "Phàm Phẩm";
-      if (randQuality < 2.0) qualityTier = "Thượng Phẩm";
-      else if (randQuality < 35.0) qualityTier = "Trung Phẩm";
-      droppedItemsMap[shuffledMats[i].name + " [" + qualityTier + "]"] = 1;
-    }
-
-    let itemsListText = [];
-    for (let key in droppedItemsMap) itemsListText.push(`- ${key} (x1)`);
-
-    document.getElementById('story-box').innerHTML = 
-      `🏃 Bạn tăng tốc đuổi theo và tóm gọn được con Lợn Rừng!<br>` +
-      `⚔️ Đã tiêu diệt lợn rừng (Tốn 1 Hoạt Lực).<br><br>` +
-      `🎁 <b>Chiến lợi phẩm nhận được:</b><br>` + (itemsListText.length > 0 ? itemsListText.join('<br>') : "Không rơi nguyên liệu nào.");
-    document.getElementById('story-actions').style.display = 'none';
-  } else {
-    hoatLuc = Math.max(0, hoatLuc - 2);
-    localStorage.setItem('game_hoat_luc', hoatLuc);
-    updateUI();
-
-    document.getElementById('story-box').innerHTML = `Bạn đuổi theo mãi mà không kịp - 2 hoạt lực`;
-    document.getElementById('story-actions').style.display = 'none';
-  }
-}
-
 function startCombat(tier, rewardType) {
-  if (isBottleneck) return;
-
-  let totalPoints = 15;
-  if (tier === 2) totalPoints = 30;
-  if (tier === 3) totalPoints = 50;
-
-  let r1 = Math.random();
-  let r2 = Math.random();
-  let low = Math.min(r1, r2);
-  let high = Math.max(r1, r2);
-
-  let monsterThe = Math.floor(low * totalPoints);
-  let monsterLinh = Math.floor((high - low) * totalPoints);
-  let monsterTinh = totalPoints - monsterThe - monsterLinh;
-
-  let maxVal = Math.max(monsterThe, monsterLinh, monsterTinh);
-  let dominantAttr = 'THE';
-  if (maxVal === monsterLinh) dominantAttr = 'LINH';
-  if (maxVal === monsterTinh) dominantAttr = 'TINH';
-
-  let matList = [
-    { name: 'Nguyên liệu A' },
-    { name: 'Nguyên liệu B' },
-    { name: 'Nguyên liệu C' },
-    { name: 'Nguyên liệu D' }
-  ];
-
-  let totalDropCount = Math.floor(Math.random() * 5); 
-  let droppedItemsMap = {};
-  let shuffledMats = [...matList].sort(() => 0.5 - Math.random());
-  let actualDropCount = Math.min(totalDropCount, shuffledMats.length);
-
-  for (let i = 0; i < actualDropCount; i++) {
-    let chosenMat = shuffledMats[i];
-    let randQuality = Math.random() * 100;
-    let qualityTier = "Phàm Phẩm";
-
-    if (tier === 1) {
-      if (randQuality < 0.2) qualityTier = "Thượng Phẩm";
-      else if (randQuality < 5.2) qualityTier = "Trung Phẩm";
-    } else if (tier === 2) {
-      if (randQuality < 2.0) qualityTier = "Thượng Phẩm";
-      else if (randQuality < 35.0) qualityTier = "Trung Phẩm";
-    } else if (tier === 3) {
-      if (randQuality < 5.0) qualityTier = "Thượng Phẩm";
-      else if (randQuality < 75.0) qualityTier = "Trung Phẩm";
-    }
-
-    let keyStr = chosenMat.name + " [" + qualityTier + "]";
-    droppedItemsMap[keyStr] = 1; 
-  }
-
-  let innerCoreFound = null;
-  let coreDropChance = 0;
-  if (tier === 2) coreDropChance = 0.5;
-  if (tier === 3) coreDropChance = 0.75;
-
-  if (tier > 1 && Math.random() < coreDropChance) {
-    let coreName = "Yêu Đan";
-    if (dominantAttr === 'THE') coreName = "Cốt Tủy Yêu Đan";
-    else if (dominantAttr === 'LINH') coreName = "Nguyên Khí Yêu Đan";
-    else coreName = "Thần Phách Yêu Đan";
-    
-    innerCoreFound = coreName + " (x1)";
-  }
-
   hoatLuc = Math.max(0, hoatLuc - 1);
   localStorage.setItem('game_hoat_luc', hoatLuc);
 
-  let baseGain = (tier === 1) ? 0.05 : (tier === 2 ? 0.2 : 0.4);
-  let targetProgType = rewardType;
-  if (rewardType === 'random') {
-    if (dominantAttr === 'THE') targetProgType = 'the_luc';
-    else if (dominantAttr === 'LINH') targetProgType = 'linh_luc';
-    else targetProgType = 'tinh_luc';
-  }
-
-  if (targetProgType === 'the_luc') {
+  let baseGain = 0.05;
+  if (rewardType === 'the_luc') {
     progTheLuc += baseGain; while (progTheLuc >= 1.0) { theLuc += 1; progTheLuc -= 1.0; }
     localStorage.setItem('game_the_luc', theLuc); localStorage.setItem('game_prog_the_luc', progTheLuc.toFixed(2));
-  } else if (targetProgType === 'linh_luc') {
+  } else if (rewardType === 'linh_luc') {
     progLinhLuc += baseGain; while (progLinhLuc >= 1.0) { linhLuc += 1; progLinhLuc -= 1.0; }
     localStorage.setItem('game_linh_luc', linhLuc); localStorage.setItem('game_prog_linh_luc', progLinhLuc.toFixed(2));
   } else {
@@ -478,24 +153,10 @@ function startCombat(tier, rewardType) {
     localStorage.setItem('game_tinh_luc', tinhLuc); localStorage.setItem('game_prog_prog_tinh_luc', progTinhLuc.toFixed(2));
   }
 
-  checkAndTriggerBottleneck();
   closeModal('combat-modal');
   updateUI();
-
-  let itemsListText = [];
-  for (let key in droppedItemsMap) {
-    itemsListText.push(`- ${key} (x1)`);
-  }
-
-  let report = `⚔️ KẾT QUẢ CHIẾN THẮNG QUÁI CẤP ${tier} (Tiêu hao 1 Hoạt Lực)!\n\n` +
-               `🎁 Chiến lợi phẩm nhận được (${itemsListText.length} món):\n` +
-               (itemsListText.length > 0 ? itemsListText.join('\n') : `- Không rơi vật phẩm nguyên liệu nào`) + '\n\n' +
-               (innerCoreFound ? `🌟 BÁU VẬT THU ĐƯỢC:\n- Tìm thấy ${innerCoreFound}` : ``);
-
-  alert(report);
+  alert(`⚔️ Chiến thắng quái! Nhận tiến độ tu luyện.`);
 }
-
-function goBack() { localStorage.clear(); window.location.href = '/'; }
 </script>
 </body>
 </html>
