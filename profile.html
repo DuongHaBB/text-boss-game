@@ -25,7 +25,7 @@ button:hover { background: #383838; }
 .monster-row { display: flex; justify-content: space-between; }
 .effect-row-item { font-size: 12px; color: #ccc; padding: 6px 0; border-bottom: 1px dashed #333; display: flex; justify-content: space-between; text-align: left; }
 
-/* CSS phụ trợ hiển thị modifier cộng/trừ chỉ số */
+/* CSS hỗ trợ hiển thị modifier cộng/trừ chỉ số */
 .stat-val-wrap { display: flex; align-items: center; gap: 4px; }
 .modifier { font-size: 0.9em; }
 .modifier.positive { color: #4ade80; }
@@ -49,9 +49,9 @@ button:hover { background: #383838; }
 
 <hr>
 <h4 style="color: #888; margin: 6px 0 4px 0;">CHỈ SỐ CHIẾN ĐẤU</h4>
-<div class="stat-item"><span>Huyết Khí (HP):</span> <span class="stat-value" id="d_hp" style="color: #e74c3c;">100 / 100</span></div>
-<div class="stat-item"><span>Linh Khí (MP):</span> <span class="stat-value" id="d_mp" style="color: #3498db;">100 / 100</span></div>
-<div class="stat-item"><span>Hoạt Lực:</span> <span class="stat-value" id="d_hoat_luc" style="color: #2ecc71;">21 / 21</span></div>
+<div class="stat-item"><span>Huyết Khí:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_hp" style="color: #e74c3c;">100 / 100</span><span class="modifier neutral" id="mod_hp">(+0)</span></div></div>
+<div class="stat-item"><span>Linh Khí:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_mp" style="color: #3498db;">100 / 100</span><span class="modifier neutral" id="mod_mp">(+0)</span></div></div>
+<div class="stat-item"><span>Hoạt Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_hoat_luc" style="color: #2ecc71;">21 / 21</span><span class="modifier neutral" id="mod_hoat_luc">(+0)</span></div></div>
 <div class="stat-item"><span>Tốc Lực:</span> <span class="stat-value" id="d_speed">0</span></div>
 <div class="stat-item"><span>Hệ Sát Thương:</span> <span class="stat-value" id="d_dmg_type" style="color: #3498db;">Vật Lý</span></div>
 <div class="stat-item"><span>Sát Thương:</span> <span class="stat-value" id="d_atk_val">0</span></div>
@@ -132,7 +132,6 @@ button:hover { background: #383838; }
 const REALMS_DATA = { 'xich_hoa': { name: 'Xích Hỏa Vực' }, 'tam_sac': { name: 'Tam Sắc Phủ' }, 'bach_ngoc': { name: 'Bạch Ngọc Đài' } };
 const BOTTLENECK_LIMITS = { 1: 20, 2: 30, 3: 40, 4: 50, 5: 60, 6: 70, 7: 80, 8: 100, 9: 100 };
 
-// Danh sách tên Cảnh Giới Hán Việt chuẩn hóa theo 9 Kỳ
 function getRealmNameAndPoint(period, maxStat) {
   let name = "Phàm Kỳ";
   if (period === 2) name = "Khai Khiếu Kỳ";
@@ -200,7 +199,6 @@ function updateUI() {
 
     let maxStat = Math.max(theLuc, linhLuc, tinhLuc);
     
-    // Kiểm tra nếu đạt Max Ping toàn diện ở cả 3 nhánh
     if (theLuc >= 100 && linhLuc >= 100 && tinhLuc >= 100) {
       document.getElementById('d_rank').innerText = `Hỗn Nguyên Tôn Giả (${maxStat})`;
     } else {
@@ -220,12 +218,29 @@ function updateUI() {
     if (hoatLuc > maxHoatLuc) hoatLuc = maxHoatLuc;
     localStorage.setItem('game_hoat_luc', hoatLuc);
 
-    document.getElementById('d_hoat_luc').innerText = hoatLuc + " / " + maxHoatLuc;
+    // Cập nhật giá trị Hoạt Lực cơ bản & modifier mẫu
+    let baseHoatLuc = hoatLuc;
+    let modHoatLuc = 0; // Thay đổi bằng giá trị item/công pháp nếu có
+    document.getElementById('d_hoat_luc').innerText = `${baseHoatLuc} / ${maxHoatLuc}`;
+    let elModHoatLuc = document.getElementById('mod_hoat_luc');
+    elModHoatLuc.innerText = (modHoatLuc >= 0 ? `(+${modHoatLuc})` : `(${modHoatLuc})`);
+    elModHoatLuc.className = "modifier " + (modHoatLuc > 0 ? "positive" : (modHoatLuc < 0 ? "negative" : "neutral"));
 
-    let maxHp = 100 + (theLuc * 10) + (currentPeriod * 50);
-    let maxMp = 100 + (linhLuc * 10) + (currentPeriod * 50);
-    document.getElementById('d_hp').innerText = maxHp + " / " + maxHp;
-    document.getElementById('d_mp').innerText = maxMp + " / " + maxMp;
+    // Cập nhật Huyết Khí (HP) và Linh Khí (MP) không kèm chữ HP/MP
+    let baseHp = 100 + (theLuc * 10) + (currentPeriod * 50);
+    let baseMp = 100 + (linhLuc * 10) + (currentPeriod * 50);
+    let modHp = 0; // Thay đổi bằng giá trị item nếu có
+    let modMp = 0; // Thay đổi bằng giá trị item nếu có
+
+    document.getElementById('d_hp').innerText = `${baseHp} / ${baseHp}`;
+    let elModHp = document.getElementById('mod_hp');
+    elModHp.innerText = (modHp >= 0 ? `(+${modHp})` : `(${modHp})`);
+    elModHp.className = "modifier " + (modHp > 0 ? "positive" : (modHp < 0 ? "negative" : "neutral"));
+
+    document.getElementById('d_mp').innerText = `${baseMp} / ${baseMp}`;
+    let elModMp = document.getElementById('mod_mp');
+    elModMp.innerText = (modMp >= 0 ? `(+${modMp})` : `(${modMp})`);
+    elModMp.className = "modifier " + (modMp > 0 ? "positive" : (modMp < 0 ? "negative" : "neutral"));
 
     document.getElementById('p_the_luc').innerText = "(" + Math.round(progTheLuc * 100) + "%)";
     document.getElementById('p_linh_luc').innerText = "(" + Math.round(progLinhLuc * 100) + "%)";
@@ -271,11 +286,9 @@ function updateUI() {
     document.getElementById('d_dmg_type').innerText = dmgTypeStr;
     document.getElementById('d_atk_val').innerText = displayAtk;
     
-    // Cập nhật chỉ số phòng thủ và kháng kèm modifier mẫu (có thể thay thế giá trị item thực tế)
     document.getElementById('d_def_vl').innerText = (Math.floor(theLuc / 20));
     document.getElementById('d_def_p').innerText = (Math.floor(linhLuc / 20));
     
-    // Ví dụ gán modifier item cho kháng vật lý / kháng pháp (nếu có)
     let modDefVl = itemDefVl;
     let elModVl = document.getElementById('mod_def_vl');
     elModVl.innerText = (modDefVl >= 0 ? `(+${modDefVl})` : `(${modDefVl})`);
