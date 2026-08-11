@@ -24,6 +24,13 @@ button:hover { background: #383838; }
 .reward-btn:hover { background: #383838; border-color: #d4af37; }
 .monster-row { display: flex; justify-content: space-between; }
 .effect-row-item { font-size: 12px; color: #ccc; padding: 6px 0; border-bottom: 1px dashed #333; display: flex; justify-content: space-between; text-align: left; }
+
+/* CSS phụ trợ hiển thị modifier cộng/trừ chỉ số */
+.stat-val-wrap { display: flex; align-items: center; gap: 4px; }
+.modifier { font-size: 0.9em; }
+.modifier.positive { color: #4ade80; }
+.modifier.negative { color: #f87171; }
+.modifier.neutral { color: #9ca3af; }
 </style>
 </head>
 <body>
@@ -31,14 +38,14 @@ button:hover { background: #383838; }
 <h2 style="text-align: center; color: #d4af37; margin-top: 0; margin-bottom: 12px;">ĐẠO TỊCH</h2>
 <div class="stat-item"><span id="d_label_traveler">Lữ khách -</span> <span class="stat-value" id="d_identity">-</span></div>
 <div class="stat-item"><span>Khu vực sinh ra:</span> <span class="stat-value" id="d_realm">-</span></div>
-<div class="stat-item"><span>Cảnh Giới:</span> <span class="stat-value" id="d_rank">Kỳ 1</span></div>
+<div class="stat-item"><span>Cảnh Giới:</span> <span class="stat-value" id="d_rank">Phàm Kỳ</span></div>
 <div class="stat-item" id="bottleneck-status-box" style="display: none;"><span>Trạng thái:</span> <span class="warning-text">Lâm vào bình cảnh!</span></div>
 
 <hr>
 <h4 style="color: #888; margin: 6px 0 4px 0;">TIỀM NĂNG & TIẾN ĐỘ</h4>
-<div class="stat-item"><span>Thể Lực:</span> <div><span class="stat-value" id="d_the_luc">0</span> <span class="prog-text" id="p_the_luc">(0%)</span></div></div>
-<div class="stat-item"><span>Linh Lực:</span> <div><span class="stat-value" id="d_linh_luc">0</span> <span class="prog-text" id="p_linh_luc">(0%)</span></div></div>
-<div class="stat-item"><span>Tinh Lực:</span> <div><span class="stat-value" id="d_tinh_luc">0</span> <span class="prog-text" id="p_tinh_luc">(0%)</span></div></div>
+<div class="stat-item"><span>Thể Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_the_luc">0</span><span class="modifier neutral" id="mod_the_luc">(+0)</span> <span class="prog-text" id="p_the_luc">(0%)</span></div></div>
+<div class="stat-item"><span>Linh Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_linh_luc">0</span><span class="modifier neutral" id="mod_linh_luc">(+0)</span> <span class="prog-text" id="p_linh_luc">(0%)</span></div></div>
+<div class="stat-item"><span>Tinh Lực:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_tinh_luc">0</span><span class="modifier neutral" id="mod_tinh_luc">(+0)</span> <span class="prog-text" id="p_tinh_luc">(0%)</span></div></div>
 
 <hr>
 <h4 style="color: #888; margin: 6px 0 4px 0;">CHỈ SỐ CHIẾN ĐẤU</h4>
@@ -48,8 +55,8 @@ button:hover { background: #383838; }
 <div class="stat-item"><span>Tốc Lực:</span> <span class="stat-value" id="d_speed">0</span></div>
 <div class="stat-item"><span>Hệ Sát Thương:</span> <span class="stat-value" id="d_dmg_type" style="color: #3498db;">Vật Lý</span></div>
 <div class="stat-item"><span>Sát Thương:</span> <span class="stat-value" id="d_atk_val">0</span></div>
-<div class="stat-item"><span>Kháng Vật Lý:</span> <span class="stat-value" id="d_def_vl">0</span></div>
-<div class="stat-item"><span>Kháng Pháp:</span> <span class="stat-value" id="d_def_p">0</span></div>
+<div class="stat-item"><span>Kháng Vật Lý:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_def_vl">0</span><span class="modifier neutral" id="mod_def_vl">(+0)</span></div></div>
+<div class="stat-item"><span>Kháng Pháp:</span> <div class="stat-val-wrap"><span class="stat-value" id="d_def_p">0</span><span class="modifier neutral" id="mod_def_p">(+0)</span></div></div>
 
 <button class="combat-btn" onclick="openCombatModal()">⚔️ Săn Quái & Hấp Thu Nguyên Khí</button>
 <button onclick="openEffectModal()" style="background: #251d08; border-color: #d4af37; color: #d4af37;">📜 Xem Bảng Hiệu Ứng & Trang Bị</button>
@@ -123,7 +130,22 @@ button:hover { background: #383838; }
 
 <script>
 const REALMS_DATA = { 'xich_hoa': { name: 'Xích Hỏa Vực' }, 'tam_sac': { name: 'Tam Sắc Phủ' }, 'bach_ngoc': { name: 'Bạch Ngọc Đài' } };
-const BOTTLENECK_LIMITS = { 1: 20, 2: 50, 3: 100, 4: 200, 5: 400, 6: 800, 7: 1600, 8: 3200, 9: 6400, 10: 12800 };
+const BOTTLENECK_LIMITS = { 1: 20, 2: 30, 3: 40, 4: 50, 5: 60, 6: 70, 7: 80, 8: 100, 9: 100 };
+
+// Danh sách tên Cảnh Giới Hán Việt chuẩn hóa theo 9 Kỳ
+function getRealmNameAndPoint(period, maxStat) {
+  let name = "Phàm Kỳ";
+  if (period === 2) name = "Khai Khiếu Kỳ";
+  else if (period === 3) name = "Bồi Nguyên Kỳ";
+  else if (period === 4) name = "Nội Liễm Kỳ";
+  else if (period === 5) name = "Thăng Hoa Kỳ";
+  else if (period === 6) name = "Đoán Tạo Kỳ";
+  else if (period === 7) name = "Quy Tông Kỳ";
+  else if (period === 8) name = "Hóa Cực Kỳ";
+  else if (period >= 9) name = "Đại Thừa Kỳ";
+  
+  return `${name} (${maxStat})`;
+}
 
 const charName = localStorage.getItem('game_character_name');
 const travelerId = localStorage.getItem('game_traveler_id');
@@ -175,7 +197,15 @@ function updateUI() {
     document.getElementById('d_label_traveler').innerText = "Lữ khách " + (travelerId || '---');
     document.getElementById('d_identity').innerText = charName || 'Vô danh';
     document.getElementById('d_realm').innerText = REALMS_DATA[realmKey] ? REALMS_DATA[realmKey].name : '---';
-    document.getElementById('d_rank').innerText = "Kỳ " + currentPeriod;
+
+    let maxStat = Math.max(theLuc, linhLuc, tinhLuc);
+    
+    // Kiểm tra nếu đạt Max Ping toàn diện ở cả 3 nhánh
+    if (theLuc >= 100 && linhLuc >= 100 && tinhLuc >= 100) {
+      document.getElementById('d_rank').innerText = `Hỗn Nguyên Tôn Giả (${maxStat})`;
+    } else {
+      document.getElementById('d_rank').innerText = getRealmNameAndPoint(currentPeriod, maxStat);
+    }
 
     document.getElementById('d_the_luc').innerText = theLuc;
     document.getElementById('d_linh_luc').innerText = linhLuc;
@@ -192,7 +222,6 @@ function updateUI() {
 
     document.getElementById('d_hoat_luc').innerText = hoatLuc + " / " + maxHoatLuc;
 
-    // Tính toán HP (Huyết Khí) và MP (Linh Khí) cơ bản
     let maxHp = 100 + (theLuc * 10) + (currentPeriod * 50);
     let maxMp = 100 + (linhLuc * 10) + (currentPeriod * 50);
     document.getElementById('d_hp').innerText = maxHp + " / " + maxHp;
@@ -202,7 +231,6 @@ function updateUI() {
     document.getElementById('p_linh_luc').innerText = "(" + Math.round(progLinhLuc * 100) + "%)";
     document.getElementById('p_tinh_luc').innerText = "(" + Math.round(progTinhLuc * 100) + "%)";
 
-    let maxStat = Math.max(theLuc, linhLuc, tinhLuc);
     let limit = BOTTLENECK_LIMITS[currentPeriod] || 20;
     document.getElementById('d_limit_val').innerText = limit;
     document.getElementById('d_max_stat').innerText = maxStat;
@@ -242,8 +270,22 @@ function updateUI() {
 
     document.getElementById('d_dmg_type').innerText = dmgTypeStr;
     document.getElementById('d_atk_val').innerText = displayAtk;
-    document.getElementById('d_def_vl').innerText = (itemDefVl + Math.floor(theLuc / 20));
-    document.getElementById('d_def_p').innerText = (itemDefP + Math.floor(linhLuc / 20));
+    
+    // Cập nhật chỉ số phòng thủ và kháng kèm modifier mẫu (có thể thay thế giá trị item thực tế)
+    document.getElementById('d_def_vl').innerText = (Math.floor(theLuc / 20));
+    document.getElementById('d_def_p').innerText = (Math.floor(linhLuc / 20));
+    
+    // Ví dụ gán modifier item cho kháng vật lý / kháng pháp (nếu có)
+    let modDefVl = itemDefVl;
+    let elModVl = document.getElementById('mod_def_vl');
+    elModVl.innerText = (modDefVl >= 0 ? `(+${modDefVl})` : `(${modDefVl})`);
+    elModVl.className = "modifier " + (modDefVl > 0 ? "positive" : (modDefVl < 0 ? "negative" : "neutral"));
+
+    let modDefP = itemDefP;
+    let elModP = document.getElementById('mod_def_p');
+    elModP.innerText = (modDefP >= 0 ? `(+${modDefP})` : `(${modDefP})`);
+    elModP.className = "modifier " + (modDefP > 0 ? "positive" : (modDefP < 0 ? "negative" : "neutral"));
+
     document.getElementById('d_speed').innerText = Number((tinhLuc / 10) + currentPeriod).toFixed(1);
 
     renderEffectModalContent();
