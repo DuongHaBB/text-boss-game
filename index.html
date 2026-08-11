@@ -2,161 +2,155 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Cửu Mệnh - Khởi Tạo Đạo Giả</title>
+<title>Đạo Tịch - Khởi Đầu Tu Tiên</title>
 <style>
-body { background: #0c0c0c; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-.panel { background: #161616; padding: 30px; border-radius: 8px; width: 440px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.9); }
-h2 { text-align: center; color: #d4af37; margin-top: 0; margin-bottom: 5px; letter-spacing: 2px; }
-.sub-title { text-align: center; color: #777; font-size: 12px; font-style: italic; margin-bottom: 20px; }
-.form-group { margin-bottom: 16px; }
-label { display: block; font-size: 12px; color: #aaa; margin-bottom: 6px; font-weight: bold; }
-input[type="text"], select { width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; font-family: inherit; box-sizing: border-box; }
-input[type="text"]:focus, select:focus { border-color: #d4af37; outline: none; }
-.stat-row { display: flex; justify-content: space-between; align-items: center; background: #1f1f1f; padding: 8px 12px; border-radius: 4px; margin-bottom: 8px; border: 1px solid #282828; }
-.stat-info { font-size: 12px; color: #ccc; }
-.btn-ctrl { background: #2a2a2a; color: #fff; border: 1px solid #555; width: 28px; height: 28px; cursor: pointer; border-radius: 3px; font-weight: bold; }
-.btn-ctrl:hover { background: #444; border-color: #d4af37; }
-.points-left { color: #2ecc71; font-weight: bold; }
-button.submit-btn { width: 100%; padding: 12px; background: #d4af37; color: #0c0c0c; border: none; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 14px; margin-top: 10px; font-family: inherit; }
-button.submit-btn:hover { background: #e6c55c; }
+body { background: #0d0d0d; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+.panel { background: #1a1a1a; padding: 30px; border-radius: 8px; width: 420px; border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.8); text-align: center; }
+h2 { color: #d4af37; margin-top: 0; letter-spacing: 2px; }
+
+/* Hệ thống Tab */
+.tab-container { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+.tab-btn { flex: 1; padding: 10px; background: #262626; color: #888; border: 1px solid #444; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: bold; transition: 0.2s; }
+.tab-btn:first-child { border-radius: 4px 0 0 4px; }
+.tab-btn:last-child { border-radius: 0 4px 4px 0; }
+.tab-btn.active { background: #15202b; color: #3498db; border-color: #3498db; }
+
+.tab-content { display: none; text-align: left; }
+.tab-content.active { display: block; }
+
+/* Form Elements */
+label { display: block; margin-top: 12px; font-size: 12px; color: #aaa; }
+input, select { width: 100%; padding: 10px; margin-top: 5px; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; font-family: inherit; box-sizing: border-box; }
+button.action-btn { width: 100%; padding: 12px; margin-top: 20px; background: #0f2a1a; color: #2ecc71; border: 1px solid #2ecc71; cursor: pointer; border-radius: 4px; font-size: 14px; font-weight: bold; font-family: inherit; }
+button.action-btn:hover { background: #153822; }
+.save-info { background: #141414; padding: 12px; border: 1px solid #333; border-radius: 4px; margin-bottom: 15px; font-size: 13px; color: #ccc; }
+.empty-save { color: #e74c3c; font-style: italic; text-align: center; padding: 20px 0; }
 </style>
 </head>
 <body>
 
 <div class="panel">
-  <h2>🐾 CỬU MỆNH 🐾</h2>
-  <div class="sub-title">Quyển 1: Xuân Thu như mộng</div>
-
-  <div class="form-group">
-    <label>1. Nhập Tên Main:</label>
-    <input type="text" id="input-name" placeholder="Ví dụ: Phương Nguyên...">
-  </div>
-
-  <div class="form-group">
-    <label>2. Xuất Thân (+5 điểm ưu thế theo vùng):</label>
-    <select id="select-realm" onchange="onRealmChange()">
-      <option value="xich_hoa">Xích Hỏa Vực (+5 Thể Lực & Hấp thu Thể Lực x2)</option>
-      <option value="tam_sac">Tam Sắc Phủ (+5 Linh Lực & Hấp thu Linh Lực x2)</option>
-      <option value="bach_ngoc">Bạch Ngọc Đài (+5 Tinh Lực & Hấp thu Tinh Lực x2)</option>
-    </select>
-  </div>
-
-  <div class="form-group">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-      <label style="margin: 0;">3. Phân bổ 10 điểm tiềm năng tự do:</label>
-      <span style="font-size: 12px;">Còn lại: <span class="points-left" id="lbl-points">10</span> điểm</span>
+    <h2>ĐẠO TỊCH</h2>
+    
+    <!-- Thanh Tab -->
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="switchTab('continue')">Chơi Tiếp</button>
+        <button class="tab-btn" onclick="switchTab('reborn')">Trùng Sinh</button>
     </div>
 
-    <div class="stat-row">
-      <span class="stat-info" id="txt-the">Thể Lực (Gốc: 0 + Xuất thân: 5 + Tự do: 0)</span>
-      <div style="display: flex; gap: 6px;">
-        <button class="btn-ctrl" onclick="adjustStat('the', -1)">-</button>
-        <button class="btn-ctrl" onclick="adjustStat('the', 1)">+</button>
-      </div>
+    <!-- TAB 1: CHƠI TIẾP -->
+    <div id="tab-continue" class="tab-content active">
+        <div id="save-game-info">
+            <!-- Dữ liệu lưu sẽ load vào đây bằng JS -->
+        </div>
+        <button id="btn-resume" class="action-btn" onclick="resumeGame()" style="display:none; background: #15202b; border-color: #3498db; color: #3498db;">🚀 Tiếp Tịch Hành Trình</button>
     </div>
 
-    <div class="stat-row">
-      <span class="stat-info" id="txt-linh">Linh Lực (Gốc: 0 + Xuất thân: 0 + Tự do: 0)</span>
-      <div style="display: flex; gap: 6px;">
-        <button class="btn-ctrl" onclick="adjustStat('linh', -1)">-</button>
-        <button class="btn-ctrl" onclick="adjustStat('linh', 1)">+</button>
-      </div>
-    </div>
+    <!-- TAB 2: TRÙNG SINH (Tạo Nhân Vật Mới) -->
+    <div id="tab-reborn" class="tab-content">
+        <div style="font-size: 12px; color: #aaa; margin-bottom: 10px;">Lựa chọn thân xác và thế lực khởi đầu cho vòng đời mới:</div>
+        <label>Đạo Hiệu / Tên Nhân Vật:</label>
+        <input type="text" id="char_name" placeholder="Nhập đạo hiệu của ngươi..." value="Mèo Đen">
 
-    <div class="stat-row">
-      <span class="stat-info" id="txt-tinh">Tinh Lực (Gốc: 0 + Xuất thân: 0 + Tự do: 0)</span>
-      <div style="display: flex; gap: 6px;">
-        <button class="btn-ctrl" onclick="adjustStat('tinh', -1)">-</button>
-        <button class="btn-ctrl" onclick="adjustStat('tinh', 1)">+</button>
-      </div>
-    </div>
-  </div>
+        <label>Mã Lữ Khách:</label>
+        <input type="text" id="traveler_id" value="395">
 
-  <button class="submit-btn" onclick="submitCharacter()">NHẬP THẾ</button>
+        <label>Xuất Thân Vực Giới:</label>
+        <select id="realm_select">
+            <option value="xich_hoa">Xích Hỏa Vực (Tân Thủ Thôn)</option>
+            <option value="tam_sac">Tam Sắc Phủ</option>
+            <option value="bach_ngoc">Bạch Ngọc Đài</option>
+        </select>
+
+        <button class="action-btn" onclick="createNewCharacter()">✨ Bắt Đầu Trùng Sinh</button>
+    </div>
 </div>
 
 <script>
-let remainingPoints = 10;
-let freeThe = 0;
-let freeLinh = 0;
-let freeTinh = 0;
+window.onload = function() {
+    checkSaveData();
+};
 
-document.getElementById('input-name').value = Math.floor(Math.random() * 90000) + 10000;
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-function getRealmBonusType() {
-  let val = document.getElementById('select-realm').value;
-  if (val === 'xich_hoa') return 'the';
-  if (val === 'tam_sac') return 'linh';
-  if (val === 'bach_ngoc') return 'tinh';
-  return 'the';
+    if (tabName === 'continue') {
+        document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+        document.getElementById('tab-continue').classList.add('active');
+        checkSaveData();
+    } else {
+        document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+        document.getElementById('tab-reborn').classList.add('active');
+    }
 }
 
-function onRealmChange() {
-  updateDisplay();
+function checkSaveData() {
+    const savedName = localStorage.getItem('game_character_name');
+    const saveContainer = document.getElementById('save-game-info');
+    const resumeBtn = document.getElementById('btn-resume');
+
+    if (!savedName) {
+        saveContainer.innerHTML = `<div class="empty-save">Chưa phát hiện linh hồn ký ức nào.<br>Hãy chọn "Trùng Sinh" để bắt đầu bước chân vào Đạo Tịch.</div>`;
+        resumeBtn.style.display = 'none';
+    } else {
+        const travelerId = localStorage.getItem('game_traveler_id') || '---';
+        const realmKey = localStorage.getItem('game_realm') || 'xich_hoa';
+        const realmsMap = { 'xich_hoa': 'Xích Hỏa Vực', 'tam_sac': 'Tam Sắc Phủ', 'bach_ngoc': 'Bạch Ngọc Đài' };
+        const theLuc = localStorage.getItem('game_the_luc') || 0;
+        const period = localStorage.getItem('game_period') || 1;
+
+        saveContainer.innerHTML = `
+            <div class="save-info">
+                <div><b>Lữ khách:</b> #${travelerId}</div>
+                <div><b>Đạo hiệu:</b> <span style="color:#d4af37">${savedName}</span></div>
+                <div><b>Vực giới:</b> ${realmsMap[realmKey]}</div>
+                <div><b>Cảnh giới:</b> Phàm Kỳ (${theLuc})</div>
+                <div style="font-size:11px; color:#888; margin-top:6px;">Tiến trình: Tân Thủ Thôn - Khởi đầu</div>
+            </div>
+        `;
+        resumeBtn.style.display = 'block';
+    }
 }
 
-function adjustStat(type, amount) {
-  if (amount > 0 && remainingPoints <= 0) return;
-  
-  if (type === 'the') {
-    if (amount < 0 && freeThe <= 0) return;
-    if (amount > 0) { freeThe += 1; remainingPoints -= 1; }
-    else { freeThe -= 1; remainingPoints += 1; }
-  } else if (type === 'linh') {
-    if (amount < 0 && freeLinh <= 0) return;
-    if (amount > 0) { freeLinh += 1; remainingPoints -= 1; }
-    else { freeLinh -= 1; remainingPoints += 1; }
-  } else if (type === 'tinh') {
-    if (amount < 0 && freeTinh <= 0) return;
-    if (amount > 0) { freeTinh += 1; remainingPoints -= 1; }
-    else { freeTinh -= 1; remainingPoints += 1; }
-  }
-  updateDisplay();
+function resumeGame() {
+    // Chuyển thẳng sang giao diện chính profile.html
+    window.location.href = 'profile.html';
 }
 
-function updateDisplay() {
-  document.getElementById('lbl-points').innerText = remainingPoints;
-  let bonus = getRealmBonusType();
-  
-  let bThe = (bonus === 'the') ? 5 : 0;
-  let bLinh = (bonus === 'linh') ? 5 : 0;
-  let bTinh = (bonus === 'tinh') ? 5 : 0;
+function createNewCharacter() {
+    const name = document.getElementById('char_name').value.trim();
+    const travelerId = document.getElementById('traveler_id').value.trim();
+    const realm = document.getElementById('realm_select').value;
 
-  document.getElementById('txt-the').innerText = `Thể Lực (Gốc: 0 + Xuất thân: ${bThe} + Tự do: ${freeThe})`;
-  document.getElementById('txt-linh').innerText = `Linh Lực (Gốc: 0 + Xuất thân: ${bLinh} + Tự do: ${freeLinh})`;
-  document.getElementById('txt-tinh').innerText = `Tinh Lực (Gốc: 0 + Xuất thân: ${bTinh} + Tự do: ${freeTinh})`;
+    if (!name) {
+        alert('Vui lòng nhập đạo hiệu cho nhân vật!');
+        return;
+    }
+
+    // Ghi dữ liệu khởi tạo mới vào localStorage
+    localStorage.setItem('game_character_name', name);
+    localStorage.setItem('game_traveler_id', travelerId);
+    localStorage.setItem('game_realm', realm);
+    
+    // Reset các chỉ số cơ bản cho nhân vật mới
+    localStorage.setItem('game_the_luc', 0);
+    localStorage.setItem('game_linh_luc', 0);
+    localStorage.setItem('game_tinh_luc', 0);
+    localStorage.setItem('game_prog_the_luc', 0);
+    localStorage.setItem('game_prog_linh_luc', 0);
+    localStorage.setItem('game_prog_prog_tinh_luc', 0);
+    localStorage.setItem('game_period', 1);
+    localStorage.setItem('game_is_bottleneck', 'false');
+    localStorage.setItem('game_hoat_luc', 20);
+    
+    // Thiết lập node cốt truyện ban đầu (Tân Thủ Thôn - Gặp Lão Sư)
+    localStorage.setItem('game_current_node', 'node_intro_01');
+
+    // Chuyển vào game
+    window.location.href = 'profile.html';
 }
-
-function submitCharacter() {
-  let name = document.getElementById('input-name').value.trim();
-  if (!name) { alert('Vui lòng nhập tên nhân vật!'); return; }
-
-  let realmKey = document.getElementById('select-realm').value;
-  let bonus = getRealmBonusType();
-
-  let finalThe = freeThe + (bonus === 'the' ? 5 : 0);
-  let finalLinh = freeLinh + (bonus === 'linh' ? 5 : 0);
-  let finalTinh = freeTinh + (bonus === 'tinh' ? 5 : 0);
-
-  localStorage.setItem('game_character_name', name);
-  localStorage.setItem('game_traveler_id', '#' + Math.floor(Math.random() * 900 + 100));
-  localStorage.setItem('game_realm', realmKey);
-  
-  localStorage.setItem('game_the_luc', finalThe);
-  localStorage.setItem('game_linh_luc', finalLinh);
-  localStorage.setItem('game_tinh_luc', finalTinh);
-
-  localStorage.setItem('game_prog_the_luc', 0);
-  localStorage.setItem('game_prog_linh_luc', 0);
-  localStorage.setItem('game_prog_prog_tinh_luc', 0);
-  localStorage.setItem('game_period', 1);
-  localStorage.setItem('game_is_bottleneck', 'false');
-
-  // Chuyển sang trang profile.html (hoặc game.html tùy bạn đặt tên file chính)
-  window.location.href = 'profile.html'; 
-}
-
-updateDisplay();
 </script>
+
 </body>
 </html>
